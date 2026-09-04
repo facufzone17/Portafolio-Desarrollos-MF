@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# capturas de verificacion
+# Las escriben los scripts de scripts/ para mirar una animacion cuadro a cuadro.
+# Son 19MB de PNG regenerables: el repo no es el lugar.
+/capturas/

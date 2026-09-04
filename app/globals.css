@@ -1,26 +1,457 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * Tokens de Desarrollos MF.
+ *
+ * La paleta es clara: fondo crema y tipografia negra. Los ratios de contraste
+ * estan medidos sobre --bg, no estimados. La tipografia y el peso de los
+ * titulos salen de formastudio.framer.ai, leidos en vivo con CDP: Mona Sans,
+ * titulos en weight 600 con letter-spacing -0.04em.
+ */
+@theme {
+  /* --- Color --- */
+  --color-bg: #f4f0e8;
+  --color-bg-elev: #fbf8f2;
+  --color-text: #17130f;
+  --color-text-muted: #6b6157;
+  --color-line: #dfd7c9;
+
+  /**
+   * Marron claro. Contraste 1,3:1 sobre --bg: es invisible.
+   * SOLO atmosfera (humo, glows, degradados). Nunca texto, borde ni foco.
+   */
+  --color-brand: #d8c3a5;
+
+  /** Marron oscuro. 7:1 sobre --bg. Este es el que se puede leer. */
+  --color-brand-soft: #6b4423;
+
+  /**
+   * Piedra. El fondo del tramo que va de la transicion de proyectos hasta el
+   * final de "Que hacemos" (ver components/fondo/). No es atmosfera: hay texto
+   * apoyado encima, asi que el valor esta elegido por contraste y no por gusto.
+   * A este tono el texto oscuro del sitio ya no sirve (3,7:1): lo que apoya
+   * arriba pasa a ser claro, y da 4,9:1 (ver .sobre-piedra).
+   *
+   * Se probo tambien un gris claro (#999590), que entraba justo en la ventana
+   * donde funcionan a la vez el texto oscuro y los iconos blancos. Se descarto:
+   * lo que hace leer la transicion como "pasaste a una capa de atras" es el
+   * salto de luminancia entre el panel crema y el fondo, y con el gris claro
+   * ese salto casi no existe.
+   *
+   * Es un gris apenas calido, no neutro puro: al lado del crema del sitio, un
+   * gris frio se lee como de otra paleta.
+   */
+  --color-piedra: #6b6763;
+  /** Las curvas de nivel del shader, un gris muy claro sobre la piedra. */
+  --color-piedra-linea: #eceae6;
+
+  /* --- Tipografia --- */
+  --font-sans: var(--font-mona), system-ui, sans-serif;
+
+  /* --- Formas (§3.4) --- */
+  --radius-card: 16px;
+  --radius-btn: 12px;
+
+  /* --- Movimiento (§3.5): una sola gramatica para todo el sitio --- */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-micro: 180ms;
+  --duration-state: 700ms;
+  --duration-reveal: 560ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    /* El scroll siempre es el del navegador. Nada de scroll-jacking (§3.5). */
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    /* Ningun ancho puede desbordar: scroll horizontal prohibido (§2, B1). */
+    overflow-x: clip;
+  }
+
+  /**
+   * Titulos: peso 600 y tracking -0.04em, como la referencia (medido en vivo:
+   * su titular de 163px va en 600 con -6,5px). El peso 400 anterior venia de
+   * nyro, que es otro sitio y otra tipografia.
+   */
+  h1, h2, h3 {
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  /**
+   * Foco visible. El outline por defecto no alcanza (§2, B3), y --brand no se
+   * puede usar para esto: no se ve sobre el crema. Va --brand-soft.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-soft);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Todo target tocable llega a 44px (§2, B1). */
+  a, button {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/**
+ * prefers-reduced-motion se resuelve una sola vez y de raiz.
+ * Por componente es la regla mas facil de olvidar, y el brief la marca como
+ * no negociable: humo estatico, palabra fija, camino dibujado, sin reveals.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * CSS recomendado por Lenis (ver lib/useLenis.ts). Lenis mueve el scroll a
+ * mano, cuadro a cuadro: si el navegador tambien intenta interpolar con
+ * `scroll-behavior: smooth`, los dos compiten y el resultado tiembla. Por
+ * eso se fuerza `auto` scopeado a `html.lenis`, la clase que Lenis agrega
+ * solo cuando esta corriendo (no toca el `smooth` de mas arriba, que sigue
+ * siendo el fallback sin JS o mientras Lenis todavia no monto).
+ */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/**
+ * Ventana de demos de "Que hacemos".
+ *
+ * La entrada y la salida se resuelven con CSS nativo (`@starting-style` mas
+ * `allow-discrete`) y no con estado de React: asi `close()` puede llamarse
+ * derecho, sin temporizadores que sincronizar, y el navegador se encarga de
+ * mantener el elemento vivo mientras se va. En un navegador sin
+ * `allow-discrete` la ventana cierra de golpe, que es la degradacion correcta.
+ *
+ * El bloque de prefers-reduced-motion de mas arriba ya deja todo esto en 0ms.
+ */
+.ventana-demos {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 220ms var(--ease-out-soft),
+    transform 220ms var(--ease-out-soft),
+    overlay 220ms allow-discrete,
+    display 220ms allow-discrete;
+}
+
+.ventana-demos[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .ventana-demos[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.ventana-demos::backdrop {
+  background-color: rgba(23, 19, 15, 0.45);
+  opacity: 0;
+  transition:
+    opacity 220ms var(--ease-out-soft),
+    overlay 220ms allow-discrete,
+    display 220ms allow-discrete;
+}
+
+.ventana-demos[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .ventana-demos[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/**
+ * Scroll sin barra visible.
+ *
+ * En Windows/Chrome la barra por defecto trae flechitas grises: rompe con
+ * todo el resto del sitio, que no tiene ni un elemento nativo del sistema
+ * operativo a la vista. El scroll sigue andando (rueda, arrastre, teclado);
+ * lo unico que se saca es el dibujo de la barra.
+ */
+.sin-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Edge viejo */
+}
+
+.sin-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/**
+ * Pantalla de entrada (components/intro/Intro.tsx).
+ *
+ * El JS solo escribe cuatro numeros en el nodo raiz; el mapeo a transform y
+ * opacidad vive aca, y llega a las dos copias del escenario por herencia.
+ *
+ * OJO: ni un `will-change` adentro de las mitades. Promueve el elemento a su
+ * propia capa, se escapa del `overflow: hidden` que lo recorta y la apertura
+ * deja de funcionar (mismo problema que costo una hora en el hero).
+ */
+[data-intro] {
+  --intro-escala: 1;
+  --intro-velo: 0;
+  --intro-abrir: 0;
+  --intro-fondo: 0;
+  --intro-cinta-a: 0;
+  --intro-cinta-b: 0;
+  --intro-cinta-c: 0;
+  --intro-cinta-d: 0;
+  --intro-cintas-op: 1;
+}
+
+[data-intro-mitad="arriba"] {
+  transform: translate3d(0, calc(var(--intro-abrir) * -100%), 0);
+}
+
+[data-intro-mitad="abajo"] {
+  transform: translate3d(0, calc(var(--intro-abrir) * 100%), 0);
+}
+
+/**
+ * 38% / 57% es el negro macizo entre los dos trazos del monograma, medido
+ * sobre el viewBox 917x964 del logo: el punto (350, 552). El centro exacto
+ * del logo no sirve — queda a 12 unidades de un borde y al escalar entra
+ * crema por la derecha.
+ */
+[data-intro-logo] {
+  transform: scale(var(--intro-escala));
+  transform-origin: 38% 57%;
+}
+
+/**
+ * Cintas de iconos (components/intro/Cintas.tsx).
+ *
+ * Iconos marrones flotando sobre el crema, sin cinta ni banda de fondo: el
+ * fondo de la pantalla es uno solo de punta a punta. Dos hileras verticales a
+ * la derecha y dos cruzando en diagonal por la izquierda. Todas miden mas que
+ * el viewport y
+ * arrancan fuera de cuadro — entran y salen por los bordes, sin extremos
+ * visibles, para que se lean como cintas que pasan.
+ *
+ * Nada de `@keyframes` ni `will-change`: el desplazamiento lo escribe el rAF
+ * de la intro en --intro-cinta-a/b/c/d (0 -> 1, en bucle) y aca solo se mapea a
+ * transform. Una animacion CSS de transform promoveria la tira a su propia
+ * capa y se escaparia del `overflow: hidden` de las mitades, que es lo que
+ * hace posible la apertura del final.
+ */
+[data-intro-cintas] {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Detras del monograma. Sin esto un absolute pinta despues del contenido
+     en flujo y las cintas taparian el logo. */
+  z-index: 0;
+  opacity: var(--intro-cintas-op);
+}
+
+[data-intro-grupo] {
+  position: absolute;
+  display: flex;
+  gap: clamp(10px, 1.6vw, 26px);
+}
+
+/* Contra el borde derecho, y sobrando por arriba y por abajo. */
+[data-intro-grupo="derecha"] {
+  top: -14vh;
+  right: 3vw;
+  height: 128vh;
+}
+
+/**
+ * El par de la izquierda cruza la pagina en diagonal.
+ *
+ * -22deg y no +22: en pantalla el eje Y va hacia abajo, asi que el giro
+ * positivo lleva el pie de la cinta hacia la izquierda. Se quiere al reves —
+ * entra por arriba a la izquierda y sale por el pie, hacia el centro.
+ *
+ * Mide 190vh para que, ya girada, siga tapando de borde a borde: al inclinarse
+ * la proyeccion vertical se acorta y una cinta de 100vh dejaria ver las puntas.
+ */
+[data-intro-grupo="izquierda"] {
+  top: 50%;
+  left: -6vw;
+  height: 190vh;
+  transform: translateY(-50%) rotate(-22deg);
+}
+
+[data-intro-cinta] {
+  /* Alto de cada casillero. Sin `gap`: el bucle es un medio alto exacto y un
+     espacio entre las dos copias lo correria. */
+  --paso: clamp(78px, 10.5vh, 128px);
+  width: clamp(42px, 5vw, 78px);
+  overflow: hidden;
+}
+
+/* Alto fijo para cada icono: el aire entre uno y otro es el padding, no un
+   `gap`, para que medio alto de tira siga siendo una tanda exacta. */
+[data-intro-casillero] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--paso);
+  padding-block: calc(var(--paso) * 0.2);
+  box-sizing: border-box;
+  /* Marron tostado: mas cuerpo que el arena de --color-brand, que sobre el
+     crema no se despegaba. */
+  color: #b3854a;
+}
+
+/* Cada una al reves de la de al lado. */
+[data-intro-cinta="a"] [data-intro-tira] {
+  transform: translate3d(0, calc(var(--intro-cinta-a) * -50%), 0);
+}
+
+[data-intro-cinta="b"] [data-intro-tira] {
+  transform: translate3d(0, calc((var(--intro-cinta-b) - 1) * 50%), 0);
+}
+
+[data-intro-cinta="c"] [data-intro-tira] {
+  transform: translate3d(0, calc(var(--intro-cinta-c) * -50%), 0);
+}
+
+[data-intro-cinta="d"] [data-intro-tira] {
+  transform: translate3d(0, calc((var(--intro-cinta-d) - 1) * 50%), 0);
+}
+
+[data-intro-velo] {
+  opacity: var(--intro-velo);
+}
+
+[data-intro-fondo] {
+  opacity: var(--intro-fondo);
+}
+
+/* Mientras la intro corre, la pagina de abajo esta quieta. */
+html.intro-bloqueada,
+html.intro-bloqueada body {
+  overflow: hidden;
+}
+
+/* Ya vista en esta pestaña: se esconde antes del primer pintado. */
+html.intro-vista [data-intro] {
+  display: none;
+}
+
+/*
+ * Menos movimiento: no hay intro, se entra derecho al hero. Va en CSS ademas
+ * de en JS para que ni siquiera alcance a pintarse antes de que React monte.
+ */
+@media (prefers-reduced-motion: reduce) {
+  [data-intro] {
+    display: none;
+  }
+}
+
+/* =====================================================================
+ * Transicion de "Nuestros proyectos" a "Que hacemos"
+ * ===================================================================== */
+
+/**
+ * Texto apoyado sobre la piedra.
+ *
+ * Se marca la seccion, no la zona entera: dentro de la zona tambien vive el
+ * panel crema de proyectos, que sigue siendo crema y no tiene que heredar
+ * nada de esto.
+ *
+ * La piedra es oscura, asi que la paleta se da vuelta: el negro del sitio da
+ * 3,7:1 ahi (no alcanza) y el crema da 4,9:1. No es un tema oscuro completo,
+ * son tres variables — todo lo que pinta con `text-text`, `text-text-muted` o
+ * `border-line` adentro de la seccion sigue funcionando sin tocarse.
+ */
+.sobre-piedra {
+  --color-text: #f7f0e6;
+  --color-text-muted: #e0d2be;
+  --color-line: #9b9793;
+}
+
+/**
+ * La ventana de demos vive adentro de la seccion, pero es una superficie
+ * crema: si heredara la paleta de la piedra escribiria crema sobre crema.
+ * Vuelve a los valores del sitio.
+ */
+.ventana-demos {
+  --color-text: #17130f;
+  --color-text-muted: #6b6157;
+  --color-line: #dfd7c9;
+}
+
+/**
+ * La barra del sitio se apaga mientras arriba de todo hay piedra (lo decide
+ * components/fondo/CabeceraSobrePiedra.tsx). Sobre el marron era una banda
+ * clara con una linea abajo, justo donde hay que estar mirando otra cosa.
+ */
+[data-barra-sitio] {
+  transition: opacity var(--duration-state) var(--ease-out-soft);
+}
+
+html[data-cabecera="oculta"] [data-barra-sitio] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/**
+ * Las dos filas de iconos de la transicion
+ * (components/proyectos/CintasTransicion).
+ *
+ * Cada fila lleva dos copias identicas de la lista, asi que desplazarla la
+ * mitad de su ancho la deja exactamente donde arrancaba: el bucle no se ve.
+ * Una corre hacia la izquierda y la otra hacia la derecha.
+ */
+@keyframes cinta-hacia-izquierda {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes cinta-hacia-derecha {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+[data-cinta="izquierda"] {
+  animation: cinta-hacia-izquierda linear infinite;
+}
+
+[data-cinta="derecha"] {
+  animation: cinta-hacia-derecha linear infinite;
 }

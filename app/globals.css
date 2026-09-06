@@ -431,194 +431,6 @@ html.preloader-visto [data-preloader] {
 }
 
 /* =====================================================================
- * Marcos de dispositivo (components/dispositivos/)
- *
- * El marco es CSS, no una foto. Dos razones: pesa cero y la captura de
- * adentro queda nitida a cualquier tamaño, en vez de ser un JPG de un iPhone
- * con otra captura pegada encima.
- *
- * El truco que sostiene todo: el bisel se hace con `padding` en porcentaje.
- * Los porcentajes de `padding` se resuelven SIEMPRE contra el ancho, en las
- * cuatro caras, asi que un `padding: 3.5%` da un bisel del mismo grosor
- * fisico arriba, abajo y a los costados. Con `inset` no funciona: ahi el
- * porcentaje vertical se mide contra el alto y el bisel sale mas fino arriba
- * que a los lados.
- *
- * Las esquinas son superelipses recortadas con clip-path (ver lib/squircle.ts
- * y DefinicionesMarcos.tsx), no `border-radius`.
- * ===================================================================== */
-/*
- * Todo el bloque va en @layer components y no suelto.
- *
- * Sin capa, estas reglas le ganan a las utilidades de Tailwind (el CSS sin
- * capa siempre pesa mas que el que esta dentro de una), y entonces el
- * "position: relative" de aca pisaba el "absolute" que le pone quien usa el
- * marco. Los dos dispositivos quedaban en flujo, uno abajo del otro, y el
- * telefono terminaba 561px por debajo del hero: se veia solo la tablet.
- *
- * Dentro de la capa "components" las utilidades vuelven a ganar, que es lo
- * que tiene que pasar: el componente pone su default y quien lo usa manda.
- */
-@layer components {
-  [data-marco] {
-    /* Los dos marcos comparten estas variables para que combinen entre si. */
-    --bisel: #0c0c0c;
-    --bisel-luz: rgba(255, 255, 255, 0.16);
-    --bisel-boton: #26262b;
-    position: relative;
-    /*
-     * Contexto de container query. Lo usa la barra de estado para medir su
-     * tipografia contra el ancho del marco y no contra el rem del sitio: el
-     * mismo componente tiene que verse bien a 200px y a 400px de ancho, y un
-     * tamaño en px lo rompe en uno de los dos extremos.
-     */
-    container-type: inline-size;
-  }
-
-  [data-marco-cuerpo] {
-    position: absolute;
-    inset: 0;
-    box-sizing: border-box;
-    background-color: var(--bisel);
-    /*
-     * Un filo claro arriba a la izquierda y otro tenue abajo a la derecha: es
-     * lo que hace que el canto se lea como metal y no como un rectangulo negro
-     * plano. Va en el fondo y no en un `border`, que el clip-path recortaria.
-     */
-    background-image: linear-gradient(
-      145deg,
-      var(--bisel-luz) 0%,
-      transparent 18%,
-      transparent 82%,
-      rgba(255, 255, 255, 0.07) 100%
-    );
-    /* Por encima de los botones, que asoman por debajo del canto. */
-    z-index: 1;
-  }
-
-  [data-marco-pantalla] {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: var(--marco-fondo, #000);
-  }
-
-  /*
-   * Los botones laterales.
-   *
-   * Van como elementos y no como pseudo-elementos del cuerpo por dos razones:
-   * el `clip-path` del cuerpo tambien recorta sus pseudo-elementos, asi que
-   * quedarian invisibles; y son tres, mientras que un elemento solo ofrece dos.
-   * Cuelgan del marco, que no esta recortado, y el cuerpo los tapa en la parte
-   * que se superpone — por eso parecen salir de abajo del canto.
-   */
-  [data-marco-boton] {
-    position: absolute;
-    background-color: var(--bisel-boton);
-    z-index: 0;
-  }
-
-  [data-marco-boton="izq"] {
-    left: -0.9%;
-    width: 1.8%;
-    border-radius: 2px 0 0 2px;
-  }
-
-  [data-marco-boton="der"] {
-    right: -0.9%;
-    width: 1.8%;
-    border-radius: 0 2px 2px 0;
-  }
-
-  /* La isla, la barra de estado y el indicador van encima de la captura. */
-  [data-marco-isla] {
-    position: absolute;
-    top: 1.5%;
-    left: 50%;
-    translate: -50% 0;
-    width: 31%;
-    aspect-ratio: 125 / 37;
-    border-radius: 999px;
-    background-color: #000;
-    z-index: 3;
-  }
-
-  [data-marco-barra] {
-    position: absolute;
-    inset-inline: 0;
-    top: 0;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: var(--marco-barra-color, #fff);
-    /* La tipografia de la barra escala con el ancho del marco, no con el rem
-       del sitio: si no, en un telefono chico el "9:41" ocupa media pantalla. */
-    font-size: 3.4cqw;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    padding-inline: 8%;
-    padding-top: 2.2%;
-    /* Sombra corta: la hora cae sobre capturas claras y oscuras por igual. */
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
-  }
-
-  [data-marco-indicador] {
-    position: absolute;
-    bottom: 0.85%;
-    left: 50%;
-    translate: -50% 0;
-    width: 34%;
-    height: 0.5%;
-    min-height: 2px;
-    border-radius: 999px;
-    background-color: rgba(255, 255, 255, 0.92);
-    z-index: 3;
-    /* Sobre una captura clara el indicador blanco desaparece. */
-    mix-blend-mode: difference;
-  }
-
-  /* La camara del iPad: sobre el bisel, no sobre la pantalla. */
-  [data-marco-camara] {
-    position: absolute;
-    /* La posicion vertical la pasa el componente: es la mitad del bisel, y el
-       bisel se mide contra el ancho mientras que top se mide contra el alto,
-       asi que el numero hay que convertirlo. */
-    left: 50%;
-    translate: -50% -50%;
-    width: 1.5%;
-    aspect-ratio: 1;
-    border-radius: 999px;
-    background-color: #05050a;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.09);
-    z-index: 2;
-  }
-
-  /*
-   * La captura de adentro.
-   *
-   * Arranca DEBAJO de la barra de estado, no a pantalla completa: si no, la
-   * isla y la hora caen encima del encabezado de la captura y se pisan. En
-   * un telefono real esa franja es la zona segura, y lo que se ve ahi es el
-   * fondo de la pagina — por eso el color de la franja se pasa por fuera
-   * (--marco-fondo) en vez de quedar negro fijo.
-   */
-  [data-marco-contenido] {
-    position: absolute;
-    inset: var(--marco-contenido-top, 0) 0 0 0;
-    z-index: 1;
-  }
-
-  [data-marco-contenido] img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-  }
-}
-
-/* =====================================================================
  * Entrada del hero (components/hero/Hero.tsx)
  *
  * Cada pieza entra con opacidad, un desplazamiento corto y desenfoque, y las
@@ -662,5 +474,97 @@ html.preloader-corriendo [data-hero-entra] {
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+/* =====================================================================
+ * Botones
+ *
+ * Medidos sobre la referencia (applio.framer.website): radio 10px, alto 43px,
+ * el primario sobre #0c0c0c y el secundario en blanco. El radio coincide con
+ * el del sistema, asi que no hubo que inventar nada.
+ *
+ * La curva exacta del hover no se pudo capturar: la referencia esta hecha en
+ * Framer y el hover lo maneja JavaScript con eventos de puntero reales, que
+ * en Chrome headless no se disparan. Lo que va aca es el gesto estandar de
+ * ese tipo de boton — crece apenas al pasar y se hunde al apretar — con la
+ * curva de movimiento que ya usa el resto del sitio.
+ *
+ * Un solo lugar para todos los botones de la pagina: la variante la elige
+ * `data-boton` y nadie vuelve a escribir estas clases a mano.
+ * ===================================================================== */
+@layer components {
+  [data-boton] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    /* 44px es el minimo tocable. La referencia usa 43, un pixel por debajo. */
+    min-height: 44px;
+    padding-inline: 1.25rem;
+    border-radius: var(--radius-card);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      transform var(--duration-micro) var(--ease-out-soft),
+      background-color var(--duration-micro) var(--ease-out-soft),
+      color var(--duration-micro) var(--ease-out-soft),
+      box-shadow var(--duration-micro) var(--ease-out-soft);
+  }
+
+  [data-boton]:hover {
+    transform: scale(1.035);
+  }
+
+  /* Se hunde al apretar: es la unica parte del gesto que confirma el toque. */
+  [data-boton]:active {
+    transform: scale(0.975);
+  }
+
+  [data-boton="oscuro"] {
+    background-color: #0c0c0c;
+    color: #fff;
+  }
+
+  [data-boton="oscuro"]:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  [data-boton="claro"] {
+    background-color: #fff;
+    color: #0c0c0c;
+  }
+
+  [data-boton="claro"]:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Sobre el negro del sitio, cuando el blanco macizo seria demasiado. */
+  [data-boton="linea"] {
+    border: 1px solid var(--color-line-alto);
+    background-color: var(--color-bg-elev);
+    color: var(--color-text);
+  }
+
+  [data-boton="linea"]:hover {
+    background-color: var(--color-bg-alto);
+  }
+
+  /*
+   * Con movimiento reducido el boton no crece, pero tiene que seguir avisando
+   * que esta bajo el cursor: ahi el aviso pasa a ser el filo.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    [data-boton]:hover,
+    [data-boton]:active {
+      transform: none;
+    }
+
+    [data-boton="oscuro"]:hover,
+    [data-boton="claro"]:hover {
+      outline: 2px solid var(--color-azul);
+      outline-offset: 2px;
+    }
   }
 }

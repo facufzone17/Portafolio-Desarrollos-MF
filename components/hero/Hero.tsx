@@ -1,166 +1,224 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Isotipo } from "@/components/ui/Isotipo";
-import { DefinicionesMarcos } from "@/components/dispositivos/DefinicionesMarcos";
-import { MarcoIPad } from "@/components/dispositivos/MarcoIPad";
-import { MarcoIPhone } from "@/components/dispositivos/MarcoIPhone";
-import { PantallaInmobiliaria } from "@/components/dispositivos/contenido/PantallaInmobiliaria";
-import { PantallaTienda } from "@/components/dispositivos/contenido/PantallaTienda";
 import { mensajes, whatsappUrl } from "@/lib/site";
 import { PalabraRotativa } from "./PalabraRotativa";
+import consorcios from "@/assets/dispositivos/consorcios.png";
+import tienda from "@/assets/dispositivos/tienda.png";
 
 /**
- * Hero.
+ * Hero, reconstruido sobre la referencia (applio.framer.website) medida en
+ * vivo a 1440x900.
  *
- * Estructura tomada de la referencia que eligio Facundo
- * (applio.framer.website): fondo de imagen a sangre, marca chica arriba,
- * titular grande, bajada angosta, dos botones y, apoyados sobre el borde de
- * abajo, dos dispositivos girados y superpuestos que se cortan con la pantalla.
+ * EL EFECTO DE SCROLL SON TRES CAPAS A DISTINTA VELOCIDAD, no dos. Medido
+ * siguiendo cada elemento cada 200px de scroll:
  *
- * Tres cosas que no son obvias:
+ *   capa            avanza    velocidad
+ *   imagen          200px     1,0x   (normal, sin transform)
+ *   texto y botones 140px     0,7x   <- se queda atras
+ *   telefonos       180px     0,9x
  *
- * 1. Los dispositivos son CSS, no fotos (ver components/dispositivos/). Pesan
- *    cero, la captura de adentro queda nitida a cualquier tamaño y se pueden
- *    cambiar sin volver a montar un PNG.
+ * La clave es que el TEXTO se rezaga mas que los telefonos. Los dos suben mas
+ * lento que la pagina, pero el texto sube todavia mas lento, asi que los
+ * telefonos lo alcanzan y lo tapan. Con el texto a velocidad normal (que es
+ * como estaba antes) los telefonos nunca lo alcanzan y el efecto no existe.
  *
- * 2. El velo sobre la imagen no es decorativo. El fondo es muy claro en el
- *    centro, justo donde cae el titular: sin velo, texto blanco sobre esa zona
- *    da menos de 2:1. El degradado oscurece arriba y en el medio y deja el
- *    resto de la foto a la vista.
+ * El momento que cierra el gesto: a 600px de scroll los botones quedan a 92px
+ * del borde de arriba, que es exactamente el alto de la barra de navegacion
+ * (91px), y para entonces los telefonos ya estan encima.
  *
- * 3. La entrada de las piezas se pisa en el tiempo (ver `hero-entrada` en
- *    globals.css) y espera a que termine la pantalla de carga. Si corriera al
- *    montar, se consumiria detras del overlay negro del preloader.
+ * Otras medidas de la referencia:
+ *   caja de la imagen   12px de margen en los cuatro lados, radio 10px
+ *   superposicion       dos tercios de un telefono
  *
- * La palabra que rota debajo de "Desarrollando" se conserva intacta: es la
- * pieza que Facundo pidio mantener desde el sitio anterior.
+ * Dos cosas se apartan de la referencia por pedido de Facundo: el hero es mas
+ * largo (100svh+420 contra 100svh+205) y los telefonos arrancan mas abajo y
+ * son mas grandes.
+ *
+ * CUANTO TAPAN LOS TELEFONOS A LOS BOTONES no se ajusta a ojo, se calcula. El
+ * momento critico es cuando los botones llegan al pie de la barra (91px), que
+ * pasa a los S = (btnTop0 - 91) / 0,7 pixeles de scroll. Ahi:
+ *
+ *   hueco = (telTop0 - btnTop0) - 0,2857 x (btnTop0 - 91)
+ *
+ * Negativo = el telefono esta por encima del boton, o sea lo tapa.
+ *
+ * Pero el numero que de verdad importa es CUANTO DURA la cobertura, no
+ * cuanto tapa al final: la cobertura arranca a los (telTop0 - btnTop0) / 0,2
+ * pixeles de scroll y termina cuando los botones se meten atras de la barra.
+ * En la referencia esa ventana dura 176px de scroll, que es lo que la hace
+ * perceptible.
+ *
+ * Lo que se probó: al 66% los botones quedaban tapados demasiado tiempo; al
+ * 72% la ventana bajaba a 9px y el cruce no se veia nunca; al 70,5% daba 74.
+ * Al 69% queda cerca de la referencia: se ve el cruce, y como termina cuando
+ * los botones se meten atras de la barra, nunca quedan tapados del todo.
+ *
+ * La palabra que rota debajo de "Desarrollando" se conserva intacta.
  */
+
+/**
+ * Cuanto se queda atras cada capa, en fraccion del scroll.
+ *
+ * Son 1 menos la velocidad medida: el texto avanza al 0,7 asi que se rezaga
+ * 0,3, y los telefonos al 0,9 asi que se rezagan 0,1. La diferencia entre los
+ * dos (0,2) es la velocidad con la que los aparatos se comen el texto.
+ */
+const REZAGO_TEXTO = 0.35;
+const REZAGO_TELEFONOS = 0.1;
 
 /** Retardos de la entrada, en ms. Se pisan a proposito: no son una fila. */
 const RETARDO = {
   marca: 0,
   titulo: 130,
-  bajada: 300,
-  botones: 420,
-  dispositivos: 540,
+  botones: 300,
+  dispositivos: 440,
 } as const;
 
 export function Hero() {
+  // El scroll de la pagina entera: el efecto arranca desde el primer pixel,
+  // no cuando la seccion entra en cuadro (ya esta en cuadro al cargar).
+  const { scrollY } = useScroll();
+  const yTexto = useTransform(scrollY, (v) => v * REZAGO_TEXTO);
+  const yTelefonos = useTransform(scrollY, (v) => v * REZAGO_TELEFONOS);
+
   return (
-    <section className="relative isolate min-h-[100svh] overflow-hidden">
-      {/* Los recortes de esquina de los dos marcos, definidos una sola vez. */}
-      <DefinicionesMarcos />
-
-      <Image
-        src="/images/hero-bg.jpg"
-        alt=""
-        aria-hidden
-        fill
-        priority
-        sizes="100vw"
-        className="-z-20 object-cover"
-      />
-
+    <section className="relative">
       {/*
-        El velo. Mas cerrado arriba (donde va la barra del sitio y el titular)
-        y otra vez abajo, para que los dispositivos se despeguen del fondo.
+        El margen de 12px. Es lo que hace que la imagen se lea como una placa
+        apoyada sobre la pagina y no como un fondo pegado al borde del
+        navegador. `overflow-clip` recorta los telefonos por abajo y el texto
+        cuando termina de irse por arriba.
       */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(4,6,16,0.82)_0%,rgba(4,6,16,0.62)_38%,rgba(4,6,16,0.35)_62%,rgba(4,6,16,0.72)_100%)]"
-      />
+      <div className="p-3">
+        <div className="relative h-[calc(100svh+420px)] overflow-clip rounded-[10px]">
+          <Image
+            src="/images/hero-bg.jpg"
+            alt=""
+            aria-hidden
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
 
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col items-center px-5 pt-24 text-center sm:px-8 sm:pt-28">
-        <div
-          data-hero-entra
-          style={{ "--hero-retardo": `${RETARDO.marca}ms` } as React.CSSProperties}
-          className="grid size-12 place-items-center rounded-card bg-white text-bg shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]"
-        >
-          <Isotipo className="h-5 w-auto" />
-        </div>
+          {/*
+            El velo. El fondo es muy claro en el centro, justo donde cae el
+            titular: sin esto, texto blanco sobre esa zona da menos de 2:1.
+          */}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,16,0.78)_0%,rgba(4,6,16,0.55)_34%,rgba(4,6,16,0.3)_58%,rgba(4,6,16,0.68)_100%)]"
+          />
 
-        <h1
-          data-hero-entra
-          style={{ "--hero-retardo": `${RETARDO.titulo}ms` } as React.CSSProperties}
-          className="mt-8 text-[clamp(2.05rem,8.2vw,6rem)] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)]"
-        >
-          {/* Texto estable para lectores de pantalla. */}
-          <span className="sr-only">
-            Desarrollando sitios web, tiendas, automatizaciones y paneles de
-            gestión para negocios.
-          </span>
-          <span aria-hidden className="block">
-            <span className="block text-white/55">Desarrollando</span>
-            <PalabraRotativa />
-          </span>
-        </h1>
-
-        <p
-          data-hero-entra
-          style={{ "--hero-retardo": `${RETARDO.bajada}ms` } as React.CSSProperties}
-          className="mt-6 max-w-[40ch] text-[15px] leading-relaxed text-white/70 sm:text-base"
-        >
-          Somos dos. Construimos la herramienta que tu negocio necesita y no la
-          entregamos hasta verla funcionando con tus datos.
-        </p>
-
-        <div
-          data-hero-entra
-          style={{ "--hero-retardo": `${RETARDO.botones}ms` } as React.CSSProperties}
-          className="mt-9 flex flex-wrap items-center justify-center gap-2.5"
-        >
-          <Link
-            href="#proyectos"
-            className="inline-flex min-h-11 items-center rounded-card bg-[#0c0c0c] px-5 text-sm font-medium text-white transition-colors duration-[var(--duration-micro)] hover:bg-black"
+          {/* Capa del texto: se rezaga 0,3 del scroll. */}
+          <motion.div
+            style={{ y: yTexto }}
+            className="relative flex flex-col items-center px-5 pt-[clamp(132px,23svh,232px)] text-center sm:px-8"
           >
-            Proyectos
-          </Link>
-          <a
-            href={whatsappUrl(mensajes.general)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center rounded-card bg-white px-5 text-sm font-medium text-[#0c0c0c] transition-colors duration-[var(--duration-micro)] hover:bg-white/90"
+            <div
+              data-hero-entra
+              style={{ "--hero-retardo": `${RETARDO.marca}ms` } as React.CSSProperties}
+              className="grid size-12 place-items-center rounded-card bg-white text-bg shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]"
+            >
+              <Isotipo className="h-5 w-auto" />
+            </div>
+
+            <h1
+              data-hero-entra
+              style={{ "--hero-retardo": `${RETARDO.titulo}ms` } as React.CSSProperties}
+              className="mt-8 text-[clamp(2.05rem,8.2vw,6rem)] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)]"
+            >
+              {/* Texto estable para lectores de pantalla. */}
+              <span className="sr-only">
+                Desarrollando sitios web, tiendas, automatizaciones y paneles
+                de gestión para negocios.
+              </span>
+              <span aria-hidden className="block">
+                <span className="block text-white/55">Desarrollando</span>
+                <PalabraRotativa />
+              </span>
+            </h1>
+
+            {/*
+              Los botones van en el lugar que ocupaba la bajada, que se saco
+              por pedido de Facundo. El hero queda con tres elementos: marca,
+              titular y accion.
+            */}
+            <div
+              data-hero-entra
+              style={{ "--hero-retardo": `${RETARDO.botones}ms` } as React.CSSProperties}
+              className="mt-8 flex flex-wrap items-center justify-center gap-2.5"
+            >
+              <Link href="#proyectos" data-boton="oscuro">
+                Proyectos
+              </Link>
+              <a
+                href={whatsappUrl(mensajes.general)}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-boton="claro"
+              >
+                Contactanos
+              </a>
+            </div>
+          </motion.div>
+
+          {/*
+            Capa de los telefonos: se rezaga 0,1, o sea que sube MAS RAPIDO que
+            el texto y termina tapandolo.
+
+            Anchos distintos a proposito: los dos mockups vienen con encuadres
+            distintos (0,687 y 0,594 de proporcion), asi que a igual ancho un
+            telefono se veria mas largo que el otro. Con 43% y 37,2% los dos
+            terminan con la misma altura y con el ancho de la referencia:
+            600px sobre un contenedor de 1401.
+
+            Las posiciones salen de resolver dos condiciones a la vez: que el
+            conjunto quede centrado y que se superpongan como en la referencia.
+          */}
+          {/*
+            El parallax y la entrada van en DOS elementos y no en uno.
+
+            Los dos quieren escribir `transform`, y una animacion CSS con
+            `fill-mode: both` (que es lo que hace `hero-entrada`) le gana al
+            estilo inline que escribe framer-motion. Con las dos cosas en el
+            mismo nodo, la animacion de entrada deja `transform: none` fijo al
+            terminar y el parallax deja de existir en silencio: los telefonos
+            se mueven a la velocidad de la pagina y el efecto no se ve.
+
+            Afuera el parallax (inline), adentro la entrada (CSS).
+          */}
+          <motion.div
+            style={{ y: yTelefonos }}
+            className="pointer-events-none absolute inset-x-0 top-[72svh]"
+            aria-hidden
           >
-            Contactanos
-          </a>
-        </div>
-
-        {/*
-          Los dispositivos.
-
-          La caja que los contiene tiene un alto propio y los dos van anclados
-          por ARRIBA (`top`), no por abajo: asi lo que se ve de cada aparato es
-          exactamente el alto de la caja, y no un resto que cambia con la
-          proporcion de la pantalla. El resto del dispositivo sigue hacia abajo
-          y lo corta el `overflow-hidden` de la seccion, que es lo que los hace
-          ver apoyados sobre el fondo y no metidos adentro de un recuadro.
-
-          Anclarlos por abajo (que es lo intuitivo) hace lo contrario: el alto
-          visible pasa a depender del alto del aparato, y en una pantalla baja
-          los dos se van de cuadro casi enteros.
-        */}
-        <div
-          data-hero-entra
-          style={{ "--hero-retardo": `${RETARDO.dispositivos}ms` } as React.CSSProperties}
-          className="relative mt-auto h-[clamp(148px,26svh,270px)] w-full max-w-[880px]"
-        >
-          <MarcoIPad
-            etiqueta="Portada de un sitio de inmobiliaria, vista en una tablet"
-            className="absolute top-0 left-1/2 w-[clamp(196px,32vw,392px)] -translate-x-[62%] rotate-[-7deg] drop-shadow-[0_36px_60px_rgba(0,0,0,0.5)]"
-          >
-            <PantallaInmobiliaria />
-          </MarcoIPad>
-
-          <MarcoIPhone
-            etiqueta="Tienda online de una distribuidora, vista en un teléfono"
-            // La tienda es clara, asi que la zona segura toma su crema y la
-            // hora pasa a oscura: blanco sobre crema no se ve.
-            fondo="#faf7f0"
-            barraColor="#2a231c"
-            className="absolute top-[13%] left-1/2 w-[clamp(112px,18vw,214px)] translate-x-[14%] rotate-[9deg] drop-shadow-[0_36px_60px_rgba(0,0,0,0.55)]"
-          >
-            <PantallaTienda />
-          </MarcoIPhone>
+            <div
+              data-hero-entra
+              style={
+                { "--hero-retardo": `${RETARDO.dispositivos}ms` } as React.CSSProperties
+              }
+            >
+              <div className="relative mx-auto h-0 w-full max-w-[1400px]">
+                <Image
+                  src={consorcios}
+                  alt=""
+                  sizes="(min-width: 1024px) 602px, 48vw"
+                  className="absolute left-[24.2%] w-[43%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                />
+                <Image
+                  src={tienda}
+                  alt=""
+                  sizes="(min-width: 1024px) 521px, 42vw"
+                  className="absolute left-[38.6%] w-[37.2%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

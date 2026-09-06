@@ -86,7 +86,7 @@ export function PalabraRotativa() {
     // que no aparece en una captura suelta: se encontro sacando diez cuadros
     // seguidos por CDP a dPR 1. `contain: paint` le promete al navegador que
     // nada se dibuja fuera de la caja, y eso el compositor si lo respeta.
-    <span className="relative mt-[0.06em] block overflow-hidden [contain:paint] -mb-[0.14em]">
+    <span className="relative mt-[0.06em] block overflow-hidden [contain:paint] [clip-path:inset(0)] -mb-[0.14em]">
       <span className={`invisible block ${alto}`} aria-hidden>
         {MAS_ANCHA}
       </span>

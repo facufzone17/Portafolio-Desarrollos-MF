@@ -13,7 +13,7 @@ export default function Privacidad() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pt-[91px]">
         <div className="mx-auto max-w-[70ch] px-5 py-20 sm:px-8 sm:py-28">
           <h1 className="text-[clamp(2rem,5vw,3.5rem)]">Privacidad</h1>
           <p className="mt-8 rounded-[var(--radius-card)] border border-line bg-bg-elev p-6 text-text-muted">

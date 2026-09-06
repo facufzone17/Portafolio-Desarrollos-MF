@@ -38,7 +38,7 @@ export default async function FichaProyecto({
       {/* El header queda siempre arriba del iframe: es la salida al portafolio. */}
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 pt-[91px]">
         <article className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-20">
           {/*
             Boton-pildora con relleno que entra desde la izquierda (§3.5:

@@ -53,14 +53,18 @@ export function instagramUrl(): string | null {
 }
 
 /**
- * Secciones de la home, en orden. Los `id` son los anclas reales de cada
- * bloque. Hoy no alimenta ninguna barra de navegacion: la home se recorre
- * scrolleando, por decision de Facundo.
+ * Secciones de la home, en orden. Los ids son los anclas reales de cada
+ * bloque y las etiquetas son las que se dibujan en la barra.
+ *
+ * Son cortas de una palabra a proposito: la barra se contrae a 818px al
+ * scrollear (medido sobre la referencia) y con etiquetas como "Que
+ * construimos" los cinco links se parten en dos renglones. Una barra de dos
+ * renglones en escritorio es diseño roto.
  */
 export const secciones = [
   { id: "proyectos", label: "Proyectos" },
-  { id: "servicios", label: "Qué construimos" },
-  { id: "como-trabajamos", label: "Cómo trabajamos" },
-  { id: "quienes-somos", label: "Quiénes somos" },
+  { id: "servicios", label: "Servicios" },
+  { id: "como-trabajamos", label: "Proceso" },
+  { id: "quienes-somos", label: "Nosotros" },
   { id: "contacto", label: "Contacto" },
 ] as const;

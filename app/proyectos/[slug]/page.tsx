@@ -21,7 +21,7 @@ export async function generateMetadata({
   if (!proyecto) return {};
 
   return {
-    title: `${proyecto.nombre} — ${site.name}`,
+    title: `${proyecto.nombre} | ${site.name}`,
     description: proyecto.resumen,
   };
 }
@@ -50,7 +50,7 @@ export default async function FichaProyecto({
           */}
           <Link
             href="/#proyectos"
-            className="group relative inline-flex min-h-11 items-center overflow-hidden rounded-[var(--radius-btn)] border border-line px-4 text-sm text-text-muted transition-colors duration-[var(--duration-state)] ease-[var(--ease-out-soft)] hover:text-bg"
+            className="group relative inline-flex min-h-11 items-center overflow-hidden rounded-[var(--radius-card)] border border-line px-4 text-sm text-text-muted transition-colors duration-[var(--duration-state)] ease-[var(--ease-out-soft)] hover:text-bg"
           >
             <span
               aria-hidden
@@ -60,7 +60,7 @@ export default async function FichaProyecto({
           </Link>
 
           <header className="mt-8 flex flex-col gap-5">
-            <p className="text-base text-brand-soft">{proyecto.rubro}</p>
+            <p className="text-base text-azul">{proyecto.rubro}</p>
             <h1 className="text-[clamp(2.25rem,6vw,4.5rem)]">
               {proyecto.nombre}
             </h1>
@@ -69,7 +69,7 @@ export default async function FichaProyecto({
               {proyecto.categorias.map((c) => (
                 <li
                   key={c}
-                  className="rounded-full border border-line px-3 py-1 text-sm text-brand-soft"
+                  className="rounded-card border border-line px-3 py-1 text-sm text-azul"
                 >
                   {c}
                 </li>
@@ -102,7 +102,7 @@ export default async function FichaProyecto({
                     key={d}
                     className="flex gap-3 text-[17px] font-light text-text-muted"
                   >
-                    <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-soft" />
+                    <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-azul" />
                     {d}
                   </li>
                 ))}
@@ -115,7 +115,7 @@ export default async function FichaProyecto({
                 {proyecto.stack.map((s) => (
                   <li
                     key={s}
-                    className="rounded-full border border-line px-3 py-1 text-sm text-text-muted"
+                    className="rounded-card border border-line px-3 py-1 text-sm text-text-muted"
                   >
                     {s}
                   </li>
@@ -139,9 +139,7 @@ export default async function FichaProyecto({
             <p className="max-w-[46ch] text-lg text-text-muted">
               Contanos qué necesita tu negocio y te decimos cómo lo resolvemos.
             </p>
-            <CtaWhatsApp mensaje={mensajes.proyecto(proyecto.nombre)}>
-              Quiero algo así
-            </CtaWhatsApp>
+            <CtaWhatsApp mensaje={mensajes.proyecto(proyecto.nombre)}>Contactanos</CtaWhatsApp>
           </div>
         </article>
       </main>

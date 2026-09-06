@@ -151,7 +151,7 @@ export function DemoFrame({
       <div
         role="group"
         aria-label="Ver la demo en otro tamaño"
-        className="flex gap-1 self-start rounded-[var(--radius-btn)] border border-line p-1"
+        className="flex gap-1 self-start rounded-[var(--radius-card)] border border-line p-1"
       >
         {(
           [
@@ -278,7 +278,7 @@ function Cartel({ visible }: { visible: boolean }) {
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <span className="rounded-full border border-line bg-bg/85 px-4 py-2 text-sm text-text-muted backdrop-blur-sm">
+      <span className="rounded-card border border-line bg-bg/85 px-4 py-2 text-sm text-text-muted backdrop-blur-sm">
         <span className="hidden [@media(hover:hover)]:inline">
           Pasá el cursor para navegar la demo
         </span>

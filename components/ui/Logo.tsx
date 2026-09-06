@@ -1,22 +1,40 @@
+import { Isotipo } from "./Isotipo";
+import { Logotipo } from "./Logotipo";
+import { site } from "@/lib/site";
+
 /**
- * Monograma MF.
+ * El lockup de marca: isotipo + palabra, como en la referencia que eligio
+ * Facundo (markiqsaas.framer.website).
  *
- * Va inline (no <img>) para que fill="currentColor" funcione: el mismo
- * componente sirve blanco en el header o navy sobre claro, sin variantes.
- * Geometria tomada de Marca/logo-mono.svg — vector real, 20 vertices.
+ * Las dos piezas se alinean por altura y no por caja: el isotipo es mas alto
+ * que las mayusculas del logotipo, asi que va un punto mas grande (1,45x) para
+ * que opticamente midan lo mismo. Alinearlos por bounding box deja el isotipo
+ * chico al lado de la palabra.
+ *
+ * El isotipo lleva `data-logo-isotipo`: el preloader lo mide en vivo para
+ * aterrizar exactamente encima (components/preloader/Preloader.tsx).
  */
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className = "",
+  soloIsotipo = false,
+}: {
+  className?: string;
+  soloIsotipo?: boolean;
+}) {
+  if (soloIsotipo) {
+    return (
+      <span data-logo-isotipo className={`inline-flex ${className}`}>
+        <Isotipo className="h-full w-auto" titulo={site.name} />
+      </span>
+    );
+  }
+
   return (
-    <svg
-      viewBox="0 0 917 964"
-      fill="currentColor"
-      role="img"
-      aria-label="Desarrollos MF"
-      className={className}
-    >
-      <path d="M 0 11 L 398 292 L 282 374 L 139 273 L 139 937 L 0 937 Z" />
-      <path d="M 916 0 L 916 166 L 420 517 L 420 650 L 650 488 L 650 654 L 420 818 L 420 961 L 281 961 L 281 449 Z" />
-      <path d="M 778 400 L 916 302 L 916 938 L 778 938 Z" />
-    </svg>
+    <span className={`inline-flex items-center gap-[0.42em] ${className}`}>
+      <span data-logo-isotipo className="inline-flex">
+        <Isotipo className="h-[1.45em] w-auto" />
+      </span>
+      <Logotipo className="h-[0.72em] w-auto" titulo={site.name} />
+    </span>
   );
 }

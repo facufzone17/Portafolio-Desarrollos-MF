@@ -132,7 +132,7 @@ export function Camino() {
         <path
           ref={trazoRef}
           d={construirTrazo(medida.w, medida.h)}
-          stroke="var(--color-brand-soft)"
+          stroke="var(--color-azul)"
           strokeWidth={2}
           strokeLinecap="round"
         />
@@ -149,15 +149,14 @@ export function Camino() {
               }`}
             >
               <div
-                className={`ml-12 rounded-[var(--radius-card)] border bg-bg-elev p-6 transition-all duration-500 ease-out md:ml-0 sm:p-8
+                className={`ml-12 rounded-card border p-6 transition-all duration-500 ease-out md:ml-0 sm:p-8
                   ${
                     encendida
-                      ? "border-brand-soft/40 opacity-100 shadow-[0_0_60px_-15px] shadow-brand-soft/25"
-                      : "border-line opacity-45"
+                      ? "border-line-alto bg-bg-elev"
+                      : "border-line bg-bg-elev/40"
                   }`}
               >
-                <span className="text-sm text-brand-soft">{etapa.numero}</span>
-                <h3 className="mt-2 text-2xl">{etapa.titulo}</h3>
+                <h3 className="text-2xl">{etapa.titulo}</h3>
                 <p className="mt-3 text-[17px] font-light text-text-muted">
                   {etapa.texto}
                 </p>

@@ -4,17 +4,20 @@ import { IconInstagram } from "@/components/ui/IconInstagram";
 import { Logo } from "@/components/ui/Logo";
 import { instagramUrl, mailtoUrl, site, whatsappUrl } from "@/lib/site";
 
-/** §10.8. Instagram solo aparece si hay usuario: nunca un link a ningun lado. */
+/**
+ * Pie. Instagram solo aparece si hay usuario: nunca un link a ningun lado.
+ *
+ * El lockup ya trae la palabra, asi que aca NO va el nombre escrito al lado:
+ * repetido, "Trevoo Trevoo" es lo que se leia mientras el logo era solo el
+ * monograma.
+ */
 export function Footer() {
   const instagram = instagramUrl();
 
   return (
     <footer className="mt-auto border-t border-line">
       <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-12 sm:px-8 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-center gap-2.5">
-          <Logo className="h-6 w-auto text-text" />
-          <span className="text-[15px] tracking-tight">{site.name}</span>
-        </div>
+        <Logo className="text-[19px] text-text" />
 
         <nav className="flex flex-col gap-3 text-sm" aria-label="Contacto">
           <a

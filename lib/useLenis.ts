@@ -9,7 +9,7 @@ import { useMovimientoReducido } from "@/lib/useMovimientoReducido";
  *
  * El ref que devuelve el hook solo sirve adentro del arbol de React, y quien
  * necesita frenar el scroll no siempre esta ahi: la pantalla de entrada
- * (components/intro/Intro.tsx) tiene que llamar a stop() sin ser hija de
+ * (components/preloader/Preloader.tsx) tiene que llamar a stop() sin ser hija de
  * SmoothScroll ni recibirlo por props. Es un unico Lenis en toda la app, asi
  * que una variable de modulo alcanza y evita un contexto para dos llamadas.
  */

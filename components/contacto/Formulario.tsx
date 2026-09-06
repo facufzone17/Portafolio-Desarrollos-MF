@@ -101,7 +101,7 @@ export function Formulario() {
     return (
       <div
         role="status"
-        className="rounded-[var(--radius-card)] border border-brand-soft/40 bg-bg-elev p-8"
+        className="rounded-[var(--radius-card)] border border-azul/40 bg-bg-elev p-8"
       >
         <p className="text-2xl">Listo.</p>
         <p className="mt-3 text-text-muted">
@@ -125,9 +125,9 @@ export function Formulario() {
           "aria-invalid": Boolean(error),
           "aria-describedby": error ? idError : undefined,
           onBlur: () => alSalir(c.id),
-          className: `w-full rounded-[var(--radius-btn)] border bg-bg-elev px-4 py-3 text-text
-            placeholder:text-text-muted/60 transition-colors duration-[var(--duration-micro)]
-            ${error ? "border-red-400/70" : "border-line focus:border-brand-soft"}`,
+          className: `w-full rounded-[var(--radius-card)] border bg-bg-elev px-4 py-3 text-text
+            placeholder:text-text-muted transition-colors duration-[var(--duration-micro)]
+            ${error ? "border-red-400/70" : "border-line focus:border-azul"}`,
         };
 
         return (
@@ -164,7 +164,7 @@ export function Formulario() {
         <button
           type="submit"
           disabled={estado === "enviando"}
-          className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[var(--radius-btn)] bg-text px-6 font-medium text-bg transition-transform duration-[var(--duration-micro)] hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+          className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[var(--radius-card)] bg-text px-6 font-medium text-bg transition-transform duration-[var(--duration-micro)] hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         >
           {estado === "enviando" && (
             <LoaderCircle className="size-4 animate-spin" aria-hidden />

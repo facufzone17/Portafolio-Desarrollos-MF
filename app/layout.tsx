@@ -1,24 +1,29 @@
 import type { Metadata } from "next";
-import { Mona_Sans } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { site } from "@/lib/site";
 import "./globals.css";
 
 /**
- * Mona Sans, la tipografia de la referencia (formastudio.framer.ai, leida en
- * vivo: su font-family es "Mona Sans" en 400/500/600).
+ * Las dos familias de la referencia que eligio Facundo
+ * (markiqsaas.framer.website, leida en vivo: su CSS declara "Inter Display"
+ * para casi todo e "Inter Tight" en los bloques de panel).
  *
- * Es variable, asi que se pide el rango 400-600 en un solo archivo en vez de
- * tres cortes. Los titulos van en 600 y el texto en 400.
- *
- * next/font la self-hostea: sin request a Google, sin bloqueo de render y
- * sin CLS de fuente (§6.1).
+ * Inter Tight es la que da la densidad de los titulos y los numeros; Inter, la
+ * que se lee comoda en parrafo. next/font las self-hostea: sin request a
+ * Google, sin bloqueo de render y sin CLS de fuente.
  */
-const monaSans = Mona_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
-  variable: "--font-mona",
+  variable: "--font-inter",
+});
+
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter-tight",
 });
 
 export const metadata: Metadata = {
@@ -42,8 +47,39 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-AR" className={`${monaSans.variable} h-full`}>
-      <body className="min-h-full flex flex-col">
+    <html
+      lang="es-AR"
+      className={`${inter.variable} ${interTight.variable} h-full`}
+    >
+      <body className="min-h-full flex flex-col bg-bg">
+      {/*
+        CONTRATO DE DIRECCION — Trevoo, home (Persuade). Rediseño 04/09/2026.
+
+        THESIS: la pagina es una rejilla de pantallas que ya funcionan, no un
+        folleto. Rechaza el molde de landing oscura de SaaS: hero con
+        resplandor radial, rotulo arriba de cada seccion, bloques numerados y
+        cuatro paneles de color identicos.
+
+        OWN-WORLD: negro neutro #08080a plano, escalones #131316 y #1c1c20,
+        filetes blancos al 9%. Un solo color, el electrico #0099ff, que hace
+        de escenario UNA vez y de texto de acento el resto. Radio 10px en
+        todo, botones incluidos: cero pastillas. Inter Tight peso 500 con
+        tracking -0,04em. Los filos diagonales usan los 26 grados del asta
+        del isotipo.
+
+        STORY: un dueño de negocio entiende en cinco segundos que esto se
+        construye a medida, ve el trabajo andando y escribe por WhatsApp.
+
+        FIRST VIEWPORT: titular centrado con la palabra que rota, bajada gris
+        angosta, dos botones chicos y el escenario azul con un panel real
+        cortado por el borde de abajo.
+
+        FORM: referencia pineada por el usuario (markiqsaas.framer.website),
+        medida en vivo; la direccion la fija el brief, no una tirada.
+
+        FINISH: unreviewed and undocumented is unfinished; this build ends
+        with the finish review, the verdict, and DESIGN.md
+      */}
         <SmoothScroll />
         {children}
       </body>

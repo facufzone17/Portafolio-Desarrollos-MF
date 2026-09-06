@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: `Aviso legal — ${site.name}`,
+  title: `Aviso legal | ${site.name}`,
   robots: { index: false },
 };
 

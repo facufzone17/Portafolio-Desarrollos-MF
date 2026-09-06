@@ -1,0 +1,37 @@
+/**
+ * La marca Trevoo, en datos.
+ *
+ * El isotipo es la T con el corte triangular; el logotipo es la palabra
+ * TREVOO entera. Los dos son un solo <path> cada uno, vectorizados desde los
+ * PNG que trajo Facundo (los .svg que mando venian vacios: un rectangulo
+ * #050612 y nada mas). El trazado se verifico rasterizando el resultado y
+ * comparandolo con el pixel original: 1,3% de diferencia en el isotipo y
+ * 2,7% en el logotipo, todo en el filo de las diagonales.
+ *
+ * Va aca y no en /public para que el preloader y el header compartan la misma
+ * geometria: el truco de la entrada es que el isotipo aterrice EXACTAMENTE
+ * encima del logo del header, y eso solo cierra si los dos son el mismo path.
+ */
+
+/** viewBox del isotipo. */
+export const ISOTIPO = { w: 197, h: 141 } as const;
+
+export const ISOTIPO_D =
+  "M23 0L195 0L197 5L187 25L183 28L53 28L48 32L44 40L0 40L20 2L23 0ZM45 50L77 70L46 90L45 50ZM106 50L145 50L109 126L103 138L98 141L62 141L97 65L106 50Z";
+
+/** viewBox del logotipo (la palabra completa). */
+export const LOGOTIPO = { w: 504, h: 75 } as const;
+
+export const LOGOTIPO_D =
+  "M361 0L377 0L391 5L400 12L400 14L405 19L409 29L409 45L403 59L391 70L377 75L361 75L347 70L336 60L329 44L329 31L336 15L346 6L361 0ZM455 0L472 0L485 5L497 16L503 29L503 45L496 60L485 70L471 75L454 75L441 70L430 60L430 58L425 52L423 45L423 30L429 16L441 5L455 0ZM4 2L71 3L72 12L70 15L43 15L42 73L29 72L29 15L1 15L0 6L4 2ZM89 2L136 2L144 5L146 8L149 9L154 20L153 33L150 39L138 48L144 54L147 60L152 64L157 73L141 73L139 69L136 67L136 65L132 62L132 60L128 57L128 55L124 52L124 50L112 38L112 36L133 36L139 32L141 26L140 21L136 16L133 15L100 15L100 71L99 73L86 72L86 5L89 2ZM175 2L231 2L233 4L233 12L231 15L173 15L172 5L175 2ZM246 2L258 2L260 4L260 7L266 17L266 20L274 34L274 37L284 57L305 15L305 12L309 4L311 2L324 3L324 6L303 47L303 50L293 70L290 73L278 73L276 71L268 55L268 52L259 36L259 33L256 30L256 27L248 13L248 10L245 6L246 2ZM367 13L358 15L352 18L347 23L343 31L343 44L347 52L355 59L364 62L374 62L383 59L392 51L396 41L396 34L392 24L386 18L377 14L367 13ZM460 13L446 18L440 24L437 31L436 40L440 51L446 57L458 62L468 62L477 59L486 51L489 44L490 35L486 24L480 18L471 14L460 13ZM174 31L231 31L232 41L229 44L174 44L172 43L172 33L174 31ZM174 60L232 60L233 70L230 73L174 73L172 71L172 62L174 60Z";
+
+/**
+ * Donde arranca y termina cada letra dentro del viewBox del logotipo, medido
+ * sobre las columnas de pixeles vacias del original.
+ *
+ * Es lo que hace posible el preloader sin cortar seis SVG a mano: cada letra
+ * se dibuja con el mismo path y su propio viewBox recortado, asi la maquina
+ * de escribir puede revelarlas de a una y, mas adelante, la T puede separarse
+ * de REVOO sin que nada se corra un pixel.
+ */
+export const LETRAS: readonly (readonly [number, number])[] = [[0, 71], [86, 156], [172, 232], [245, 323], [329, 408], [423, 502]];

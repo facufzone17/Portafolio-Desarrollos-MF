@@ -1,17 +1,20 @@
+import { Revelar } from "@/components/ui/Revelar";
+
 /**
  * Encabezado de seccion.
  *
- * Patron tomado de nyro (verificado en vivo): titulo grande a la izquierda y
- * bajada en la columna derecha, no centrado. Se usa en todas las secciones
- * para que el ritmo de la pagina sea el mismo.
+ * Titulo centrado en dos lineas y bajada gris angosta debajo, que es el ritmo
+ * exacto de la referencia (markiqsaas.framer.website, medido en vivo).
  *
- * El titulo es opcional: "Nuestros proyectos" va sin encabezado, directo a las
- * piezas. Sin titulo tampoco va el margen que lo separaba del contenido, si no
- * queda un hueco arriba sin nada que lo justifique.
+ * NO hay rotulo arriba del titulo. La version anterior ponia uno en cada
+ * seccion ("Nuestros proyectos", "Qué construimos", "El proceso", "Contacto")
+ * y ademas numeraba los bloques 01, 02, 03: son las dos marcas mas delatoras
+ * de una pagina generada. El titulo se sostiene solo; si necesita un rotulo
+ * que lo explique, el titulo esta mal escrito.
  *
- * `etiqueta` es para esos casos: la seccion sin titulo visible igual tiene que
- * tener nombre para quien la recorre con lector de pantalla, y ese nombre no
- * puede ser un <h2> escondido en el aire.
+ * La variedad de la pagina no vive aca: vive en los cuerpos de cada seccion
+ * (la pista horizontal, el indice pegajoso, el camino, el formulario). El
+ * encabezado es lo que se repite igual para que el resto pueda ser distinto.
  */
 export function Seccion({
   id,
@@ -23,6 +26,7 @@ export function Seccion({
 }: {
   id?: string;
   titulo?: string;
+  /** Solo nombre accesible cuando no hay titulo a la vista. Nunca se dibuja. */
   etiqueta?: string;
   bajada?: string;
   children: React.ReactNode;
@@ -31,24 +35,26 @@ export function Seccion({
   return (
     <section
       id={id}
-      aria-label={etiqueta}
+      aria-label={titulo ? undefined : etiqueta}
       // scroll-mt compensa el header sticky: sin esto el ancla deja el titulo
       // tapado detras de la barra.
-      className={`scroll-mt-20 py-20 sm:py-28 ${className}`}
+      className={`scroll-mt-24 py-20 sm:py-28 ${className}`}
     >
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
         {titulo && (
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-16">
-            <h2 className="text-[clamp(2rem,5vw,3.5rem)]">{titulo}</h2>
-            {bajada && (
-              <p className="max-w-[46ch] text-base text-text-muted sm:text-lg">
-                {bajada}
-              </p>
-            )}
-          </div>
+          <Revelar>
+            <div className="mx-auto max-w-[46ch] text-center">
+              <h2 className="text-[clamp(2rem,4.6vw,3.5rem)]">{titulo}</h2>
+              {bajada && (
+                <p className="mx-auto mt-5 max-w-[44ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
+                  {bajada}
+                </p>
+              )}
+            </div>
+          </Revelar>
         )}
 
-        <div className={titulo ? "mt-12 sm:mt-16" : ""}>{children}</div>
+        <div className={titulo ? "mt-14 sm:mt-20" : ""}>{children}</div>
       </div>
     </section>
   );

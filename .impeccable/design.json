@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-06T00:00:00.000Z",
+  "title": "Design System: Trevoo",
+  "extensions": {
+    "colorMeta": {
+      "azul": {
+        "role": "primary",
+        "displayName": "Electric Blue",
+        "canonical": "#0099ff",
+        "contrastOnGround": "6.6:1",
+        "tonalRamp": ["#031729", "#062a4a", "#0b4da8", "#0d8ef5", "#0099ff", "#3fb3ff", "#8ed2ff", "#d4ecff"]
+      },
+      "azul-hondo": {
+        "role": "primary",
+        "displayName": "Deep Blue",
+        "canonical": "#0b4da8",
+        "tonalRamp": ["#020c1a", "#04182f", "#072f66", "#0b4da8", "#1268d6", "#3f92ea", "#84bdf3", "#cfe4fa"]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Ground Black",
+        "canonical": "#08080a",
+        "tonalRamp": ["#08080a", "#131316", "#1c1c20", "#2b2b31", "#45454d", "#6b6b74", "#8e8e96", "#f4f4f5"]
+      },
+      "bg-elev": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "#131316",
+        "tonalRamp": ["#08080a", "#0e0e11", "#131316", "#1c1c20", "#26262b", "#33333a", "#4a4a52", "#8e8e96"]
+      },
+      "bg-alto": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "canonical": "#1c1c20",
+        "tonalRamp": ["#08080a", "#131316", "#1c1c20", "#26262b", "#33333a", "#4a4a52", "#6b6b74", "#8e8e96"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#f4f4f5",
+        "contrastOnGround": "18.6:1",
+        "tonalRamp": ["#1c1c20", "#33333a", "#4a4a52", "#6b6b74", "#8e8e96", "#b8b8be", "#d9d9dd", "#f4f4f5"]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Muted Grey",
+        "canonical": "#8e8e96",
+        "contrastOnGround": "6.1:1",
+        "tonalRamp": ["#131316", "#26262b", "#3b3b42", "#54545c", "#6f6f78", "#8e8e96", "#b5b5bb", "#dcdce0"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(255, 255, 255, 0.09)"
+      },
+      "line-alto": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "rgba(255, 255, 255, 0.16)"
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero headline only. Its 2.05rem lower bound is a hard floor: the rotating word is locked to one line and overflows a 360px screen above it." },
+      "headline": { "displayName": "Headline", "purpose": "Centred section titles, capped at 46ch. The pinned projects rail runs a smaller variant, clamp(1.75rem, 3.4vw, 3rem)." },
+      "title": { "displayName": "Title", "purpose": "The promise line beside a service panel; project names on a card run clamp(1.5rem, 2.6vw, 2.25rem)." },
+      "panel-label": { "displayName": "Panel Label", "purpose": "The rubro name set inside the top left of a service panel. A label for the screenshot, never an eyebrow for a heading." },
+      "body": { "displayName": "Body", "purpose": "Subheads and paragraphs, 15px rising to 16px at the sm breakpoint, capped at 42-46ch, muted grey by default." },
+      "label": { "displayName": "Label", "purpose": "Buttons, sticky index entries, chips, list items, form labels and error messages." },
+      "micro": { "displayName": "Micro", "purpose": "The filename in a window title bar. Hidden below the sm breakpoint." }
+    },
+    "shadows": [
+      {
+        "name": "stage-lift",
+        "value": "0 40px 90px -30px rgba(0,0,0,0.85)",
+        "purpose": "The only shadow in the system. Seats the hero screenshot frame on the blue stage, the one place a surface floats over a coloured field. Everything else is flat tonal layering."
+      }
+    ],
+    "motion": [
+      { "name": "ease-out-soft", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The page's main ease: reveals, hover transforms, the rotating word, header state." },
+      { "name": "ease-suave", "value": "cubic-bezier(0.33, 1, 0.68, 1)", "purpose": "Micro state changes: sticky index colour and its tilted active marker." },
+      { "name": "duration-micro", "value": "160ms", "purpose": "Hover and colour state on buttons, links, inputs, index entries." },
+      { "name": "duration-state", "value": "620ms", "purpose": "Larger state changes: card veil and zoom, header background, screenshot lift." },
+      { "name": "duration-reveal", "value": "820ms", "purpose": "The single page-wide entrance: 18px up plus a fade, staged by a delay prop." },
+      { "name": "angulo-marca", "value": "26deg", "purpose": "The isotype stem's fall. The only angle allowed for any diagonal edge, tilt, or directional gradient." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "container", "value": "1400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The site's single action. Paper white on black at 19.9:1, so blue stays free to be atmosphere.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Hablemos</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; background: var(--color-text, #f4f4f5); color: var(--color-bg, #08080a); font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-decoration: none; border: none; border-radius: var(--radius-card, 10px); transition: background 160ms cubic-bezier(0.33,1,0.68,1), transform 160ms cubic-bezier(0.33,1,0.68,1); } .ds-btn-primary:hover { background: #ffffff; } .ds-btn-primary:active { transform: scale(0.99); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-azul, #0099ff); outline-offset: 3px; border-radius: 3px; }"
+    },
+    {
+      "name": "WhatsApp CTA",
+      "kind": "button",
+      "refersTo": "button-primary-lg",
+      "description": "The large primary at 52px with a message-circle icon at 1.15em. The icon inherits the button's text colour; WhatsApp green appears nowhere.",
+      "html": "<a class=\"ds-btn-wa\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22z\"/></svg>Hablemos por WhatsApp</a>",
+      "css": ".ds-btn-wa { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 24px; background: var(--color-text, #f4f4f5); color: var(--color-bg, #08080a); font-family: Inter, system-ui, sans-serif; font-size: 16px; font-weight: 500; text-decoration: none; border-radius: var(--radius-card, 10px); transition: transform 160ms ease-out; } .ds-btn-wa svg { width: 1.15em; height: 1.15em; flex-shrink: 0; } .ds-btn-wa:hover { transform: scale(1.02); } .ds-btn-wa:active { transform: scale(0.99); } .ds-btn-wa:focus-visible { outline: 2px solid var(--color-azul, #0099ff); outline-offset: 3px; border-radius: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Panel fill with a hairline border. Used for the header action and for 'Ver proyectos'. Hover raises both border and fill one step.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">Ver proyectos</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; background: var(--color-bg-elev, #131316); color: var(--color-text, #f4f4f5); font-family: Inter, system-ui, sans-serif; font-size: 14px; text-decoration: none; border: 1px solid rgba(255,255,255,0.09); border-radius: var(--radius-card, 10px); transition: background 160ms cubic-bezier(0.33,1,0.68,1), border-color 160ms cubic-bezier(0.33,1,0.68,1); } .ds-btn-secondary:hover { background: var(--color-bg-alto, #1c1c20); border-color: rgba(255,255,255,0.16); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-azul, #0099ff); outline-offset: 3px; border-radius: 3px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Panel fill, hairline border, always a visible label above. Focus shifts the border to blue. Placeholders are examples, never labels.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-nombre\">Nombre</label><input class=\"ds-field-input\" id=\"ds-nombre\" type=\"text\" placeholder=\"Cómo te llamás\"></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 8px; font-family: Inter, system-ui, sans-serif; } .ds-field-label { font-size: 14px; color: var(--color-text, #f4f4f5); } .ds-field-input { width: 100%; padding: 12px 16px; background: var(--color-bg-elev, #131316); color: var(--color-text, #f4f4f5); font-family: inherit; font-size: 15px; border: 1px solid rgba(255,255,255,0.09); border-radius: var(--radius-card, 10px); transition: border-color 160ms cubic-bezier(0.33,1,0.68,1); } .ds-field-input::placeholder { color: var(--color-text-muted, #8e8e96); } .ds-field-input:focus { outline: none; border-color: var(--color-azul, #0099ff); } .ds-field-input[aria-invalid=\"true\"] { border-color: rgba(248,113,113,0.7); }"
+    },
+    {
+      "name": "Category Chip",
+      "kind": "chip",
+      "refersTo": "chip-category",
+      "description": "Project metadata on a card. Transparent fill, strong hairline, house radius. Static: chips here are not filters and have no selected state.",
+      "html": "<span class=\"ds-chip\">Panel de gestión</span>",
+      "css": ".ds-chip { display: inline-block; padding: 4px 12px; background: transparent; color: var(--color-text, #f4f4f5); font-family: Inter, system-ui, sans-serif; font-size: 14px; border: 1px solid rgba(255,255,255,0.16); border-radius: var(--radius-card, 10px); }"
+    },
+    {
+      "name": "Service Panel",
+      "kind": "card",
+      "refersTo": "card-panel",
+      "description": "The rubro panel: name set inside the top left, screenshot below, bottom padding dropped to zero so the screen runs off the edge.",
+      "html": "<div class=\"ds-panel\"><p class=\"ds-panel-label\">Tiendas</p><div class=\"ds-panel-crop\"><div class=\"ds-panel-screen\"></div></div></div>",
+      "css": ".ds-panel { background: var(--color-bg-elev, #131316); border-radius: var(--radius-card, 10px); padding: 28px 28px 0; overflow: hidden; font-family: Inter, system-ui, sans-serif; } .ds-panel-label { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: -0.02em; color: var(--color-text, #f4f4f5); } .ds-panel-crop { margin-top: 32px; } .ds-panel-screen { height: 140px; background: var(--color-bg-alto, #1c1c20); border: 1px solid rgba(255,255,255,0.16); border-bottom: none; border-radius: var(--radius-card, 10px) var(--radius-card, 10px) 0 0; }"
+    },
+    {
+      "name": "Screen Window",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The signature object: a product screenshot in a window frame. Dark title bar with three decorative dots and an optional 11px filename. Screenshots anchor to the top; a compact variant drops the bar.",
+      "html": "<div class=\"ds-window\"><div class=\"ds-window-bar\"><span class=\"ds-dot ds-dot-1\"></span><span class=\"ds-dot ds-dot-2\"></span><span class=\"ds-dot ds-dot-3\"></span><span class=\"ds-window-title\">Panel de administración</span></div><div class=\"ds-window-body\"></div></div>",
+      "css": ".ds-window { overflow: hidden; background: var(--color-bg-alto, #1c1c20); border: 1px solid rgba(255,255,255,0.16); border-radius: var(--radius-card, 10px); font-family: Inter, system-ui, sans-serif; } .ds-window-bar { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; background: #0a0a0c; border-bottom: 1px solid rgba(255,255,255,0.09); } .ds-dot { width: 8px; height: 8px; border-radius: 9999px; } .ds-dot-1 { background: rgba(255,255,255,0.25); } .ds-dot-2 { background: rgba(255,255,255,0.18); } .ds-dot-3 { background: rgba(255,255,255,0.12); } .ds-window-title { margin-left: 12px; font-size: 11px; color: var(--color-text-muted, #8e8e96); } .ds-window-body { aspect-ratio: 16 / 10; background: linear-gradient(180deg, #26262b, #131316); }"
+    },
+    {
+      "name": "Blue Stage",
+      "kind": "custom",
+      "refersTo": "stage-hero",
+      "description": "The hero's ground, and the only full field of colour in the document. Light enters on the brand angle, off-centre, never as a centred radial glow.",
+      "html": "<div class=\"ds-stage\"><div class=\"ds-stage-screen\"></div></div>",
+      "css": ".ds-stage { padding: 4.5% 6% 0; border-radius: var(--radius-card, 10px); overflow: hidden; background-color: var(--color-azul, #0099ff); background-image: linear-gradient(calc(90deg - var(--angulo-marca, 26deg)), #3fb3ff 0%, #0d8ef5 42%, var(--color-azul-hondo, #0b4da8) 100%), radial-gradient(120% 90% at 8% -10%, rgba(255,255,255,0.5), transparent 55%); background-blend-mode: normal, soft-light; } .ds-stage-screen { height: 150px; margin-bottom: -8%; background: var(--color-bg-elev, #131316); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-card, 10px); box-shadow: 0 40px 90px -30px rgba(0,0,0,0.85); }"
+    },
+    {
+      "name": "Sticky Index Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "The desktop-only services index. The active entry goes white and grows a 2px blue bar rotated to the brand angle, 18px to its left.",
+      "html": "<ul class=\"ds-index\"><li><a class=\"ds-index-item ds-index-active\" href=\"#\">Sitios web</a></li><li><a class=\"ds-index-item\" href=\"#\">Tiendas</a></li><li><a class=\"ds-index-item\" href=\"#\">Paneles</a></li></ul>",
+      "css": ".ds-index { list-style: none; margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 14px; font-family: Inter, system-ui, sans-serif; } .ds-index-item { position: relative; display: block; font-size: 14px; text-decoration: none; color: var(--color-text-muted, #8e8e96); transition: color 160ms cubic-bezier(0.33,1,0.68,1); } .ds-index-item::before { content: \"\"; position: absolute; left: -18px; top: 50%; height: 15px; width: 2px; translate: 0 -50%; rotate: var(--angulo-marca, 26deg); background: var(--color-azul, #0099ff); opacity: 0; transition: opacity 160ms cubic-bezier(0.33,1,0.68,1); } .ds-index-item:hover { color: var(--color-text, #f4f4f5); } .ds-index-active { color: var(--color-text, #f4f4f5); } .ds-index-active::before { opacity: 1; }"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Clean image at rest; on hover a dark veil drops in, the name and chips rise, and the image zooms 4%. On touch, the veil is always on so the resting state stays legible.",
+      "html": "<a class=\"ds-project\" href=\"#\"><div class=\"ds-project-img\"></div><div class=\"ds-project-veil\"></div><div class=\"ds-project-meta\"><h3 class=\"ds-project-name\">Duo Administración</h3><span class=\"ds-project-go\">Ver proyecto</span></div></a>",
+      "css": ".ds-project { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; text-decoration: none; background: var(--color-bg-elev, #131316); border: 1px solid rgba(255,255,255,0.09); border-radius: var(--radius-card, 10px); transition: border-color 160ms cubic-bezier(0.33,1,0.68,1); } .ds-project:hover { border-color: rgba(0,153,255,0.45); } .ds-project-img { position: absolute; inset: 0; background: linear-gradient(140deg, #d9d9dd, #8e8e96); transition: transform 620ms cubic-bezier(0.16,1,0.3,1); } .ds-project:hover .ds-project-img { transform: scale(1.04); } .ds-project-veil { position: absolute; inset: 0; background: rgba(8,8,10,0); transition: background 620ms cubic-bezier(0.16,1,0.3,1); } .ds-project:hover .ds-project-veil, .ds-project:focus-visible .ds-project-veil { background: rgba(8,8,10,0.85); } .ds-project-meta { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 0 24px; text-align: center; opacity: 0; transform: translateY(8px); transition: opacity 620ms cubic-bezier(0.16,1,0.3,1), transform 620ms cubic-bezier(0.16,1,0.3,1); } .ds-project:hover .ds-project-meta, .ds-project:focus-visible .ds-project-meta { opacity: 1; transform: none; } .ds-project-name { margin: 0; font-family: \"Inter Tight\", Inter, system-ui, sans-serif; font-size: 28px; font-weight: 500; letter-spacing: -0.04em; line-height: 1.03; color: var(--color-text, #f4f4f5); } .ds-project-go { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; background: var(--color-text, #f4f4f5); color: var(--color-bg, #08080a); font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; border-radius: var(--radius-card, 10px); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lit Rack",
+    "overview": "The page is a rack of screens that already work. Everything in this system exists to hold up a real screenshot: the ground goes flat black and stays out of the way, the type goes tight and quiet, and one electric blue is spent — once — as a lit stage under the strongest capture in the build. Nothing else on the page is allowed to glow.\n\nThe character is dense and workmanlike rather than atmospheric. Panels are grey steps off a neutral black, hairlines are barely there, and headings sit at weight 500 instead of 600 or 700 because at 600 a headline reads as an advertisement and at 500 it reads as an interface. There is no ornament layer: no glow behind the title, no eyebrow above a heading, no order numbers on blocks, no repeated colour panel per service. The variety comes from layout — a pinned horizontal rail, a sticky index, a path, a form — not from six different entrance animations or four tinted boxes.\n\nThe system is defined as much by its refusals as its tokens. It is built directly against the dark-SaaS-landing mould: a radial glow behind the hero, a small label above every section, numbered blocks, and four identical coloured cards were all present in an earlier build and were all removed. What replaced them is a single gesture repeated everywhere (one reveal, one radius, one angle, one accent), so that the one moment of colour still reads as a moment.",
+    "keyCharacteristics": [
+      "Flat neutral black ground (#08080a), no gradients and no glow outside the one stage",
+      "Exactly one colour on the page, electric blue, at 6.6:1 against the ground",
+      "One radius (10px) on every corner, buttons included — zero pills",
+      "Inter Tight 500 at -0.04em for anything looked at; Inter for anything read",
+      "No eyebrow, no section number, anywhere",
+      "Diagonal edges only at 26deg, the angle of the isotype's stem",
+      "Product screenshots are the only imagery and the only source of light"
+    ],
+    "rules": [
+      { "name": "The One Colour Rule", "body": "Blue is the only colour in the system. If a new element needs \"its own colour\", the answer is a neutral step or a hairline, not a second hue. Four differently tinted panels is the failure mode this rule exists to prevent.", "section": "colors" },
+      { "name": "The Stage-Once Rule", "body": "The blue stage (.escenario) appears exactly one time in the document, in the hero. A second one demotes it from a moment to a template. Everywhere else blue is a line, a border, or a word — never a field.", "section": "colors" },
+      { "name": "The Measured Contrast Rule", "body": "Every text colour in this system has a measured ratio on the ground: white 18.6:1, muted 6.1:1, blue 6.6:1. A new text colour is admissible only once it has been measured against the ground and clears 4.5:1. Do not introduce a \"dimmer grey\" for de-emphasis; muted is the floor.", "section": "colors" },
+      { "name": "The No-Eyebrow Rule", "body": "No small label above any heading, anywhere, and no order number on any block. A heading that needs a label above it to be understood is a badly written heading. This is the single most legible tell of a generated page and the system refuses it outright.", "section": "typography" },
+      { "name": "The 500 Rule", "body": "Headings are weight 500 at -0.04em, never 600 or 700 and never looser. Bolder reads as advertising; -0.04em is the tracking floor, below which letters collide on small screens.", "section": "typography" },
+      { "name": "The Balanced Heading Rule", "body": "Headings carry text-wrap: balance and a 46ch cap so a section title never breaks into a one-word orphan line.", "section": "typography" },
+      { "name": "The No-Overflow Rule", "body": "overflow-x: clip is set on body and nothing is allowed to require horizontal scrolling. A wide element crops or scales; it does not widen the page.", "section": "layout" },
+      { "name": "The Own-Scroll Rule", "body": "The browser's scroll is the scroll. Smooth scrolling is Lenis-assisted and reduced-motion turns it off at the root. The one pinned section is a deliberate, explicitly requested exception, and it is not a pattern to repeat.", "section": "layout" },
+      { "name": "The Flat Ground Rule", "body": "No shadow, no glow, no gradient on the black ground. Depth off the stage is a tonal step or a hairline. A radial glow behind a heading is the default gesture of every generated dark page and is banned by name.", "section": "elevation" },
+      { "name": "The Crop-Don't-Float Rule", "body": "Screens are cropped by the bottom edge of whatever contains them, not centred inside a frame with air around them. The crop is what reads as \"this screen continues\" and what invites the scroll without drawing an arrow.", "section": "elevation" },
+      { "name": "The One Radius Rule", "body": "10px on everything, buttons included. If a new element needs a different corner, it is the wrong element.", "section": "shapes" },
+      { "name": "The Brand Angle Rule", "body": "Every diagonal edge, tilt, or directional gradient uses var(--angulo-marca) (26deg). No other angle is admissible, including \"nicer\" ones like 15 or 45. The brand's only proprietary geometry becomes a system by being reused, not by living once in the header.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do use one radius, 10px, on every rectangle including buttons.",
+      "Do keep blue as the page's only colour, and spend it as a full field exactly once.",
+      "Do let headings stand alone: no label above them, no number beside them.",
+      "Do set headings in Inter Tight 500 at -0.04em, and body copy in Inter.",
+      "Do use 26deg (var(--angulo-marca)) for every diagonal edge or directional gradient.",
+      "Do crop screenshots against the bottom edge of their container so a screen reads as continuing.",
+      "Do anchor screenshot crops to the top (object-top); the identifying part of a full-page capture is at the top.",
+      "Do keep every tappable target at 44px minimum.",
+      "Do measure a new text colour against the ground before using it; the floor is 4.5:1 and the muted grey at 6.1:1 is the dimmest tone in the system.",
+      "Do switch a service block to its single-column text layout when it has no screenshot yet.",
+      "Do keep contain: paint on the rotating word's mask and keep will-change off the animating words.",
+      "Do give every motion a reduced-motion path that ends with the content visible."
+    ],
+    "donts": [
+      "Don't use a pill. rounded-full belongs to circles only: the window dots and a phone mock's island.",
+      "Don't put a radial glow behind a heading, or any gradient on the black ground.",
+      "Don't introduce a second accent hue, or tint panels per section. Four identically coloured blocks is a template, not a system.",
+      "Don't number blocks 01–04, and don't add an eyebrow above a section title.",
+      "Don't set a heading at 600 or 700, and don't track tighter than -0.04em.",
+      "Don't draw a dashed empty box where the rest of the page shows product; a rubro with no capture changes layout instead.",
+      "Don't repeat a name three times down one strip — if the sticky index and the panel label already say \"Tiendas\", the promise column says the promise.",
+      "Don't use a blue-black ground. Neutral black under a blue accent is the whole point.",
+      "Don't put WhatsApp green anywhere, including the icon.",
+      "Don't add a second entrance animation. There is one reveal for the page; variety comes from layout.",
+      "Don't let any element force horizontal scrolling."
+    ]
+  }
+}

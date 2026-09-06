@@ -8,7 +8,7 @@ import { whatsappUrl } from "@/lib/site";
  */
 export function CtaWhatsApp({
   mensaje,
-  children = "Hablemos por WhatsApp",
+  children = "Contactanos",
   size = "md",
   className = "",
 }: {
@@ -29,7 +29,7 @@ export function CtaWhatsApp({
       target="_blank"
       rel="noopener noreferrer"
       data-analytics="cta-whatsapp"
-      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-btn)]
+      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-card)]
         bg-text font-medium text-bg transition-transform duration-[var(--duration-micro)]
         ease-out hover:scale-[1.02] active:scale-[0.99] ${sizes[size]} ${className}`}
     >

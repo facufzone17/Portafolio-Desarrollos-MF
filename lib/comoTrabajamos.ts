@@ -11,7 +11,7 @@ export const etapas: Etapa[] = [
     numero: "01",
     titulo: "Conocer al cliente",
     texto:
-      "Hablamos de tu negocio antes de hablar de tecnología: cómo trabajás hoy, qué te hace perder tiempo y qué te preguntan tus clientes todo el día. De ahí sale qué hay que construir — y a veces, qué no.",
+      "Hablamos de tu negocio antes de hablar de tecnología: cómo trabajás hoy, qué te hace perder tiempo y qué te preguntan tus clientes todo el día. De ahí sale qué hay que construir, y a veces qué no.",
     necesitamos: "Una charla.",
   },
   {
@@ -27,7 +27,7 @@ export const etapas: Etapa[] = [
     texto:
       "Construimos por partes y te vamos mostrando. No desaparecemos tres semanas para volver con algo que no esperabas.",
     necesitamos:
-      "El contenido: fotos, textos y precios. Es lo que más atrasa un proyecto — cuanto antes llega, antes se termina.",
+      "El contenido: fotos, textos y precios. Es lo que más atrasa un proyecto: cuanto antes llega, antes se termina.",
   },
   {
     numero: "04",

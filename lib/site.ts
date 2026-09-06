@@ -1,17 +1,16 @@
 /**
  * Datos de marca y contacto. Fuente unica.
  *
- * Ningun componente hardcodea telefono, mail ni dominio: todo sale de aca.
- * El brief (§5.5) lo pide explicitamente porque el dominio todavia no se
- * compro y hay que poder cambiarlo en un solo lugar.
+ * Ningun componente hardcodea nombre, telefono, mail ni dominio: todo sale de
+ * aca. El cambio de "Desarrollos MF" a "Trevoo" (04/09/2026) se hizo tocando
+ * este archivo y la marca en lib/marca.ts, no buscando el nombre por el arbol.
  */
 
 export const site = {
-  name: "Desarrollos MF",
-  /** §10.9 */
-  title: "Desarrollos MF — Sitios, tiendas y sistemas a medida",
+  name: "Trevoo",
+  title: "Trevoo: sitios, tiendas, paneles y automatizaciones",
   description:
-    "Construimos sitios web, tiendas online, sistemas de gestión y automatizaciones para negocios. Mirá nuestros proyectos funcionando.",
+    "Construimos sitios web, tiendas online, paneles de gestión y automatizaciones para negocios. Mirá nuestros proyectos funcionando.",
 
   /** Formato internacional sin signos, para wa.me: 54 + 9 + 11 + numero. */
   whatsapp: "5491122728576",
@@ -33,9 +32,11 @@ export const site = {
 /** Mensajes prellenados de WhatsApp (§10.7). */
 export const mensajes = {
   general:
-    "Hola, vi el portafolio de Desarrollos MF y quiero consultarles por un proyecto.",
+    "Hola, vi el portafolio de Trevoo y quiero consultarles por un proyecto.",
   proyecto: (proyecto: string) =>
     `Hola, vi la demo de ${proyecto} en el portafolio y quiero algo así para mi negocio.`,
+  servicio: (servicio: string) =>
+    `Hola, vi la sección de ${servicio} en el portafolio de Trevoo y quiero algo así para mi negocio.`,
 } as const;
 
 /** Link a WhatsApp con mensaje prellenado. */
@@ -52,13 +53,13 @@ export function instagramUrl(): string | null {
 }
 
 /**
- * Secciones de la home, en el orden del §4.1. Los `id` son los anclas reales
- * de cada bloque. Hoy no alimenta ninguna barra de navegacion: la home se
- * recorre scrolleando, por decision de Facundo.
+ * Secciones de la home, en orden. Los `id` son los anclas reales de cada
+ * bloque. Hoy no alimenta ninguna barra de navegacion: la home se recorre
+ * scrolleando, por decision de Facundo.
  */
 export const secciones = [
-  { id: "que-hacemos", label: "Qué hacemos" },
   { id: "proyectos", label: "Proyectos" },
+  { id: "servicios", label: "Qué construimos" },
   { id: "como-trabajamos", label: "Cómo trabajamos" },
   { id: "quienes-somos", label: "Quiénes somos" },
   { id: "contacto", label: "Contacto" },

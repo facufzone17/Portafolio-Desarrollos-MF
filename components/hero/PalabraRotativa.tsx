@@ -74,7 +74,19 @@ export function PalabraRotativa() {
   const alto = "pb-[0.14em] whitespace-nowrap";
 
   return (
-    <span className="relative mt-[0.06em] block overflow-hidden -mb-[0.14em]">
+    // `contain: paint` no es decorativo y no se puede sacar: sin el, la
+    // mascara pierde el recorte a mitad de la transicion. Chrome promueve la
+    // palabra a su propia capa mientras el transform anima, y una capa
+    // compuesta no queda recortada por el `overflow: hidden` de un ancestro
+    // que no es, el mismo, un contexto de recorte. El resultado es que la
+    // palabra que sale y la que entra se pintan las dos encima de
+    // "Desarrollando" durante ~300ms.
+    //
+    // Se veia solo a densidad de pixel 1 y solo en cuadros intermedios, asi
+    // que no aparece en una captura suelta: se encontro sacando diez cuadros
+    // seguidos por CDP a dPR 1. `contain: paint` le promete al navegador que
+    // nada se dibuja fuera de la caja, y eso el compositor si lo respeta.
+    <span className="relative mt-[0.06em] block overflow-hidden [contain:paint] -mb-[0.14em]">
       <span className={`invisible block ${alto}`} aria-hidden>
         {MAS_ANCHA}
       </span>

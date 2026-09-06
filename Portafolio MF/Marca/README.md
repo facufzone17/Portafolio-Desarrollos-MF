@@ -1,65 +1,79 @@
-# Marca — Desarrollos MF
+# Marca — Trevoo
+
+> **04/09/2026 — cambió la marca.** Desarrollos MF pasó a llamarse **Trevoo**.
+> Los archivos `Logo Desarrollos MF*`, `logo-mono*` y `favicon*` (sin prefijo)
+> son de la marca vieja y **no los usa nadie**: quedan como historial.
 
 ## Logo ✅
 
-Monograma **MF**, geométrico y angular. Existe como **vector real**.
+Dos piezas: un **isotipo** (la T con el corte triangular, tipo play) y un
+**logotipo** (la palabra TREVOO). Juntos forman el lockup del header.
 
 ### Archivos que usa el sitio
 
+El sitio **no lee ninguno de estos archivos**: la geometría vive en
+[`lib/marca.ts`](../../lib/marca.ts), como dos strings de `path`, y los
+componentes `Isotipo` / `Logotipo` la dibujan inline. Eso es lo que permite que
+el preloader recorte la palabra letra por letra y que el isotipo que vuela
+aterrice **exactamente** encima del logo del header.
+
+Estos SVG son la copia exportada, para lo que vive fuera del sitio (firmas de
+mail, redes, un PDF de propuesta):
+
 | Archivo | Qué es | Peso |
 |---|---|---|
-| **`logo-mono.svg`** | El monograma con `fill="currentColor"` → toma el color por CSS. **Es el que va en el header.** | 375 B |
-| `favicon.svg` | Cuadrado navy con esquinas redondeadas, mark blanco | 455 B |
-| `favicon-32.png` · `-180.png` · `-512.png` | Rasters del favicon (pestaña, iOS, PWA) | 1-14 KB |
-| `logo-mono-blanco-1024.png` | Mark blanco con transparencia, por si hace falta un raster | 34 KB |
+| **`trevoo-isotipo.svg`** | La T sola, `fill="currentColor"` | 253 B |
+| **`trevoo-logotipo.svg`** | La palabra TREVOO, `currentColor` | 1,3 KB |
+| **`trevoo-lockup.svg`** | Isotipo + palabra, con la separación exacta del header | 1,5 KB |
+| `trevoo-favicon.svg` | Cuadrado negro con esquinas redondeadas y la T blanca | 370 B |
+| `trevoo-favicon-32/180/512.png` | Rasters del favicon (pestaña, iOS, PWA) | 0,3–4 KB |
 
-**Cómo se usa:** al ser `currentColor`, el mismo archivo sirve de cualquier color. No hay que mantener variantes:
+Al ser `currentColor`, el mismo archivo sirve de cualquier color:
 
 ```jsx
-<span className="text-white"><Logo /></span>   {/* blanco en el header */}
-<span className="text-[#1A213B]"><Logo /></span> {/* navy sobre fondo claro */}
+<span className="text-white"><Isotipo /></span>
+<span className="text-[#050612]"><Isotipo /></span>
 ```
 
-### Archivos originales (no usar en el sitio)
+### De dónde salió el vector
 
-| Archivo | Por qué no se usa |
+Los archivos que llegaron de diseño **estaban vacíos**:
+
+| Archivo entregado | Qué tenía adentro |
 |---|---|
-| `Logo Desarrollos MF (1).png` | Original de referencia. Fondo navy quemado, sin transparencia. |
-| `Logo Desarrollos MF.svg` | ⚠️ **No es un vector.** Contiene `0` elementos `<path>`, un **JPEG embebido en base64** y **dos rectángulos de fondo blanco**. Pesa 1,4 MB. Es un raster envuelto en SVG — lo que devuelven los conversores online gratuitos: no vectorizan, envuelven. |
+| `Logo Trevoo.svg` | Un solo `<rect>` de 606×603 relleno de `#050612`. Cero `<path>`. |
+| `Isotipo Trevoo.png` | 1044×603 px de un único color, `#050612`. Nada dibujado. |
 
----
+Los que sí servían eran `trevoo_isotipo_concepto3.png` (197×141) y
+`trevoo_logotipo_concepto3.png` (504×75): blanco sobre transparente.
 
-## Cómo se hizo el vector
+De ahí se **vectorizaron** los dos paths (contorno por marching squares sobre
+la máscara de alfa, más Douglas-Peucker para sacar la escalera de píxeles). El
+resultado se verificó rasterizándolo de nuevo y comparándolo contra el píxel
+original: **1,3 % de diferencia en el isotipo y 2,7 % en el logotipo**, todo
+sobre el filo de las diagonales.
 
-No se calcó a ojo. El procedimiento fue:
+**Si aparece el vector real de diseño, reemplazar los dos `path` de
+`lib/marca.ts` y regenerar estos archivos.** Los números de `LETRAS` (dónde
+empieza y termina cada letra dentro del viewBox) también salen de ahí y son los
+que usa el preloader: si cambia el logotipo, hay que recalcularlos.
 
-1. Umbralizar el PNG original para aislar el trazo blanco.
-2. Separar componentes conexos → **3 formas**.
-3. Trazar el contorno de cada una (Moore) y simplificar con **Douglas-Peucker** → **20 vértices en total**, sin curvas.
-4. Limpiar el ruido de rasterización respetando el sistema de construcción detectado:
-   - **grosor de trazo: 139 px**
-   - **diagonales con pendiente dx/dy = √2** (consistente en todo el mark)
-   - **separaciones uniformes de ~136 px** entre trazos
-5. Verificar contra el original: **IoU 99,33 %** (lo que difiere es el antialiasing del borde).
+## Color
 
-**Resultado:** 375 bytes contra 1,4 MB — **3.600× más liviano**, nítido a cualquier tamaño, con transparencia real.
-
-### Detalle pendiente de decisión
-
-En el original, el trazo central (el pie de la F) **baja 24 px más** que los otros dos (961 vs 937). Son 2,5 % de la altura: invisible a 32 px, apreciable a tamaño grande. **El vector lo respeta tal cual.** Si se prefiere alinear los tres pies a una misma base, es cambiar un número.
-
----
-
-## Color de marca
-
-Navy del logo: **`#1A213B`** — medido sobre el archivo original, no estimado.
-
-⚠️ Sobre el fondo negro del sitio (`#08090C`) este navy da **1,3:1** de contraste: es prácticamente invisible. Se usa **solo para atmósfera** (humo, glows, degradados). Para texto, íconos, chips y anillos de foco va `--brand-soft` **`#8FA9E0`**, que da **8,5:1**. Ver §3.3 del build brief.
-
----
-
-## Pendiente
-
-| Archivo | Para qué | Estado |
+| Token | Valor | Para qué |
 |---|---|---|
-| `og-image.png` (1200×630) | Preview al compartir el link | ⬜ falta — conviene hacerla cuando esté la tipografía Manrope montada, para que lleve el wordmark |
+| `--color-bg` | `#050612` | El negro de la marca. Sale del propio archivo de logo. |
+| `--color-azul` | `#2563ff` | **Superficie**, no texto: sobre el negro da 2,9:1. |
+| `--color-acento` | `#8ab0ff` | El azul que **sí** se puede leer: 9,3:1 sobre el fondo. |
+| `--color-text` | `#f4f6fb` | 18,6:1 |
+| `--color-text-muted` | `#9096ab` | 6,9:1 |
+
+## Tipografía
+
+**Inter Tight** para títulos, números y la voz de panel; **Inter** para el
+texto. Las dos salen de la referencia que eligió Facundo
+(markiqsaas.framer.website), leída en vivo: su CSS declara `Inter Display` para
+casi todo e `Inter Tight` en los bloques de panel.
+
+Las carga `next/font` y quedan self-hosteadas: sin request a Google, sin
+bloqueo de render y sin CLS de fuente.

@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: `Privacidad — ${site.name}`,
+  title: `Privacidad | ${site.name}`,
   robots: { index: false },
 };
 
@@ -19,7 +19,7 @@ export default function Privacidad() {
           <p className="mt-8 rounded-[var(--radius-card)] border border-line bg-bg-elev p-6 text-text-muted">
             <strong className="text-text">Pendiente de redacción.</strong> Esta
             política se escribe con contenido real antes de publicar los
-            anuncios — tiene que decir qué datos se guardan de verdad y por
+            anuncios: tiene que decir qué datos se guardan de verdad y por
             cuánto tiempo.
           </p>
         </div>

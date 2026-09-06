@@ -1,10 +1,9 @@
 import { Header } from "@/components/Header";
-import { Intro } from "@/components/intro/Intro";
+import { Preloader } from "@/components/preloader/Preloader";
 import { Footer } from "@/components/Footer";
-import { ZonaPiedra } from "@/components/fondo/ZonaPiedra";
 import { Hero } from "@/components/hero/Hero";
-import { QueHacemos } from "@/components/que-hacemos/QueHacemos";
 import { Proyectos } from "@/components/proyectos/Proyectos";
+import { Servicios } from "@/components/servicios/Servicios";
 import { ComoTrabajamos } from "@/components/como-trabajamos/ComoTrabajamos";
 import { QuienesSomos } from "@/components/QuienesSomos";
 import { Contacto } from "@/components/contacto/Contacto";
@@ -12,20 +11,20 @@ import { Contacto } from "@/components/contacto/Contacto";
 export default function Home() {
   return (
     <>
-      <Intro />
+      <Preloader />
       <Header />
       <main className="flex-1">
         <Hero />
         {/*
-          Proyectos y "Que hacemos" comparten un mismo fondo de piedra, que
-          entra en escena cuando el panel de proyectos se retrae al final de su
-          recorrido (ver ProyectosPista). Van juntos adentro de la zona para
-          que el fondo sea uno solo y continuo, sin junta entre las dos.
+          Proyectos primero y despues los servicios: se muestra el trabajo y
+          recien despues se explica. Entre las dos ya no hay transicion
+          fabricada — la piedra, la retraccion del panel y las filas de iconos
+          se sacaron enteras (04/09/2026): es scroll normal.
         */}
-        <ZonaPiedra>
-          <Proyectos />
-          <QueHacemos />
-        </ZonaPiedra>
+        <Proyectos />
+        <div className="mt-24 sm:mt-32">
+          <Servicios />
+        </div>
         <ComoTrabajamos />
         <QuienesSomos />
         <Contacto />

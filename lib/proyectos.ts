@@ -108,7 +108,7 @@ export const proyectos: Proyecto[] = [
     imagen: duoMiniatura,
     proporcion: "lg:aspect-[4/5]",
     ubicacion: "lg:col-start-1 lg:col-span-5 lg:row-start-1",
-    pista: { alto: "h-[82vh]", aspecto: "aspect-[4/5]", carril: "self-center" },
+    pista: { alto: "h-[62vh]", aspecto: "aspect-[4/5]", carril: "self-center" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: duoPoster,
     esDemo: false,
@@ -132,7 +132,7 @@ export const proyectos: Proyecto[] = [
     imagen: tiendaMatesMiniatura,
     proporcion: "lg:aspect-[16/9]",
     ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:mt-[30vh]",
-    pista: { alto: "h-[54vh]", aspecto: "aspect-[16/9]", carril: "self-center -translate-y-[8vh]" },
+    pista: { alto: "h-[40vh]", aspecto: "aspect-[16/9]", carril: "self-center -translate-y-[6vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: tiendaMatesPoster,
     // Demo para pitchear el servicio: productos, precios y fotos son de
@@ -148,7 +148,7 @@ export const proyectos: Proyecto[] = [
     resumen:
       "Una distribuidora que vende por unidad lo que el resto vende por cajón: cientos de artículos con precio propio, hoy respondidos uno por uno por WhatsApp.",
     detalle: [
-      "Catálogo completo repartido en diecinueve categorías — de vinos y cervezas a snacks, aceites y regalería —, con paginado, orden por precio o nombre y filtros de disponible y en oferta.",
+      "Catálogo completo repartido en diecinueve categorías (de vinos y cervezas a snacks, aceites y regalería), con paginado, orden por precio o nombre y filtros de disponible y en oferta.",
       "Buscador en el encabezado para llegar al producto escribiendo la marca, sin recorrer el menú.",
       "Precios y ofertas visibles, con el porcentaje de descuento y el precio anterior tachado.",
       "Pedido armado desde cualquier página con un botón, y guardado en el navegador: se puede cerrar y volver sin perderlo.",
@@ -161,7 +161,7 @@ export const proyectos: Proyecto[] = [
     imagen: distribuidoraMiniatura,
     proporcion: "lg:aspect-[3/1]",
     ubicacion: "lg:col-start-2 lg:col-span-11 lg:row-start-2 lg:mt-[14vh]",
-    pista: { alto: "h-[64vh]", aspecto: "aspect-[3/2]", carril: "self-center translate-y-[5vh]" },
+    pista: { alto: "h-[48vh]", aspecto: "aspect-[3/2]", carril: "self-center translate-y-[4vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 90vw, 1280px",
     poster: distribuidoraPoster,
     // Demo para mostrar el servicio: el nombre del negocio, la direccion, los
@@ -189,7 +189,7 @@ export const proyectos: Proyecto[] = [
     imagen: inmobiliariaMiniatura,
     proporcion: "lg:aspect-[16/9]",
     ubicacion: "lg:col-start-1 lg:col-span-7 lg:row-start-3 lg:mt-[10vh]",
-    pista: { alto: "h-[60vh]", aspecto: "aspect-[8/5]", carril: "self-start mt-[4vh]" },
+    pista: { alto: "h-[46vh]", aspecto: "aspect-[8/5]", carril: "self-start mt-[3vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 60vw, 820px",
     poster: inmobiliariaPoster,
     // La cartera, la direccion, el telefono y la resena son del negocio real:

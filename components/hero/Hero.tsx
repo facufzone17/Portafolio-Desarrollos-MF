@@ -208,13 +208,13 @@ export function Hero() {
                   src={consorcios}
                   alt=""
                   sizes="(min-width: 1024px) 602px, 48vw"
-                  className="absolute left-[24.2%] w-[43%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[21.45%] w-[43%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
                 />
                 <Image
                   src={tienda}
                   alt=""
                   sizes="(min-width: 1024px) 521px, 42vw"
-                  className="absolute left-[38.6%] w-[37.2%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[41.35%] w-[37.2%] rotate-[5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
                 />
               </div>
             </div>

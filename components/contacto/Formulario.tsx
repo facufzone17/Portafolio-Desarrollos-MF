@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
+import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 
 type Campo = "nombre" | "negocio" | "necesita" | "contacto";
 
@@ -164,12 +165,19 @@ export function Formulario() {
         <button
           type="submit"
           disabled={estado === "enviando"}
-          className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[var(--radius-card)] bg-text px-6 font-medium text-bg transition-transform duration-[var(--duration-micro)] hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+          data-boton="claro"
+          className="group min-h-[52px] px-6 text-base disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         >
           {estado === "enviando" && (
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
           )}
-          {estado === "enviando" ? "Enviando…" : "Enviar"}
+          {/* Mientras envia no hay deslizamiento: el boton esta deshabilitado
+              y el hover no se dispara, asi que seria maquinaria muerta. */}
+          {estado === "enviando" ? (
+            "Enviando…"
+          ) : (
+            <TextoDeslizante>Enviar</TextoDeslizante>
+          )}
         </button>
 
         {estado === "error" && (

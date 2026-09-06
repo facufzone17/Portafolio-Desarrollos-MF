@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/ui/Logo";
+import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { secciones, site, whatsappUrl } from "@/lib/site";
 
 /**
@@ -73,9 +74,9 @@ export function Header() {
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="rounded-card px-3 py-2 text-[15px] whitespace-nowrap text-white/75 transition-colors duration-[var(--duration-micro)] hover:text-white"
+              className="group rounded-card px-3 py-2 text-[15px] whitespace-nowrap text-white/75 transition-colors duration-[var(--duration-micro)] hover:text-white"
             >
-              {s.label}
+              <TextoDeslizante>{s.label}</TextoDeslizante>
             </a>
           ))}
         </nav>
@@ -86,9 +87,9 @@ export function Header() {
           rel="noopener noreferrer"
           data-analytics="cta-header"
           data-boton="oscuro"
-          className="shrink-0"
+          className="group shrink-0"
         >
-          Contactanos
+          <TextoDeslizante>Contactanos</TextoDeslizante>
         </a>
       </div>
     </header>

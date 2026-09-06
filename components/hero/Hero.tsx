@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Isotipo } from "@/components/ui/Isotipo";
+import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { mensajes, whatsappUrl } from "@/lib/site";
 import { PalabraRotativa } from "./PalabraRotativa";
 import consorcios from "@/assets/dispositivos/consorcios.png";
@@ -153,16 +154,17 @@ export function Hero() {
               style={{ "--hero-retardo": `${RETARDO.botones}ms` } as React.CSSProperties}
               className="mt-8 flex flex-wrap items-center justify-center gap-2.5"
             >
-              <Link href="#proyectos" data-boton="oscuro">
-                Proyectos
+              <Link href="#proyectos" data-boton="oscuro" className="group">
+                <TextoDeslizante>Proyectos</TextoDeslizante>
               </Link>
               <a
                 href={whatsappUrl(mensajes.general)}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-boton="claro"
+                className="group"
               >
-                Contactanos
+                <TextoDeslizante>Contactanos</TextoDeslizante>
               </a>
             </div>
           </motion.div>

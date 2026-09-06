@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DemoFrame } from "@/components/ui/DemoFrame";
 import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
+import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { proyectos, proyectoPorSlug } from "@/lib/proyectos";
 import { mensajes, site } from "@/lib/site";
 
@@ -50,13 +51,11 @@ export default async function FichaProyecto({
           */}
           <Link
             href="/#proyectos"
-            className="group relative inline-flex min-h-11 items-center overflow-hidden rounded-[var(--radius-card)] border border-line px-4 text-sm text-text-muted transition-colors duration-[var(--duration-state)] ease-[var(--ease-out-soft)] hover:text-bg"
+            data-boton="linea"
+            className="group text-sm"
           >
-            <span
-              aria-hidden
-              className="absolute inset-0 origin-left scale-x-0 bg-text transition-transform duration-[var(--duration-state)] ease-[var(--ease-out-soft)] group-hover:scale-x-100"
-            />
-            <span className="relative">← Volver a los proyectos</span>
+            <span aria-hidden>&larr;</span>
+            <TextoDeslizante>Volver a los proyectos</TextoDeslizante>
           </Link>
 
           <header className="mt-8 flex flex-col gap-5">

@@ -50,6 +50,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="es-AR"
       className={`${inter.variable} ${interTight.variable} h-full`}
+      // El <script> inline del preloader le agrega `js` (y a veces
+      // `preloader-visto`) antes de que hidrate React: el server no puede saber
+      // si hay JavaScript. Es el patron estandar de los scripts que tocan
+      // <html> antes de la hidratacion; solo silencia este nodo, no los hijos.
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-bg">
       {/*

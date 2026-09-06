@@ -213,7 +213,16 @@ html.lenis {
 /*
  * Sin JS y con movimiento reducido, todo se ve. Un contenido que solo aparece
  * si corre una animacion es contenido que se puede perder.
+ *
+ * El IntersectionObserver de Revelar.tsx nunca corre sin JavaScript: ahi el
+ * `html:not(.js)` (la marca la pone el <script> inline del preloader) deja el
+ * contenido plano y visible en vez de en opacity 0 para siempre.
  */
+html:not(.js) [data-revelar] {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-revelar] {
     opacity: 1;
@@ -307,6 +316,32 @@ html.lenis {
   --pre-cursor-op: 0;
 
   opacity: var(--pre-fondo);
+
+  /*
+   * Ultimo recurso, por si el JS quedo congelado en el parseo mismo (ni este
+   * componente ni el <script> inline llegaron a correr su setTimeout). El negro
+   * se descarta igual a los 7s. Con cualquier JS vivo esto nunca se alcanza: el
+   * nodo ya se desmonto o el <script> le puso `display:none` via clase.
+   *
+   * Anima solo `visibility` a proposito: no promueve capa ni crea contexto de
+   * apilado, asi no toca el `clip-path` de las letras (ver el OJO de arriba).
+   */
+  animation: preloader-failsafe 1ms linear 7000ms forwards;
+}
+
+@keyframes preloader-failsafe {
+  to {
+    visibility: hidden;
+  }
+}
+
+/*
+ * Sin JavaScript la entrada no puede ni empezar: el overlay negro no debe
+ * renderizarse. `html.js` la pone el <script> inline del preloader apenas
+ * parsea; si no esta, no hay JS.
+ */
+html:not(.js) [data-preloader] {
+  display: none;
 }
 
 /* La palabra completa: 504x75 de viewBox, o sea 6,72 de ancho por 1 de alto. */
@@ -566,5 +601,72 @@ html.preloader-corriendo [data-hero-entra] {
       outline: 2px solid var(--color-azul);
       outline-offset: 2px;
     }
+  }
+}
+
+/* =====================================================================
+ * Text roll (components/ui/TextoDeslizante.tsx)
+ *
+ * Las letras suben una despues de otra y en su lugar aparece una copia. La
+ * copia NO es un segundo texto: es una text-shadow solida corrida un
+ * renglon para abajo. Cuando la letra sube exactamente un renglon, su propia
+ * sombra queda donde estaba ella. Asi lo hace la referencia
+ * (applio.framer.website), y es lo que hace imposible que las dos copias se
+ * desincronicen.
+ * ===================================================================== */
+[data-roll] {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+[data-roll-letras] {
+  display: flex;
+  width: max-content;
+  /* El renglon es la unidad de todo el efecto: el alto de la mascara, el
+     desplazamiento de la letra y el offset de la sombra son el mismo valor. */
+  line-height: 1.2;
+  overflow: hidden;
+  /* Ademas del overflow: los botones del hero viven dentro de un transform de
+     framer-motion, y con un ancestro compuesto el overflow solo no recorta. */
+  clip-path: inset(0);
+  text-shadow: 0 1.2em 0 currentColor;
+  user-select: none;
+}
+
+[data-roll-letras] > span {
+  display: block;
+  flex-shrink: 0;
+  white-space: pre;
+  /* Sin esto Chrome redondea la posicion de cada letra a pixel entero durante
+     el movimiento y la ola se ve escalonada en vez de continua. */
+  backface-visibility: hidden;
+  /*
+   * La curva arranca lenta a proposito. Medido en la referencia: 5,7% del
+   * recorrido a los 50ms, 41% a los 100ms. Con la ease-out-soft del resto del
+   * sitio (que a los 50ms ya va por la mitad) las letras salen todas juntas y
+   * el escalonado no se ve.
+   */
+  transition: transform 380ms cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+a:hover [data-roll-letras] > span,
+button:hover [data-roll-letras] > span {
+  transform: translateY(-1.2em);
+}
+
+/* Con movimiento reducido la palabra se queda quieta y sin sombra fantasma. */
+@media (prefers-reduced-motion: reduce) {
+  [data-roll-letras] {
+    text-shadow: none;
+  }
+
+  [data-roll-letras] > span {
+    transition: none;
+  }
+
+  a:hover [data-roll-letras] > span,
+  button:hover [data-roll-letras] > span {
+    transform: none;
   }
 }

@@ -48,6 +48,17 @@ const CLAVE = "trevoo-entrada-vista";
 const CLASE_VISTO = "preloader-visto";
 const CLASE_BLOQUEO = "preloader-bloqueado";
 const CLASE_CORRIENDO = "preloader-corriendo";
+/** Marca "hay JavaScript vivo": la pone el <script> inline apenas parsea. */
+const CLASE_JS = "js";
+/** La clase con la que Lenis bloquea el scroll (ver globals.css). */
+const CLASE_LENIS_STOP = "lenis-stopped";
+
+declare global {
+  interface Window {
+    /** La pone el failsafe inline: "ya limpie el preloader a mano". */
+    __trevooFailsafe?: 1;
+  }
+}
 
 /* --- La linea de tiempo, en milisegundos --- */
 /** Fin de la escritura (la ultima letra cierra en ~800ms; el resto es aire). */
@@ -66,6 +77,24 @@ const ASENTADO = 2900;
 const VIAJE = 3400;
 /** Fin del fundido del overlay. */
 const TOTAL = 3600;
+
+/**
+ * Red de seguridad, en milisegundos.
+ *
+ * El overlay negro lo saca el JS: `terminar()` desmonta el nodo. Si el bundle
+ * no llega a hidratar —browser viejo, un chunk que no baja, un error de
+ * runtime— sin esto la pagina queda tapada de negro y sin scroll para siempre.
+ * Eso es lo que se veia en mobile.
+ *
+ * A los FAILSAFE ms un <script> inline (que corre en el parseo, sin depender
+ * de React) limpia todo a mano: saca el overlay, el bloqueo de scroll y revela
+ * el contenido. El efecto de abajo tambien se rinde si arranca pasado este
+ * plazo: a esa altura el momento de la entrada ya paso.
+ *
+ * Con una carga sana nunca se alcanza —la entrada termina a los TOTAL (3,6s)—
+ * y deja aire para hidratar en un telefono lento sin cortar la animacion.
+ */
+const FAILSAFE = 5000;
 
 /** Retardo entre letra y letra de la maquina de escribir. */
 const RETARDO_LETRA = 130;
@@ -140,7 +169,13 @@ function leerDebeMostrar(): boolean {
     // Modo privado o storage bloqueado: la entrada se vuelve a ver, nada mas.
   }
   decision =
-    !vista && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    !vista &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+    // Si el bundle tardo tanto en hidratar que el failsafe inline ya corrio (o
+    // que el momento de la entrada ya paso), no montar el overlay: entrar
+    // directo al sitio, que a esta altura ya se esta viendo.
+    !window.__trevooFailsafe &&
+    performance.now() < FAILSAFE;
   return decision;
 }
 
@@ -167,6 +202,8 @@ export function Preloader() {
     const raiz = raizRef.current;
     const lienzo = lienzoRef.current;
     const iso = isoRef.current;
+    // Si `debeMostrar` dio false (ya vista, movimiento reducido, o el failsafe
+    // inline ya limpio todo) el overlay no se renderiza y no hay nada que hacer.
     if (!raiz || !lienzo || !iso) return;
 
     const html = document.documentElement;
@@ -184,6 +221,10 @@ export function Preloader() {
     const inicio = performance.now();
     let raf = 0;
     let terminado = false;
+
+    // Si el rAF se cuelga (pestaña que estuvo en segundo plano y despierta mal,
+    // un throttle agresivo del navegador), un timer igual cierra la entrada.
+    const parada = window.setTimeout(() => terminar(), TOTAL + 2000);
     /** Se completa al empezar el viaje, midiendo las dos cajas reales. */
     let destino: { dx: number; dy: number; escala: number } | null = null;
     let logoRevelado = false;
@@ -282,6 +323,7 @@ export function Preloader() {
       if (terminado) return;
       terminado = true;
       cancelAnimationFrame(raf);
+      window.clearTimeout(parada);
       html.classList.remove(CLASE_BLOQUEO, CLASE_CORRIENDO);
       html.classList.add(CLASE_VISTO);
       // La marca va aca y no al arrancar: quien recarga a mitad de la entrada
@@ -292,21 +334,35 @@ export function Preloader() {
         // Sin storage la entrada se repite en cada carga. Degradacion
         // aceptable, ya contemplada en leerDebeMostrar.
       }
-      window.scrollTo(0, 0);
       const lenis = lenisActual();
       lenis?.start();
-      lenis?.scrollTo(0, { immediate: true });
+      // Volver arriba solo si la entrada corrio de verdad. Si ya salto el
+      // failsafe inline, el visitante pudo haber scrolleado: no tironearlo.
+      if (!window.__trevooFailsafe) {
+        window.scrollTo(0, 0);
+        lenis?.scrollTo(0, { immediate: true });
+      }
       setTerminada(true);
     }
 
     function cuadro(ahora: number) {
-      const t = ahora - inicio;
-      aplicar(Math.min(t, TOTAL));
-      if (t >= TOTAL) {
+      try {
+        // El failsafe inline gano la carrera (bundle lento): soltar y entrar.
+        if (window.__trevooFailsafe) {
+          terminar();
+          return;
+        }
+        const t = ahora - inicio;
+        aplicar(Math.min(t, TOTAL));
+        if (t >= TOTAL) {
+          terminar();
+          return;
+        }
+        raf = requestAnimationFrame(cuadro);
+      } catch {
+        // Un cuadro que tira no puede dejar el overlay puesto: cerrar y entrar.
         terminar();
-        return;
       }
-      raf = requestAnimationFrame(cuadro);
     }
 
     /** Salida de emergencia: Escape o un click cortan y entran al sitio. */
@@ -324,6 +380,7 @@ export function Preloader() {
     return () => {
       cancelAnimationFrame(arranque);
       cancelAnimationFrame(raf);
+      window.clearTimeout(parada);
       window.removeEventListener("keydown", alSaltar);
       raiz.removeEventListener("click", alSaltar);
       html.classList.remove(CLASE_BLOQUEO, CLASE_CORRIENDO);
@@ -334,17 +391,37 @@ export function Preloader() {
   return (
     <>
       {/*
-        Corre antes de que la entrada se pinte: si ya se vio en esta pestaña,
-        marca el <html> y el CSS la esconde de entrada. Sin esto, el que vuelve
-        al home ve un parpadeo de pantalla negra antes de que React monte.
+        Corre en el parseo, antes de que se pinte la entrada y sin depender del
+        bundle. Hace tres cosas:
+
+        1. Marca `html.js`. El CSS usa `html:not(.js)` para no renderizar
+           siquiera el overlay cuando no hay JavaScript: sin esto la pagina
+           seria una pantalla negra para un browser con JS apagado.
+        2. Si la entrada ya se vio en esta pestaña, esconde el overlay de una
+           (evita el parpadeo negro del que vuelve al home antes de que monte
+           React).
+        3. Failsafe: si a los FAILSAFE ms el overlay sigue en el DOM, el bundle
+           no hidrato (chunk que no baja, error de runtime, browser viejo).
+           Saca el bloqueo de scroll a mano y revela el contenido que espera al
+           IntersectionObserver. Esto es lo que evita el "todo negro" de mobile.
       */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(sessionStorage.getItem(${JSON.stringify(
-            CLAVE,
-          )})==="1")document.documentElement.classList.add(${JSON.stringify(
-            CLASE_VISTO,
-          )})}catch(e){}`,
+          __html:
+            `(function(){var h=document.documentElement;` +
+            `h.classList.add(${JSON.stringify(CLASE_JS)});` +
+            `try{if(sessionStorage.getItem(${JSON.stringify(CLAVE)})==="1")` +
+            `h.classList.add(${JSON.stringify(CLASE_VISTO)})}catch(e){}` +
+            `setTimeout(function(){` +
+            `if(!document.querySelector("[data-preloader]"))return;` +
+            `window.__trevooFailsafe=1;` +
+            `h.classList.remove(${JSON.stringify(CLASE_BLOQUEO)},${JSON.stringify(
+              CLASE_CORRIENDO,
+            )},${JSON.stringify(CLASE_LENIS_STOP)});` +
+            `h.classList.add(${JSON.stringify(CLASE_VISTO)});` +
+            `var r=document.querySelectorAll("[data-revelar]"),i=0;` +
+            `for(;i<r.length;i++)r[i].setAttribute("data-visible","")` +
+            `},${FAILSAFE})})();`,
         }}
       />
       {debeMostrar && !terminada && (

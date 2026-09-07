@@ -42,9 +42,6 @@ import { lenisActual } from "@/lib/useLenis";
  *    valor por cuadro.
  */
 
-/** Marca de "ya la vio" en esta pestaña. */
-const CLAVE = "trevoo-entrada-vista";
-
 const CLASE_VISTO = "preloader-visto";
 const CLASE_BLOQUEO = "preloader-bloqueado";
 const CLASE_CORRIENDO = "preloader-corriendo";
@@ -153,23 +150,18 @@ function noSuscribir() {
  * La decision se toma una sola vez por carga y despues queda congelada.
  *
  * useSyncExternalStore exige que getSnapshot devuelva siempre lo mismo mientras
- * no avise la suscripcion, y aca no da igual: al terminar, la entrada escribe
- * la marca en sessionStorage, y si el snapshot se recalculara pasaria de true a
- * false en pleno render. Sin este cache, el primer render posterior a la
- * hidratacion desmonta la pantalla antes de que llegue a verse.
+ * no avise la suscripcion. `performance.now()` crece cuadro a cuadro, asi que
+ * sin este cache el snapshot pasaria de true a false en pleno render y
+ * desmontaria la pantalla antes de que llegue a verse.
+ *
+ * La entrada se ve en CADA carga de pagina (pedido de Facundo, 05/09/2026): ya
+ * no hay marca de "ya la vio" en sessionStorage. Recargar = volver a verla.
  */
 let decision: boolean | null = null;
 
 function leerDebeMostrar(): boolean {
   if (decision !== null) return decision;
-  let vista = false;
-  try {
-    vista = sessionStorage.getItem(CLAVE) === "1";
-  } catch {
-    // Modo privado o storage bloqueado: la entrada se vuelve a ver, nada mas.
-  }
   decision =
-    !vista &&
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
     // Si el bundle tardo tanto en hidratar que el failsafe inline ya corrio (o
     // que el momento de la entrada ya paso), no montar el overlay: entrar
@@ -325,15 +317,9 @@ export function Preloader() {
       cancelAnimationFrame(raf);
       window.clearTimeout(parada);
       html.classList.remove(CLASE_BLOQUEO, CLASE_CORRIENDO);
+      // `preloader-visto` solo oculta el overlay por CSS mientras React
+      // desmonta el nodo; no persiste nada entre cargas.
       html.classList.add(CLASE_VISTO);
-      // La marca va aca y no al arrancar: quien recarga a mitad de la entrada
-      // nunca llego a ver el sitio, y merece verla otra vez.
-      try {
-        sessionStorage.setItem(CLAVE, "1");
-      } catch {
-        // Sin storage la entrada se repite en cada carga. Degradacion
-        // aceptable, ya contemplada en leerDebeMostrar.
-      }
       const lenis = lenisActual();
       lenis?.start();
       // Volver arriba solo si la entrada corrio de verdad. Si ya salto el
@@ -392,15 +378,12 @@ export function Preloader() {
     <>
       {/*
         Corre en el parseo, antes de que se pinte la entrada y sin depender del
-        bundle. Hace tres cosas:
+        bundle. Hace dos cosas:
 
         1. Marca `html.js`. El CSS usa `html:not(.js)` para no renderizar
            siquiera el overlay cuando no hay JavaScript: sin esto la pagina
            seria una pantalla negra para un browser con JS apagado.
-        2. Si la entrada ya se vio en esta pestaña, esconde el overlay de una
-           (evita el parpadeo negro del que vuelve al home antes de que monte
-           React).
-        3. Failsafe: si a los FAILSAFE ms el overlay sigue en el DOM, el bundle
+        2. Failsafe: si a los FAILSAFE ms el overlay sigue en el DOM, el bundle
            no hidrato (chunk que no baja, error de runtime, browser viejo).
            Saca el bloqueo de scroll a mano y revela el contenido que espera al
            IntersectionObserver. Esto es lo que evita el "todo negro" de mobile.
@@ -410,8 +393,6 @@ export function Preloader() {
           __html:
             `(function(){var h=document.documentElement;` +
             `h.classList.add(${JSON.stringify(CLASE_JS)});` +
-            `try{if(sessionStorage.getItem(${JSON.stringify(CLAVE)})==="1")` +
-            `h.classList.add(${JSON.stringify(CLASE_VISTO)})}catch(e){}` +
             `setTimeout(function(){` +
             `if(!document.querySelector("[data-preloader]"))return;` +
             `window.__trevooFailsafe=1;` +

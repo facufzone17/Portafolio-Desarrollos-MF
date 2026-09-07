@@ -108,7 +108,7 @@ export function ProyectosPista() {
         <div className="shrink-0 pt-24 sm:pt-28">
           <div className="mx-auto max-w-[1400px] px-5 text-center sm:px-8">
             <h2 className="text-[clamp(1.75rem,3.4vw,3rem)]">
-              Cosas que ya están funcionando
+              Proyectos que ya están funcionando
             </h2>
           </div>
         </div>

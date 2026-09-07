@@ -24,7 +24,7 @@ export function ProyectosApilado({ className = "" }: { className?: string }) {
         <Revelar>
           <div className="mx-auto max-w-[46ch] text-center">
             <h2 className="text-[clamp(2rem,4.6vw,3.5rem)]">
-              Cosas que ya están funcionando
+              Proyectos que ya están funcionando
             </h2>
             <p className="mx-auto mt-5 max-w-[44ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
               Entrá a cualquiera. Son sitios y tiendas reales, andando.

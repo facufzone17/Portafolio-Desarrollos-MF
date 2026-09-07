@@ -695,10 +695,10 @@ button:hover [data-roll-letras] > span {
 
 [data-ola] [data-ola-letra] {
   opacity: 0;
-  transform: translateY(0.55em);
+  transform: translateY(0.6em);
   transition:
     opacity 200ms linear calc(var(--i) * 58ms),
-    transform 520ms cubic-bezier(0.22, 1.35, 0.5, 1) calc(var(--i) * 58ms);
+    transform 520ms var(--ease-out-soft) calc(var(--i) * 58ms);
 }
 
 [data-ola][data-visible] [data-ola-letra] {

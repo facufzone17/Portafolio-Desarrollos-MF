@@ -326,6 +326,16 @@ export function Preloader() {
       window.clearTimeout(parada);
       html.classList.remove(CLASE_BLOQUEO, CLASE_CORRIENDO);
       html.classList.add(CLASE_VISTO);
+      // `decision` es de modulo y sobrevive a la navegacion cliente. Recien
+      // aca es seguro pasarlo a false: la entrada ya termino, asi que ningun
+      // snapshot en curso se va a dar vuelta en pleno render (que es lo que
+      // este cache evita). Sin esto, cada vuelta al home por <Link> —tocar el
+      // logo del header desde una ficha de proyecto— remonta el Preloader,
+      // `leerDebeMostrar()` devuelve el true viejo y el efecto vuelve a correr:
+      // bloquea el scroll, esconde el logo y pausa la entrada del hero durante
+      // los 3,6s de la linea de tiempo. Eso es el "se queda congelado al
+      // volver al inicio".
+      decision = false;
       // La marca va aca y no al arrancar: quien recarga a mitad de la entrada
       // nunca llego a ver el sitio, y merece verla otra vez.
       try {

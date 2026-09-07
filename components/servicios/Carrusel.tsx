@@ -36,29 +36,35 @@ import type { Vista } from "@/lib/servicios";
 const INTERVALO = 4000;
 
 /**
- * Lo que dura el deslizamiento de una captura a la otra. Pedido asi por
- * Facundo (07/09/2026).
+ * Cuanto dura el paso segun quien lo pidio. Son dos movimientos distintos:
  *
- * Es tres veces la duracion mas larga del sistema (`--duration-state`, 620ms),
- * asi que va como numero propio y no como token: no es "la duracion de un
- * cambio de estado", es un movimiento deliberadamente lento. Contra el
- * INTERVALO de 4s deja la captura quieta la mitad del tiempo.
+ *   AUTO   — el carrusel avanza solo cada 4s. Deliberadamente lento (2s,
+ *            pedido asi por Facundo el 07/09/2026): es tres veces la duracion
+ *            mas larga del sistema (`--duration-state`, 620ms), no es "un
+ *            cambio de estado" sino un planeo. Contra el INTERVALO deja la
+ *            captura quieta la mitad del tiempo.
+ *   MANUAL — la persona toco una flecha o deslizo con el dedo. Un gesto
+ *            deliberado espera respuesta, no dos segundos de planeo: aca el
+ *            paso es corto y entra en la ventana para la que si sirve la
+ *            ease-out del sistema.
  */
-const DESLIZAMIENTO = 2000;
+const DESLIZAMIENTO_AUTO = 2000;
+const DESLIZAMIENTO_MANUAL = 480;
 
 /**
- * La curva del deslizamiento, y es la unica de la pagina que no es una de las
- * dos del sistema.
+ * La curva de cada uno.
  *
- * `--ease-out-soft` (0.16, 1, 0.3, 1) esta hecha para movimientos de 200 a
- * 600ms: arranca disparada y frena enseguida. Medida sobre estos 2 segundos,
- * a los 500ms ya habia recorrido el 82% del camino y el segundo y medio que
- * queda es una cola que no se ve. O sea: pedir 2 segundos y que se vean 500ms.
+ * AUTO va con una in-out simetrica (la easeInOutCubic de siempre), la unica de
+ * la pagina que no es una de las dos del sistema: a la mitad del tiempo va por
+ * la mitad del camino y los 2 segundos se perciben enteros. `--ease-out-soft`
+ * (0.16, 1, 0.3, 1) ahi no sirve — esta hecha para 200-600ms y sobre 2s a los
+ * 500ms ya recorrio el 82%: seria pedir 2 segundos y ver 500ms.
  *
- * Esta es una in-out simetrica (la easeInOutCubic de siempre): a la mitad del
- * tiempo va por la mitad del camino, y los 2 segundos se perciben enteros.
+ * MANUAL, en cambio, dura justo esos ~480ms, asi que va con `--ease-out-soft`:
+ * sale disparada y frena, que es lo que hace que un click se sienta resuelto.
  */
-const CURVA = "cubic-bezier(0.65, 0, 0.35, 1)";
+const CURVA_AUTO = "cubic-bezier(0.65, 0, 0.35, 1)";
+const CURVA_MANUAL = "var(--ease-out-soft)";
 
 /** Pixeles de arrastre que cuentan como "pasar de imagen" en tactil. */
 const UMBRAL_DESLIZAMIENTO = 44;
@@ -77,6 +83,11 @@ export function Carrusel({
   sizes: string;
 }) {
   const [indice, setIndice] = useState(0);
+  // Que movimiento usar en el proximo paso. Lo fija quien llama a `ir`: el
+  // reloj de 4s pide "auto" (planeo de 2s), una flecha o un dedo pide "manual"
+  // (paso corto). Sin esto, tocar la flecha arrastraba los mismos 2 segundos
+  // y el carrusel se sentia trabado.
+  const [modo, setModo] = useState<"auto" | "manual">("auto");
   const [detenido, setDetenido] = useState(false);
   const [enPantalla, setEnPantalla] = useState(false);
   const reducido = useMovimientoReducido();
@@ -85,7 +96,10 @@ export function Carrusel({
 
   const total = vistas.length;
   const ir = useCallback(
-    (n: number) => setIndice(((n % total) + total) % total),
+    (n: number, origen: "auto" | "manual" = "manual") => {
+      setModo(origen);
+      setIndice(((n % total) + total) % total);
+    },
     [total],
   );
 
@@ -105,7 +119,7 @@ export function Carrusel({
 
   useEffect(() => {
     if (reducido || detenido || !enPantalla || total < 2) return;
-    const reloj = window.setInterval(() => ir(indice + 1), INTERVALO);
+    const reloj = window.setInterval(() => ir(indice + 1, "auto"), INTERVALO);
     return () => window.clearInterval(reloj);
     // `indice` va en las dependencias a proposito: asi, si alguien toca una
     // flecha, los 4 segundos vuelven a contarse desde ahi y no salta a la
@@ -169,8 +183,14 @@ export function Carrusel({
           className={reducido ? "flex" : "flex transition-transform"}
           style={{
             transform: `translate3d(-${indice * 100}%, 0, 0)`,
-            transitionDuration: reducido ? undefined : `${DESLIZAMIENTO}ms`,
-            transitionTimingFunction: reducido ? undefined : CURVA,
+            transitionDuration: reducido
+              ? undefined
+              : `${modo === "auto" ? DESLIZAMIENTO_AUTO : DESLIZAMIENTO_MANUAL}ms`,
+            transitionTimingFunction: reducido
+              ? undefined
+              : modo === "auto"
+                ? CURVA_AUTO
+                : CURVA_MANUAL,
           }}
         >
           {vistas.map((vista, n) => (

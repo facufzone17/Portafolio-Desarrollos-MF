@@ -85,7 +85,7 @@ export const servicios: Servicio[] = [
     id: "tiendas",
     titulo: "Tiendas",
     bajada:
-      "Tu catálogo abierto las veinticuatro horas. El cliente elige, paga con Mercado Pago y vos te enterás con el pedido ya cobrado.",
+      "Tu catálogo abierto las veinticuatro horas. El cliente elige, paga y vos te enterás con el pedido ya cobrado.",
     lado: "derecha",
     vistas: [
       { titulo: "Tienda de mates", imagen: tiendasMates },
@@ -111,7 +111,7 @@ export const servicios: Servicio[] = [
     id: "sitios-web",
     titulo: "Sitios web",
     bajada:
-      "El lugar al que llega el que te busca. Entiende qué hacés en cinco segundos y te escribe por WhatsApp, sin que atiendas el teléfono para contarlo.",
+      "Claridad, velocidad y diseño funcional. Hacemos que quien entre entienda tu propuesta en segundos y dé el paso de contactarte.",
     lado: "derecha",
     vistas: [
       { titulo: "Duo Administración", imagen: sitiosDuo },
@@ -125,7 +125,7 @@ export const servicios: Servicio[] = [
     id: "automatizaciones",
     titulo: "Automatizaciones",
     bajada:
-      "Lo que respondés veinte veces por día, respondido solo. Un asistente de WhatsApp que contesta precios, horarios y disponibilidad a cualquier hora, toma el pedido y te lo deja donde ya lo mirás. Se conecta a lo que usás hoy: no hay sistema nuevo que aprender ni consulta que se pierda a las once de la noche.",
+      "Olvidate de responder veinte veces los mismos mensajes. El asistente de tu negocio atiende a todos, toma pedidos y confirma pagos mientras vos te ocupás de lo que importa.",
     telefonos: [
       { imagen: iphoneIzquierda, alt: "Conversación de WhatsApp con el asistente de una tienda" },
       { imagen: iphoneDerecha, alt: "El asistente tomando un pedido y confirmando el pago" },

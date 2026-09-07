@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
+import { lenisActual } from "@/lib/useLenis";
 import { secciones, site, whatsappUrl } from "@/lib/site";
 
 /**
@@ -32,6 +34,7 @@ const UMBRAL = 40;
 
 export function Header() {
   const [contraida, setContraida] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const alScroll = () => setContraida(window.scrollY > UMBRAL);
@@ -39,6 +42,20 @@ export function Header() {
     window.addEventListener("scroll", alScroll, { passive: true });
     return () => window.removeEventListener("scroll", alScroll);
   }, []);
+
+  /**
+   * El logo lleva al inicio. Si ya estamos en la home, un `<Link href="/">` no
+   * hace nada (misma ruta) y encima Lenis maneja el scroll: hay que llevarlo
+   * arriba a mano. Fuera de la home, se deja navegar normal.
+   */
+  const alClicLogo = (e: React.MouseEvent) => {
+    if (pathname !== "/") return;
+    e.preventDefault();
+    const lenis = lenisActual();
+    if (lenis) lenis.scrollTo(0, { duration: 1.1, force: true });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+    window.history.replaceState(null, "", "/");
+  };
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-6">
@@ -54,6 +71,7 @@ export function Header() {
       >
         <Link
           href="/"
+          onClick={alClicLogo}
           data-logo-marca
           className="flex shrink-0 items-center pl-2 text-white"
           aria-label={`${site.name}, ir al inicio`}

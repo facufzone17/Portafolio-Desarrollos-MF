@@ -205,18 +205,25 @@ export function Hero() {
                 { "--hero-retardo": `${RETARDO.dispositivos}ms` } as React.CSSProperties
               }
             >
+              {/*
+                Sin `drop-shadow`: los dos PNG traen el fondo recortado al ras
+                del contenido (la sombra propia del mockup llega hasta el borde
+                del archivo), asi que un `filter: drop-shadow` dibujaba la sombra
+                de ese rectangulo y se veia un recuadro alrededor de cada
+                telefono. Los mockups ya traen su sombra pintada; alcanza.
+              */}
               <div className="relative mx-auto h-0 w-full max-w-[1400px]">
                 <Image
                   src={consorcios}
                   alt=""
                   sizes="(min-width: 1024px) 602px, 48vw"
-                  className="absolute left-[21.45%] w-[43%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[21.45%] w-[43%] rotate-[-5deg]"
                 />
                 <Image
                   src={tienda}
                   alt=""
                   sizes="(min-width: 1024px) 521px, 42vw"
-                  className="absolute left-[41.35%] w-[37.2%] rotate-[5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[41.35%] w-[37.2%] rotate-[5deg]"
                 />
               </div>
             </div>

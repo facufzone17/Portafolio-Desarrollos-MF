@@ -194,9 +194,19 @@ export function Hero() {
 
             Afuera el parallax (inline), adentro la entrada (CSS).
           */}
+          {/*
+            Arranque de los telefonos. En la referencia era `72svh` fijo, pero
+            en ventanas bajas (portatil con escalado al 125/150 %, ~700px de
+            alto util) eso los sube por encima de los botones ya en reposo: el
+            72 % del alto queda dentro del bloque de texto porque el titular no
+            se achica igual de rapido. `calc(23svh + 400px)` sigue el pie real
+            del bloque de botones (mismo 23svh del padding de arriba + el alto
+            aproximado de marca + titular + botones), y el `max` deja que en
+            pantallas altas gane el 72svh de siempre — ahi no hace falta bajarlos.
+          */}
           <motion.div
             style={{ y: yTelefonos }}
-            className="pointer-events-none absolute inset-x-0 top-[72svh]"
+            className="pointer-events-none absolute inset-x-0 top-[max(72svh,calc(23svh+416px))]"
             aria-hidden
           >
             <div

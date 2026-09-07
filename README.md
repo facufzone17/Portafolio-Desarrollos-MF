@@ -16,6 +16,42 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Variables de entorno
+
+Van en `.env.local` (ya está en `.gitignore`) y, para el deploy, en Vercel.
+**Nunca en un commit.**
+
+| Variable | Obligatoria | Default | Para qué |
+|---|---|---|---|
+| `RESEND_API_KEY` | para que el formulario entregue | — | Clave de [resend.com](https://resend.com). Sin ella el endpoint no rompe: en dev y en preview registra y devuelve ok; en producción devuelve 502 y el formulario cae a su CTA de WhatsApp. |
+| `CONTACTO_REMITENTE` | no | `Trevoo <onboarding@resend.dev>` | Remitente del mail de consulta. |
+| `CONTACTO_DESTINO` | no | `site.email` (`lib/site.ts`) | A dónde llegan las consultas. |
+
+**Todavía no hay dominio, y no hace falta.** Resend pide dominio verificado solo
+para un remitente propio; `onboarding@resend.dev` no pide nada, con la
+restricción de que **solo entrega al mail dueño de la cuenta de Resend**. Como
+el destino es justamente `desarrollosmf00@gmail.com`, alcanza con crear la
+cuenta de Resend **con ese gmail** y el formulario queda andando. El día que
+haya dominio se cambia `CONTACTO_REMITENTE` en Vercel y no se toca código.
+
+## Verificación
+
+No hay framework de tests. Las compuertas son:
+
+```bash
+npm run lint && npm run build
+node scripts/verificar-arreglos.mjs      # regresiones (sale != 0 si falla)
+node scripts/verificar-contacto.mjs      # la sección de contacto
+```
+
+Y para mirar la página, con el dev server arriba, los scripts de captura por
+CDP dejan PNG en `capturas/` (ignorado por git):
+
+```bash
+node scripts/estados.mjs http://localhost:3000/ capturas/contacto-desktop 1440 900 0.82,0.88,0.94,1
+node scripts/estados.mjs http://localhost:3000/ capturas/contacto-mobile 390 844 0.86,0.92,0.97,1
+```
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

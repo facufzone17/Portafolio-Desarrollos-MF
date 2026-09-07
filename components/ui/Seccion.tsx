@@ -23,14 +23,18 @@ export function Seccion({
   bajada,
   children,
   className = "",
+  anchoTitulo = "max-w-[46ch]",
 }: {
   id?: string;
-  titulo?: string;
+  titulo?: React.ReactNode;
   /** Solo nombre accesible cuando no hay titulo a la vista. Nunca se dibuja. */
   etiqueta?: string;
   bajada?: string;
   children: React.ReactNode;
   className?: string;
+  /** Cap de ancho del bloque titulo+bajada. Se abre cuando un titulo largo
+   *  necesitaria tres renglones con el cap por defecto. */
+  anchoTitulo?: string;
 }) {
   return (
     <section
@@ -43,7 +47,7 @@ export function Seccion({
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
         {titulo && (
           <Revelar>
-            <div className="mx-auto max-w-[46ch] text-center">
+            <div className={`mx-auto ${anchoTitulo} text-center`}>
               <h2 className="text-[clamp(2rem,4.6vw,3.5rem)]">{titulo}</h2>
               {bajada && (
                 <p className="mx-auto mt-5 max-w-[44ch] text-[15px] leading-relaxed text-text-muted sm:text-base">

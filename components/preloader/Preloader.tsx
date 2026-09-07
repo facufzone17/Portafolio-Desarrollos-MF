@@ -320,7 +320,6 @@ export function Preloader() {
       // `preloader-visto` solo oculta el overlay por CSS mientras React
       // desmonta el nodo; no persiste nada entre cargas.
       html.classList.add(CLASE_VISTO);
-<<<<<<< HEAD
       // `decision` es de modulo y sobrevive a la navegacion cliente. Recien
       // aca es seguro pasarlo a false: la entrada ya termino, asi que ningun
       // snapshot en curso se va a dar vuelta en pleno render (que es lo que
@@ -330,17 +329,12 @@ export function Preloader() {
       // bloquea el scroll, esconde el logo y pausa la entrada del hero durante
       // los 3,6s de la linea de tiempo. Eso es el "se queda congelado al
       // volver al inicio".
+      //
+      // OJO: esto NO es la vieja marca de sessionStorage, que se saco a
+      // proposito (la entrada se ve en cada carga). `decision` vive en el
+      // modulo y muere con la carga de pagina: solo apaga la entrada dentro de
+      // la misma navegacion cliente.
       decision = false;
-      // La marca va aca y no al arrancar: quien recarga a mitad de la entrada
-      // nunca llego a ver el sitio, y merece verla otra vez.
-      try {
-        sessionStorage.setItem(CLAVE, "1");
-      } catch {
-        // Sin storage la entrada se repite en cada carga. Degradacion
-        // aceptable, ya contemplada en leerDebeMostrar.
-      }
-=======
->>>>>>> bff13de0e2d8e1af5e5c4180bc3ac4c8f40c0bbd
       const lenis = lenisActual();
       lenis?.start();
       // Volver arriba solo si la entrada corrio de verdad. Si ya salto el

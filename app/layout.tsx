@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { WhatsAppFlotante } from "@/components/ui/WhatsAppFlotante";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -88,7 +87,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       */}
         <SmoothScroll />
         {children}
-        <WhatsAppFlotante />
       </body>
     </html>
   );

@@ -60,6 +60,18 @@ export function whatsappUrl(mensaje: string = mensajes.general): string {
 /** Link de mail. */
 export const mailtoUrl = `mailto:${site.email}`;
 
+/**
+ * Link de llamada. Es el MISMO telefono que el de WhatsApp, por eso sale de la
+ * misma constante y no de un numero suelto que despues se desincroniza.
+ *
+ * OJO CON EL 9: en formato internacional los celulares argentinos llevan un 9
+ * despues del +54, y asi esta guardado (`5491122728576`). Desde afuera del
+ * pais es lo correcto; adentro, algunos discadores lo toleran y otros no.
+ * ESTO HAY QUE PROBARLO EN UN TELEFONO DE VERDAD antes de darlo por bueno: si
+ * falla, la version sin el 9 es `tel:+541122728576`.
+ */
+export const telUrl = `tel:+${site.whatsapp}`;
+
 /** Instagram, o null si todavia no se sabe el usuario. */
 export function instagramUrl(): string | null {
   return site.instagram ? `https://instagram.com/${site.instagram}` : null;

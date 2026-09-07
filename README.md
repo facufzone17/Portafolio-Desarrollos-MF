@@ -16,41 +16,29 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Variables de entorno
+## Contacto: no hay backend
 
-Van en `.env.local` (ya está en `.gitignore`) y, para el deploy, en Vercel.
-**Nunca en un commit.**
+**El sitio no tiene rutas de API ni formulario.** Hubo uno con entrega por
+Resend, honeypot y límite por IP; se sacó el 07/09/2026 junto con la sección
+vieja, y está entero en el historial de git si alguna vez hace falta.
 
-| Variable | Obligatoria | Default | Para qué |
-|---|---|---|---|
-| `RESEND_API_KEY` | para que el formulario entregue | — | Clave de [resend.com](https://resend.com). Sin ella el endpoint no rompe: en dev y en preview registra y devuelve ok; en producción devuelve 502 y el formulario cae a su CTA de WhatsApp. |
-| `CONTACTO_REMITENTE` | no | `Trevoo <onboarding@resend.dev>` | Remitente del mail de consulta. |
-| `CONTACTO_DESTINO` | no | `site.email` (`lib/site.ts`) | A dónde llegan las consultas. |
+Hoy la sección de contacto son dos columnas, las dos sin servidor: el
+compositor de WhatsApp (`components/contacto/MensajeWhatsApp.tsx`, arma un link
+`wa.me` con lo que el visitante escribe) y las vías
+(`components/contacto/Vias.tsx`: WhatsApp, mail, Instagram y teléfono).
 
-**Todavía no hay dominio, y no hace falta.** Resend pide dominio verificado solo
-para un remitente propio; `onboarding@resend.dev` no pide nada, con la
-restricción de que **solo entrega al mail dueño de la cuenta de Resend**. Como
-el destino es justamente `desarrollosmf00@gmail.com`, alcanza con crear la
-cuenta de Resend **con ese gmail** y el formulario queda andando. El día que
-haya dominio se cambia `CONTACTO_REMITENTE` en Vercel y no se toca código.
+Consecuencia a tener presente: **ninguna vía retiene al visitante en el sitio.**
+Todas abren WhatsApp, el cliente de mail, Instagram o el discador.
 
-## Protección del formulario
+Dos datos siguen faltando, y los dos los tiene que traer Facundo:
 
-Dos capas, las dos en código y sin dependencias ni servicios externos:
-
-- **Honeypot** (`apodo`): un campo fuera de pantalla, `aria-hidden`,
-  `tabIndex={-1}` y `autocomplete="off"`. Si viene lleno, la ruta responde
-  **200 y descarta en silencio** — a un bot no se le avisa que lo detectaron,
-  porque si recibe un error prueba otra cosa.
-- **Límite por IP** (`lib/limite.ts`): **5 envíos cada 10 minutos**, en memoria.
-  Al pasarse devuelve **429** con `Retry-After` y el formulario muestra un
-  mensaje propio (no el de error genérico) más el CTA de WhatsApp.
-
-**El límite no es distribuido**: cada instancia serverless tiene su propio
-contador, así que con varias instancias vivas el tope real es más alto, y no
-frena a alguien con muchas IP. Es una capa, no la última palabra. Si el abuso
-llega a ser real, la respuesta es el firewall de Vercel o un límite sobre KV,
-no estirar esto.
+- **Usuario de Instagram** — mientras `site.instagram` sea `null`, ese bloque
+  directamente no se dibuja (§9.1: un ícono que no lleva a ningún lado es peor
+  que no tenerlo). Se completa en `lib/site.ts` y aparece solo.
+- **El `tel:` hay que probarlo en un teléfono real.** Sale de `site.whatsapp`,
+  que lleva el `9` del formato internacional (`tel:+5491122728576`). Desde
+  afuera del país es lo correcto; adentro, algunos discadores lo toleran y
+  otros no. Si falla, la versión sin el `9` es `tel:+541122728576`.
 
 ## Verificación
 

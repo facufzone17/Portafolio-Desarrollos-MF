@@ -12,15 +12,11 @@
  *  4. Las reglas del sistema que un rediseño rompe sin querer: nada de
  *     pastillas, nada de verde de WhatsApp, targets de 44px, sin scroll
  *     horizontal, y todo visible con movimiento reducido.
- *  5. El endpoint valida y, sin RESEND_API_KEY, sigue devolviendo 200 en local.
- *  6. El honeypot esta escondido de verdad y, lleno, responde 200 sin delatar
- *     la deteccion. El limite por IP corta al sexto envio y no salpica a otras.
- *
- * Cada assert que toca el endpoint manda su propia `x-forwarded-for` al azar:
- * el limitador cuenta por IP y en memoria, asi que sin eso el conteo se
- * arrastra entre corridas y los asserts empiezan a dar 429 solos. En local no
- * hay proxy adelante y la cabecera llega tal cual; en Vercel la pone la
- * plataforma y esto no cambia nada.
+ *  5. Las cuatro vias miden lo mismo y apuntan a donde dicen: el mail al mail
+ *     real, la llamada a un tel: con el numero del sitio, y el bloque de
+ *     WhatsApp NO a wa.me sino al campo del compositor.
+ *  6. Instagram no se dibuja mientras no haya usuario (§9.1), y el formulario
+ *     con su ruta /api/contacto se fueron del todo.
  *
  * Uso: node scripts/verificar-contacto.mjs [url-base]
  */
@@ -193,7 +189,7 @@ try {
   const orden = await evaluar(ws, `(() => {
     const comp = document.querySelector('#contacto [data-analytics="cta-compositor"]')
       .closest('[data-revelar]');
-    const form = document.querySelector('#contacto form').closest('[data-revelar]');
+    const form = document.querySelector('#contacto [data-analytics="via-mail"]').closest('[data-revelar]');
     const rel = comp.compareDocumentPosition(form);
     return {
       compPrimeroEnDom: Boolean(rel & Node.DOCUMENT_POSITION_FOLLOWING),
@@ -261,7 +257,7 @@ try {
   const movil = await evaluar(ws, `(() => {
     const comp = document.querySelector('#contacto [data-analytics="cta-compositor"]')
       .closest('[data-revelar]');
-    const form = document.querySelector('#contacto form').closest('[data-revelar]');
+    const form = document.querySelector('#contacto [data-analytics="via-mail"]').closest('[data-revelar]');
     return {
       compTop: Math.round(comp.getBoundingClientRect().top),
       formTop: Math.round(form.getBoundingClientRect().top),
@@ -270,7 +266,7 @@ try {
     };
   })()`);
   checar(
-    "390: el compositor va arriba del formulario",
+    "390: el compositor va arriba de las vias",
     movil.compTop < movil.formTop,
     JSON.stringify({ compTop: movil.compTop, formTop: movil.formTop }),
   );
@@ -303,123 +299,128 @@ try {
     JSON.stringify(opacidades),
   );
 
-  // --- 11. El endpoint ---
-  const endpoint = await evaluar(ws, `(async () => {
-    // IP propia por corrida: si no, el conteo del limitador se arrastra entre
-    // corridas y a la tercera estos dos asserts empiezan a dar 429.
-    const ip = '198.51.100.' + (10 + Math.floor(Math.random() * 200));
-    const post = (cuerpo) => fetch('/api/contacto', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
-      body: JSON.stringify(cuerpo),
-    }).then(r => r.status);
-    return {
-      valido: await post({
-        nombre: 'Prueba', negocio: 'Prueba SA',
-        necesita: 'Quiero una tienda online para vender mates.',
-        contacto: 'prueba@ejemplo.com',
-      }),
-      incompleto: await post({ nombre: 'Prueba', negocio: 'x', contacto: 'y' }),
-    };
-  })()`);
-  checar(
-    "POST valido -> 200 (sin RESEND_API_KEY en local igual responde ok)",
-    endpoint.valido === 200,
-    `status ${endpoint.valido}`,
-  );
-  checar(
-    "POST sin `necesita` -> 400",
-    endpoint.incompleto === 400,
-    `status ${endpoint.incompleto}`,
-  );
+  // --- 11. Las vias: cuatro bloques, del mismo alto y con destino real ---
+  await llamar(ws, "Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "no-preference" }],
+  });
+  await llamar(ws, "Page.navigate", { url: `${BASE}/` });
+  await dormir(6000);
+  await evaluar(ws, IR_A_CONTACTO);
 
-  // --- 12. Honeypot: el campo esta, escondido y fuera del alcance ---
-  const trampa = await evaluar(ws, `(() => {
-    const i = document.querySelector('#contacto input[name="apodo"]');
-    if (!i) return { existe: false };
-    const caja = i.getBoundingClientRect();
-    return {
-      existe: true,
-      tabIndex: i.tabIndex,
-      autoComplete: i.getAttribute('autocomplete'),
-      escondido: Boolean(i.closest('[aria-hidden="true"], [aria-hidden]')),
-      // Fuera de pantalla por la izquierda, no por display:none.
-      fueraDePantalla: caja.right < 0,
-    };
-  })()`);
-  checar(
-    "honeypot: existe, aria-hidden, tabIndex -1, autocomplete off y fuera de pantalla",
-    trampa.existe &&
-      trampa.tabIndex === -1 &&
-      trampa.autoComplete === "off" &&
-      trampa.escondido &&
-      trampa.fueraDePantalla,
-    JSON.stringify(trampa),
-  );
-
-  // Con la trampa llena responde 200 (a un bot no se le avisa que lo pescamos)
-  // pero NO entrega. Que no entregue solo se ve del lado del server; desde aca
-  // lo comprobable es que no filtre la deteccion.
-  const conTrampa = await evaluar(ws, `fetch('/api/contacto', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-forwarded-for': '198.51.100.' + (10 + Math.floor(Math.random() * 200)),
-    },
-    body: JSON.stringify({
-      nombre: 'Bot', negocio: 'Bot SA',
-      necesita: 'Comprá seguidores baratos ahora mismo.',
-      contacto: 'bot@ejemplo.com', apodo: 'me llene solo',
-    }),
-  }).then(r => r.status)`);
-  checar(
-    "honeypot lleno -> 200 en silencio (no delata la deteccion)",
-    conTrampa === 200,
-    `status ${conTrampa}`,
-  );
-
-  // --- 13. Limite por IP ---
-  // Cada corrida usa una IP propia (203.0.113.x al azar) para no arrastrar el
-  // conteo de la corrida anterior. En local no hay proxy adelante, asi que la
-  // cabecera llega tal cual; en Vercel la pone la plataforma.
-  const limite = await evaluar(ws, `(async () => {
-    const ip = '203.0.113.' + (10 + Math.floor(Math.random() * 200));
-    const post = (cual) => fetch('/api/contacto', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': cual },
-      body: JSON.stringify({
-        nombre: 'Prueba', negocio: 'Prueba SA',
-        necesita: 'Quiero una tienda online para vender mates.',
-        contacto: 'prueba@ejemplo.com',
-      }),
+  const vias = await evaluar(ws, `(() => {
+    const items = [...document.querySelectorAll('#contacto ul > li')];
+    return items.map(li => {
+      const a = li.querySelector('a[data-analytics]') || li.querySelector('a');
+      const b = li.matches('[data-analytics]') ? li : li.querySelector('button[type="button"]');
+      const caja = li.getBoundingClientRect();
+      return {
+        alto: Math.round(caja.height),
+        href: a ? a.getAttribute('href') : null,
+        tieneBoton: Boolean(li.querySelector('button')),
+        texto: li.innerText.replace(/\s+/g, ' ').trim().slice(0, 60),
+      };
     });
-    const codigos = [];
-    // El tope es 5 por ventana: al sexto tiene que cortar.
-    for (let i = 0; i < 6; i++) codigos.push((await post(ip)).status);
-    const ultima = await post(ip);
-    // Otra IP no tiene por que pagar el limite de esta.
-    const otra = await post('203.0.113.250');
+  })()`);
+  checar(
+    "hay bloques de vias y todos miden lo mismo",
+    vias.length >= 3 &&
+      new Set(vias.map((v) => v.alto)).size === 1 &&
+      vias[0].alto >= 92,
+    JSON.stringify(vias.map((v) => v.alto)),
+  );
+
+  const hrefs = vias.map((v) => v.href);
+  checar(
+    "el bloque de mail apunta al mail real",
+    hrefs.includes("mailto:desarrollosmf00@gmail.com"),
+    JSON.stringify(hrefs),
+  );
+  checar(
+    "el bloque de llamada es un tel: con el numero del sitio",
+    hrefs.includes("tel:+5491122728576"),
+    JSON.stringify(hrefs),
+  );
+
+  // El primer bloque NO puede ser un link a wa.me: tiene que llevar al
+  // compositor. Si algun dia vuelve a ser <a href="wa.me">, esto lo caza.
+  const primeroEsBoton = await evaluar(ws, `(() => {
+    const li = document.querySelector('#contacto ul > li');
     return {
-      codigos,
-      retryAfter: ultima.headers.get('Retry-After'),
-      otraIp: otra.status,
+      etiqueta: li.firstElementChild.tagName,
+      llevaAWaMe: /wa\.me/.test(li.innerHTML),
     };
   })()`);
   checar(
-    "limite por IP: los primeros 5 pasan y el sexto es 429",
-    limite.codigos.slice(0, 5).every((c) => c === 200) &&
-      limite.codigos[5] === 429,
-    JSON.stringify(limite.codigos),
+    "el bloque de WhatsApp es un boton y no una salida a wa.me",
+    primeroEsBoton.etiqueta === "BUTTON" && !primeroEsBoton.llevaAWaMe,
+    JSON.stringify(primeroEsBoton),
+  );
+
+  // --- 12. El boton de WhatsApp deja el foco en el campo del compositor ---
+  const foco = await evaluar(ws, `(async () => {
+    document.querySelector('#contacto ul > li button').click();
+    await new Promise(r => setTimeout(r, 400));
+    return document.activeElement ? document.activeElement.id : '(ninguno)';
+  })()`);
+  checar(
+    "el bloque de WhatsApp enfoca el campo del compositor",
+    foco === "mensaje-whatsapp",
+    `foco en: ${foco}`,
+  );
+
+  // --- 12b. El boton de copiar deja el mail en el portapapeles de verdad ---
+  // Sin el permiso, writeText tira y el componente se lo traga en silencio (a
+  // proposito: el mailto sigue estando). Se lo damos para poder comprobarlo.
+  await llamar(ws, "Browser.grantPermissions", {
+    origin: BASE,
+    permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"],
+  });
+  // Sin esto la pestaña headless no cuenta como enfocada y readText tira
+  // "Document is not focused", que no dice nada sobre nuestro codigo.
+  await llamar(ws, "Emulation.setFocusEmulationEnabled", { enabled: true });
+  const copiado = await evaluar(ws, `(async () => {
+    const b = document.querySelector('#contacto [data-analytics="via-mail"]')
+      .closest('li').querySelector('button');
+    b.click();
+    await new Promise(r => setTimeout(r, 300));
+    return {
+      portapapeles: await navigator.clipboard.readText(),
+      avisa: document.querySelector('#contacto [role="status"]').textContent.trim(),
+    };
+  })()`);
+  checar(
+    "copiar deja el mail en el portapapeles y lo anuncia",
+    copiado.portapapeles === "desarrollosmf00@gmail.com" &&
+      /copiada/i.test(copiado.avisa),
+    JSON.stringify(copiado),
+  );
+
+  // --- 13. Instagram no se dibuja mientras no haya usuario (§9.1) ---
+  const insta = await evaluar(
+    ws,
+    `document.querySelectorAll('#contacto [data-analytics="via-instagram"]').length`,
   );
   checar(
-    "el 429 trae Retry-After en segundos",
-    Number(limite.retryAfter) > 0,
-    `Retry-After: ${limite.retryAfter}`,
+    "sin usuario de Instagram, el bloque no se dibuja",
+    insta === 0,
+    `bloques: ${insta}`,
+  );
+
+  // --- 14. El formulario y su endpoint se fueron del todo ---
+  const formulario = await evaluar(
+    ws,
+    `document.querySelectorAll('#contacto form, #contacto input[name="apodo"]').length`,
+  );
+  checar("no quedo ningun formulario en la seccion", formulario === 0, `nodos: ${formulario}`);
+
+  const rutaMuerta = await evaluar(
+    ws,
+    `fetch('/api/contacto', { method: 'POST', body: '{}' }).then(r => r.status).catch(() => 0)`,
   );
   checar(
-    "el limite es por IP: otra IP sigue pasando",
-    limite.otraIp === 200,
-    `status ${limite.otraIp}`,
+    "la ruta /api/contacto ya no existe (404)",
+    rutaMuerta === 404,
+    `status ${rutaMuerta}`,
   );
 } finally {
   chrome.kill();

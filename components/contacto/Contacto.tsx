@@ -1,18 +1,24 @@
 import { Seccion } from "@/components/ui/Seccion";
 import { Revelar } from "@/components/ui/Revelar";
-import { Formulario } from "./Formulario";
 import { MensajeWhatsApp } from "./MensajeWhatsApp";
+import { Vias } from "./Vias";
 
 /**
- * Contacto: dos canales, uno por columna.
+ * Contacto: el compositor a un lado, las vias al otro.
  *
  * Antes la seccion era un boton que disparaba wa.me con una frase enlatada y
- * te sacaba del sitio — en escritorio, derecho al QR de WhatsApp Web. Ahora
- * cada columna es un camino entero:
+ * te sacaba del sitio — en escritorio, derecho al QR de WhatsApp Web. Ahora:
  *
  *  - El compositor: escribis el mensaje ACA y recien el boton abre WhatsApp
  *    con tu texto puesto.
- *  - El formulario: se manda a nuestro backend y no te saca de la pagina.
+ *  - Las vias: WhatsApp (que lleva al compositor, no al chat), mail, Instagram
+ *    y telefono, un bloque cada una.
+ *
+ * EL FORMULARIO SE FUE, y con el su backend entero (Resend, honeypot y limite
+ * por IP), por pedido de Facundo el 07/09/2026. Consecuencia que conviene
+ * tener presente antes de "mejorar" esta seccion: ya no queda ninguna via que
+ * no saque al visitante del sitio. Si alguna vez hace falta, el formulario y
+ * su ruta estan enteros en el historial.
  *
  * ACA NO VAN EL NUMERO NI EL MAIL. Estuvieron una version, como una tira
  * debajo de las dos columnas, y en la captura se veia el problema: el pie de
@@ -72,19 +78,19 @@ export function Contacto() {
           de diferencia y el escalonado tiene que seguir el orden real de
           lectura.
 
-          El encabezado NO puede ser "O dejanos tus datos": en escritorio esta
-          columna se lee primero, y un "o" que aparece antes de aquello de lo
-          que es alternativa esta roto.
+          El encabezado NO puede ser "O por donde prefieras": en escritorio
+          esta columna se lee primero, y un "o" que aparece antes de aquello de
+          lo que es alternativa esta roto.
         */}
         <Revelar demora={100} className="lg:order-1 lg:flex-[2]">
-          <h3 className="text-2xl">Dejanos tus datos</h3>
+          <h3 className="text-2xl">Por donde prefieras</h3>
 
           <p className="mt-3 max-w-[38ch] text-[15px] leading-relaxed text-text-muted">
-            Nos llega al mail y te contestamos por donde vos nos digas.
+            Todas llegan al mismo lado. Elegí la que te quede más cómoda.
           </p>
 
           <div className="mt-6">
-            <Formulario />
+            <Vias />
           </div>
         </Revelar>
       </div>

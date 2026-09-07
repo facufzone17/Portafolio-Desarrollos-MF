@@ -173,6 +173,22 @@ export function Ruleta() {
           }}
         >
           {/*
+            Rueda y aguja van en un contenedor con las MISMAS medidas que la
+            lista de etapas (mx-auto max-w-1400 + padding). Si se posicionaran
+            sobre el ancho completo, arriba de 1400px de ventana la aguja se
+            despegaria del titulo: los titulos se corren con el contenedor y
+            ella no. Asi la distancia aguja->primera letra es la misma en toda
+            ventana.
+
+            Este contenedor NO lleva mascara ni `overflow`, a proposito: el
+            disco tiene que poder pintarse fuera de el y salirse por el borde
+            de la pantalla. El unico que recorta es el div de afuera, que ocupa
+            el ancho completo (`mask-clip` es `border-box`, o sea que la
+            mascara TAMBIEN recorta: por eso el escenario no puede estar
+            limitado a 1400px).
+          */}
+          <div className="pointer-events-none absolute inset-0 mx-auto max-w-[1400px] px-5 sm:px-8">
+          {/*
             La rueda. Un disco enorme del que solo se ve el filo derecho: el
             resto se va por el costado izquierdo y lo recorta el `overflow` del
             pin. Gira exactamente lo que avanzan las etapas (ANGULO por etapa),
@@ -189,10 +205,10 @@ export function Ruleta() {
           <div
             ref={ruedaRef}
             aria-hidden
-            className="pointer-events-none absolute left-[15%] top-1/2 z-0 size-[1320px] overflow-hidden rounded-full"
+            className="absolute left-[13.5%] top-1/2 z-0 size-[1320px] overflow-hidden rounded-full"
             // `translate` y `rotate` son propiedades separadas y se aplican en
             // ese orden: primero se coloca el disco (su filo derecho queda en
-            // el 15% del escenario) y despues gira sobre su propio centro.
+            // el 13,5% del contenedor) y despues gira sobre su propio centro.
             style={{ translate: "-100% -50%" }}
           >
             <Image
@@ -207,6 +223,34 @@ export function Ruleta() {
             <div className="absolute inset-0 bg-[rgba(6,7,12,0.45)]" />
           </div>
 
+          {/*
+            La aguja. Marca cual de los cinco titulos hay que leer: sin esto la
+            unica pista es que uno esta mas nitido que el resto, y en el medio
+            de un tramo hay dos a media nitidez y no se entiende cual manda.
+
+            NO va adentro del disco, va al lado: si fuera hija de la rueda
+            giraria con ella y solo apuntaria al titulo correcto en un unico
+            momento. Es fija, como la aguja de una ruleta de feria — se queda
+            en el vertice y la rueda pasa por debajo.
+
+            Ese vertice es el punto mas a la derecha del disco, que cae a la
+            misma altura que el titulo enfocado porque los dos estan en el
+            centro vertical del escenario. De ahi que apunte siempre bien sin
+            que nadie calcule nada.
+          */}
+          <svg
+            aria-hidden
+            viewBox="0 0 13 22"
+            fill="currentColor"
+            // 30px de alto contra un titulo de ~37px. A 22 se leia como una
+            // viñeta de lista pegada a la palabra, no como una aguja.
+            className="absolute left-[13.5%] top-1/2 z-0 h-[30px] w-[18px] text-text"
+            style={{ translate: "-100% -50%" }}
+          >
+            <path d="M0 0 L13 11 L0 22 Z" />
+          </svg>
+          </div>
+
           <ol className="absolute inset-0 mx-auto max-w-[1400px] px-5 sm:px-8">
             {etapas.map((etapa, i) => (
               <li key={etapa.numero} className="absolute inset-0">
@@ -216,17 +260,22 @@ export function Ruleta() {
                   animacion. El centrado va dentro del calc() que escribe el JS.
                 */}
                 {/*
-                  El titulo va alineado a la derecha y la tarjeta empieza justo
-                  despues: los dos filos que se miran quedan a un canal de
-                  distancia y el par se lee como una sola linea partida. Con el
-                  titulo centrado en su mitad quedaba un hueco muerto en el
-                  medio de la pantalla.
+                  Alineado a la IZQUIERDA, y eso cambio cuando entro la aguja.
+                  Antes iba a la derecha, para que su filo quedara a un canal de
+                  la tarjeta y el par se leyera como una linea partida. Pero con
+                  el titulo a la derecha la primera letra se mueve segun el
+                  largo del texto, y la aguja —que es fija— quedaba a 35px de
+                  "Diseñar propuesta a medida" y a 330px de "Entrega": ahi ya
+                  no se entiende que esta senalando. A la izquierda todos los
+                  titulos arrancan en la misma linea. El costo es un hueco mas
+                  grande entre los titulos cortos y su tarjeta, que se nota
+                  mucho menos que una flecha flotando en el aire.
                 */}
                 <h3
                   ref={(n) => {
                     titulosRef.current[i] = n;
                   }}
-                  className="absolute left-[25%] top-1/2 w-[40%] text-right text-[clamp(1.5rem,2.6vw,2.6rem)] opacity-0"
+                  className="absolute left-[34%] top-1/2 w-[36%] text-left text-[clamp(1.5rem,2.6vw,2.6rem)] opacity-0"
                 >
                   {etapa.titulo}
                 </h3>

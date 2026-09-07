@@ -35,8 +35,18 @@ export function Contacto() {
   return (
     <Seccion
       id="contacto"
-      titulo="Contemos qué necesitás"
-      bajada="Escribinos por WhatsApp y te respondemos en el día. Si preferís, dejanos los datos y te escribimos nosotros."
+      anchoTitulo="max-w-[40rem]"
+      titulo={
+        // El salto es a mano: dos renglones, "Contanos qué necesitás" /
+        // "y lo armamos". `text-wrap: pretty` saca el `balance` del h2, que si
+        // no vuelve a partir el primer renglon para emparejarlo con el segundo.
+        <span className="[text-wrap:pretty]">
+          Contanos qué necesitás
+          <br />
+          y lo armamos
+        </span>
+      }
+      bajada="Escribinos por WhatsApp y te respondemos el mismo día. Sin compromiso: entendemos tu negocio y te pasamos una propuesta a medida, con precio y plazo."
     >
       <div className="flex flex-col gap-12 md:flex-row md:gap-20">
         <Revelar className="md:flex-[2]">
@@ -44,8 +54,8 @@ export function Contacto() {
           <CtaWhatsApp>Contactanos</CtaWhatsApp>
 
           <p className="mt-6 max-w-[38ch] text-[15px] leading-relaxed text-text-muted">
-            Es la vía más rápida. Contanos qué necesitás y te respondemos en el
-            día.
+            Es la vía más rápida: nos escribís, entendemos qué querés y te
+            respondemos el mismo día.
           </p>
 
           <ul className="mt-10 border-t border-line">

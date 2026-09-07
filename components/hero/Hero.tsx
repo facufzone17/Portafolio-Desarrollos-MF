@@ -194,9 +194,19 @@ export function Hero() {
 
             Afuera el parallax (inline), adentro la entrada (CSS).
           */}
+          {/*
+            Arranque de los telefonos. En la referencia era `72svh` fijo, pero
+            en ventanas bajas (portatil con escalado al 125/150 %, ~700px de
+            alto util) eso los sube por encima de los botones ya en reposo: el
+            72 % del alto queda dentro del bloque de texto porque el titular no
+            se achica igual de rapido. `calc(23svh + 400px)` sigue el pie real
+            del bloque de botones (mismo 23svh del padding de arriba + el alto
+            aproximado de marca + titular + botones), y el `max` deja que en
+            pantallas altas gane el 72svh de siempre — ahi no hace falta bajarlos.
+          */}
           <motion.div
             style={{ y: yTelefonos }}
-            className="pointer-events-none absolute inset-x-0 top-[72svh]"
+            className="pointer-events-none absolute inset-x-0 top-[max(72svh,calc(23svh+416px))]"
             aria-hidden
           >
             <div
@@ -205,18 +215,25 @@ export function Hero() {
                 { "--hero-retardo": `${RETARDO.dispositivos}ms` } as React.CSSProperties
               }
             >
+              {/*
+                Sin `drop-shadow`: los dos PNG traen el fondo recortado al ras
+                del contenido (la sombra propia del mockup llega hasta el borde
+                del archivo), asi que un `filter: drop-shadow` dibujaba la sombra
+                de ese rectangulo y se veia un recuadro alrededor de cada
+                telefono. Los mockups ya traen su sombra pintada; alcanza.
+              */}
               <div className="relative mx-auto h-0 w-full max-w-[1400px]">
                 <Image
                   src={consorcios}
                   alt=""
                   sizes="(min-width: 1024px) 602px, 48vw"
-                  className="absolute left-[21.45%] w-[43%] rotate-[-5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[21.45%] w-[43%] rotate-[-5deg]"
                 />
                 <Image
                   src={tienda}
                   alt=""
                   sizes="(min-width: 1024px) 521px, 42vw"
-                  className="absolute left-[41.35%] w-[37.2%] rotate-[5deg] drop-shadow-[0_40px_80px_rgba(0,0,0,0.55)]"
+                  className="absolute left-[41.35%] w-[37.2%] rotate-[5deg]"
                 />
               </div>
             </div>

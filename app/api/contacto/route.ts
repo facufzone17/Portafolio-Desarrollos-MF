@@ -1,20 +1,55 @@
 import { NextResponse } from "next/server";
 import { enviarConsulta } from "@/lib/correo";
+import { ipDe, permitir } from "@/lib/limite";
 
 /**
  * Recepcion del formulario.
  *
- * Valida los cuatro campos y entrega por mail con Resend (ver lib/correo.ts).
+ * El orden importa y es el barato primero: limite por IP, despues parseo,
+ * despues honeypot, despues validacion, y recien al final la entrega, que es
+ * lo unico que sale de la maquina.
  *
- * Nunca se loguea el payload completo: los logs de la funcion se quedan con el
- * telefono y el mail de un lead para siempre y no le sirven a nadie.
+ * Nunca se loguea el payload completo: los logs de la funcion se quedarian con
+ * el telefono y el mail de un lead para siempre y no le sirven a nadie.
  */
 export async function POST(request: Request) {
+  // --- Limite por IP, antes de leer el cuerpo ---
+  // Va primero para que una rafaga de basura tampoco pueda hacernos trabajar.
+  const veredicto = permitir(ipDe(request));
+  if (!veredicto.ok) {
+    return NextResponse.json(
+      { error: "Demasiados envíos" },
+      { status: 429, headers: { "Retry-After": String(veredicto.esperar) } },
+    );
+  }
+
   let cuerpo: Record<string, unknown>;
   try {
     cuerpo = await request.json();
   } catch {
     return NextResponse.json({ error: "Cuerpo inválido" }, { status: 400 });
+  }
+
+  /*
+   * Honeypot.
+   *
+   * `apodo` es un campo que en la pagina esta fuera de pantalla, con
+   * tabIndex -1 y aria-hidden: una persona no lo ve, no lo tabula y no se lo
+   * lee el lector de pantalla. Un bot que completa todos los inputs si lo
+   * llena.
+   *
+   * Se responde 200 y se descarta en silencio, NO 400: un bot que recibe un
+   * error aprende que lo detectamos y prueba otra cosa. Uno que recibe "ok" se
+   * va contento y no vuelve.
+   *
+   * El nombre es deliberadamente anodino. Si se llamara `email`, `url` o
+   * `website`, el autocompletado del navegador podria llenarlo solo y tirar a
+   * la basura la consulta de una persona real.
+   */
+  const apodo = cuerpo.apodo;
+  if (typeof apodo === "string" && apodo.trim()) {
+    console.log("[contacto] honeypot: descartada");
+    return NextResponse.json({ ok: true });
   }
 
   const campos = ["nombre", "negocio", "necesita", "contacto"] as const;

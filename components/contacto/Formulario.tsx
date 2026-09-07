@@ -53,7 +53,11 @@ export function Formulario() {
   const [valores, setValores] = useState(VACIO);
   const [errores, setErrores] = useState<Partial<Record<Campo, string>>>({});
   const [tocados, setTocados] = useState<Partial<Record<Campo, boolean>>>({});
-  const [estado, setEstado] = useState<"idle" | "enviando" | "ok" | "error">("idle");
+  const [estado, setEstado] = useState<
+    "idle" | "enviando" | "ok" | "error" | "limite"
+  >("idle");
+  // Honeypot: ver el campo escondido abajo y el comentario en la ruta.
+  const [apodo, setApodo] = useState("");
 
   function alEscribir(campo: Campo, valor: string) {
     setValores((v) => ({ ...v, [campo]: valor }));
@@ -87,8 +91,14 @@ export function Formulario() {
       const r = await fetch("/api/contacto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(valores),
+        body: JSON.stringify({ ...valores, apodo }),
       });
+      // 429 tiene su propio estado: decirle "no pudimos enviar" a alguien que
+      // en realidad choco contra el tope es mentirle sobre lo que paso.
+      if (r.status === 429) {
+        setEstado("limite");
+        return;
+      }
       if (!r.ok) throw new Error(String(r.status));
       setEstado("ok");
       setValores(VACIO);
@@ -119,6 +129,29 @@ export function Formulario() {
 
   return (
     <form onSubmit={enviar} noValidate className="flex flex-col gap-6">
+      {/*
+        Honeypot. Fuera de pantalla en vez de `display:none` porque hay bots
+        que saltean lo que esta oculto con display; `absolute` ademas lo saca
+        del flujo, asi que no abre un hueco en el `gap-6` del formulario.
+
+        Las tres defensas para que ninguna persona lo complete sin querer:
+        `aria-hidden` (el lector de pantalla no lo anuncia), `tabIndex={-1}`
+        (con teclado no se llega) y `autoComplete="off"` mas un nombre anodino
+        (el navegador no tiene con que autocompletarlo).
+      */}
+      <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="apodo">No completes este campo</label>
+        <input
+          id="apodo"
+          name="apodo"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={apodo}
+          onChange={(e) => setApodo(e.target.value)}
+        />
+      </div>
+
       {CAMPOS.map((c) => {
         const error = errores[c.id];
         const idError = `${c.id}-error`;
@@ -191,14 +224,15 @@ export function Formulario() {
           )}
         </button>
 
-        {estado === "error" && (
+        {(estado === "error" || estado === "limite") && (
           <div
             role="alert"
             className="flex flex-col items-start gap-4 rounded-[var(--radius-card)] border border-line bg-bg-elev p-5"
           >
             <p className="text-text-muted">
-              No pudimos enviar el mensaje. Escribinos directo por WhatsApp y lo
-              resolvemos ahora.
+              {estado === "limite"
+                ? "Ya recibimos varias consultas tuyas y estamos en eso. Si es urgente, escribinos por WhatsApp."
+                : "No pudimos enviar el mensaje. Escribinos directo por WhatsApp y lo resolvemos ahora."}
             </p>
             {/*
               El CTA se lleva lo que el visitante ya escribio. Antes mandaba la

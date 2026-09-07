@@ -34,6 +34,24 @@ el destino es justamente `desarrollosmf00@gmail.com`, alcanza con crear la
 cuenta de Resend **con ese gmail** y el formulario queda andando. El día que
 haya dominio se cambia `CONTACTO_REMITENTE` en Vercel y no se toca código.
 
+## Protección del formulario
+
+Dos capas, las dos en código y sin dependencias ni servicios externos:
+
+- **Honeypot** (`apodo`): un campo fuera de pantalla, `aria-hidden`,
+  `tabIndex={-1}` y `autocomplete="off"`. Si viene lleno, la ruta responde
+  **200 y descarta en silencio** — a un bot no se le avisa que lo detectaron,
+  porque si recibe un error prueba otra cosa.
+- **Límite por IP** (`lib/limite.ts`): **5 envíos cada 10 minutos**, en memoria.
+  Al pasarse devuelve **429** con `Retry-After` y el formulario muestra un
+  mensaje propio (no el de error genérico) más el CTA de WhatsApp.
+
+**El límite no es distribuido**: cada instancia serverless tiene su propio
+contador, así que con varias instancias vivas el tope real es más alto, y no
+frena a alguien con muchas IP. Es una capa, no la última palabra. Si el abuso
+llega a ser real, la respuesta es el firewall de Vercel o un límite sobre KV,
+no estirar esto.
+
 ## Verificación
 
 No hay framework de tests. Las compuertas son:

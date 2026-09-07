@@ -13,6 +13,14 @@
  *     pastillas, nada de verde de WhatsApp, targets de 44px, sin scroll
  *     horizontal, y todo visible con movimiento reducido.
  *  5. El endpoint valida y, sin RESEND_API_KEY, sigue devolviendo 200 en local.
+ *  6. El honeypot esta escondido de verdad y, lleno, responde 200 sin delatar
+ *     la deteccion. El limite por IP corta al sexto envio y no salpica a otras.
+ *
+ * Cada assert que toca el endpoint manda su propia `x-forwarded-for` al azar:
+ * el limitador cuenta por IP y en memoria, asi que sin eso el conteo se
+ * arrastra entre corridas y los asserts empiezan a dar 429 solos. En local no
+ * hay proxy adelante y la cabecera llega tal cual; en Vercel la pone la
+ * plataforma y esto no cambia nada.
  *
  * Uso: node scripts/verificar-contacto.mjs [url-base]
  */
@@ -233,6 +241,10 @@ try {
   const chicos = await evaluar(ws, `(() => {
     const malos = [];
     for (const el of document.querySelectorAll('#contacto a, #contacto button, #contacto input, #contacto textarea')) {
+      // Lo que no esta expuesto no es un target: el honeypot es aria-hidden,
+      // tabIndex -1 y vive fuera de pantalla justamente para que nadie lo
+      // toque. Medirle el alto seria exigirle 44px a un campo invisible.
+      if (el.closest('[aria-hidden]')) continue;
       const h = el.getBoundingClientRect().height;
       if (h > 0 && h < 44) malos.push(el.tagName + ':' + Math.round(h) + 'px');
     }
@@ -293,9 +305,12 @@ try {
 
   // --- 11. El endpoint ---
   const endpoint = await evaluar(ws, `(async () => {
+    // IP propia por corrida: si no, el conteo del limitador se arrastra entre
+    // corridas y a la tercera estos dos asserts empiezan a dar 429.
+    const ip = '198.51.100.' + (10 + Math.floor(Math.random() * 200));
     const post = (cuerpo) => fetch('/api/contacto', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
       body: JSON.stringify(cuerpo),
     }).then(r => r.status);
     return {
@@ -316,6 +331,95 @@ try {
     "POST sin `necesita` -> 400",
     endpoint.incompleto === 400,
     `status ${endpoint.incompleto}`,
+  );
+
+  // --- 12. Honeypot: el campo esta, escondido y fuera del alcance ---
+  const trampa = await evaluar(ws, `(() => {
+    const i = document.querySelector('#contacto input[name="apodo"]');
+    if (!i) return { existe: false };
+    const caja = i.getBoundingClientRect();
+    return {
+      existe: true,
+      tabIndex: i.tabIndex,
+      autoComplete: i.getAttribute('autocomplete'),
+      escondido: Boolean(i.closest('[aria-hidden="true"], [aria-hidden]')),
+      // Fuera de pantalla por la izquierda, no por display:none.
+      fueraDePantalla: caja.right < 0,
+    };
+  })()`);
+  checar(
+    "honeypot: existe, aria-hidden, tabIndex -1, autocomplete off y fuera de pantalla",
+    trampa.existe &&
+      trampa.tabIndex === -1 &&
+      trampa.autoComplete === "off" &&
+      trampa.escondido &&
+      trampa.fueraDePantalla,
+    JSON.stringify(trampa),
+  );
+
+  // Con la trampa llena responde 200 (a un bot no se le avisa que lo pescamos)
+  // pero NO entrega. Que no entregue solo se ve del lado del server; desde aca
+  // lo comprobable es que no filtre la deteccion.
+  const conTrampa = await evaluar(ws, `fetch('/api/contacto', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-forwarded-for': '198.51.100.' + (10 + Math.floor(Math.random() * 200)),
+    },
+    body: JSON.stringify({
+      nombre: 'Bot', negocio: 'Bot SA',
+      necesita: 'Comprá seguidores baratos ahora mismo.',
+      contacto: 'bot@ejemplo.com', apodo: 'me llene solo',
+    }),
+  }).then(r => r.status)`);
+  checar(
+    "honeypot lleno -> 200 en silencio (no delata la deteccion)",
+    conTrampa === 200,
+    `status ${conTrampa}`,
+  );
+
+  // --- 13. Limite por IP ---
+  // Cada corrida usa una IP propia (203.0.113.x al azar) para no arrastrar el
+  // conteo de la corrida anterior. En local no hay proxy adelante, asi que la
+  // cabecera llega tal cual; en Vercel la pone la plataforma.
+  const limite = await evaluar(ws, `(async () => {
+    const ip = '203.0.113.' + (10 + Math.floor(Math.random() * 200));
+    const post = (cual) => fetch('/api/contacto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': cual },
+      body: JSON.stringify({
+        nombre: 'Prueba', negocio: 'Prueba SA',
+        necesita: 'Quiero una tienda online para vender mates.',
+        contacto: 'prueba@ejemplo.com',
+      }),
+    });
+    const codigos = [];
+    // El tope es 5 por ventana: al sexto tiene que cortar.
+    for (let i = 0; i < 6; i++) codigos.push((await post(ip)).status);
+    const ultima = await post(ip);
+    // Otra IP no tiene por que pagar el limite de esta.
+    const otra = await post('203.0.113.250');
+    return {
+      codigos,
+      retryAfter: ultima.headers.get('Retry-After'),
+      otraIp: otra.status,
+    };
+  })()`);
+  checar(
+    "limite por IP: los primeros 5 pasan y el sexto es 429",
+    limite.codigos.slice(0, 5).every((c) => c === 200) &&
+      limite.codigos[5] === 429,
+    JSON.stringify(limite.codigos),
+  );
+  checar(
+    "el 429 trae Retry-After en segundos",
+    Number(limite.retryAfter) > 0,
+    `Retry-After: ${limite.retryAfter}`,
+  );
+  checar(
+    "el limite es por IP: otra IP sigue pasando",
+    limite.otraIp === 200,
+    `status ${limite.otraIp}`,
   );
 } finally {
   chrome.kill();

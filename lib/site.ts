@@ -37,6 +37,19 @@ export const mensajes = {
     `Hola, vi la demo de ${proyecto} en el portafolio y quiero algo así para mi negocio.`,
   servicio: (servicio: string) =>
     `Hola, vi la sección de ${servicio} en el portafolio de Trevoo y quiero algo así para mi negocio.`,
+
+  /**
+   * Lo que se manda cuando el visitante escribio el mensaje en el sitio
+   * (components/contacto/MensajeWhatsApp.tsx).
+   *
+   * Su texto va solo, SIN el "Hola, vi el portafolio" de `general`: pegarle
+   * adelante una frase que el no escribio le convierte el mensaje en el de un
+   * formulario, que es justo lo contrario de por que existe el compositor. La
+   * unica linea que agregamos dice de donde salio la consulta, porque si no
+   * llegan todas sin origen.
+   */
+  compuesto: (texto: string) =>
+    `Hola, les escribo desde el sitio de Trevoo.\n\n${texto.trim()}`,
 } as const;
 
 /** Link a WhatsApp con mensaje prellenado. */

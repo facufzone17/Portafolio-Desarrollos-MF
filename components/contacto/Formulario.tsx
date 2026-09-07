@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
+import { mensajes } from "@/lib/site";
 
 type Campo = "nombre" | "negocio" | "necesita" | "contacto";
 
@@ -105,8 +106,12 @@ export function Formulario() {
         className="rounded-[var(--radius-card)] border border-azul/40 bg-bg-elev p-8"
       >
         <p className="text-2xl">Listo.</p>
+        {/*
+          No promete WhatsApp: el ultimo campo acepta un mail y prometerle
+          WhatsApp a alguien que dejo un mail es prometer mal.
+        */}
         <p className="mt-3 text-text-muted">
-          Te escribimos por WhatsApp en el día.
+          Te contestamos hoy mismo por donde nos dejaste.
         </p>
       </div>
     );
@@ -162,10 +167,16 @@ export function Formulario() {
       })}
 
       <div className="flex flex-col gap-4">
+        {/*
+          Secundario (`linea`) y no `claro`. La seccion tiene dos columnas con
+          una accion cada una, y el brief pide una sola accion primaria
+          dominante por pantalla: el unico boton blanco es el de WhatsApp. Asi
+          la jerarquia se lee por rango y no solo por tamaño.
+        */}
         <button
           type="submit"
           disabled={estado === "enviando"}
-          data-boton="claro"
+          data-boton="linea"
           className="group min-h-[52px] px-6 text-base disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         >
           {estado === "enviando" && (
@@ -189,7 +200,19 @@ export function Formulario() {
               No pudimos enviar el mensaje. Escribinos directo por WhatsApp y lo
               resolvemos ahora.
             </p>
-            <CtaWhatsApp size="sm" />
+            {/*
+              El CTA se lleva lo que el visitante ya escribio. Antes mandaba la
+              frase enlatada y le tiraba las palabras a la basura justo en el
+              peor momento de la pantalla. Los valores se leen sin guardas
+              porque a este estado solo se llega despues de validar.
+            */}
+            <CtaWhatsApp
+              size="sm"
+              analytics="cta-fallback-formulario"
+              mensaje={mensajes.compuesto(
+                `${valores.necesita}\n\nSoy ${valores.nombre}, de ${valores.negocio}.`,
+              )}
+            />
           </div>
         )}
       </div>

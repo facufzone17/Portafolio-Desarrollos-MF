@@ -21,18 +21,25 @@ export function CtaWhatsApp({
   children = "Contactanos",
   size = "md",
   className = "",
+  analytics = "cta-whatsapp",
 }: {
   mensaje?: string;
   children?: string;
   size?: "sm" | "md";
   className?: string;
+  /**
+   * Para separar en la analitica el CTA del compositor (que lleva lo que el
+   * visitante escribio) de los que mandan la frase enlatada. El default deja
+   * intactos los call sites que ya existian.
+   */
+  analytics?: string;
 }) {
   return (
     <a
       href={whatsappUrl(mensaje)}
       target="_blank"
       rel="noopener noreferrer"
-      data-analytics="cta-whatsapp"
+      data-analytics={analytics}
       data-boton="claro"
       className={`group ${size === "md" ? "min-h-[52px] px-6 text-base" : ""} ${className}`}
     >

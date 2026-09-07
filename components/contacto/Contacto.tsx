@@ -1,37 +1,27 @@
-import { Mail, MessageCircle } from "lucide-react";
 import { Seccion } from "@/components/ui/Seccion";
-import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
 import { Revelar } from "@/components/ui/Revelar";
-import { mailtoUrl, site, whatsappUrl } from "@/lib/site";
 import { Formulario } from "./Formulario";
+import { MensajeWhatsApp } from "./MensajeWhatsApp";
 
 /**
- * Contacto.
+ * Contacto: dos canales, uno por columna.
  *
- * La columna izquierda ya no es un boton solo con una linea de texto flotando
- * al lado de un formulario del doble de alto: ahora lleva tambien los datos
- * directos, que es informacion real y no relleno para emparejar columnas.
+ * Antes la seccion era un boton que disparaba wa.me con una frase enlatada y
+ * te sacaba del sitio — en escritorio, derecho al QR de WhatsApp Web. Ahora
+ * cada columna es un camino entero:
  *
- * El boton dice "Contactanos", igual que el del header y el del hero. Una sola
- * etiqueta por intencion en toda la pagina: tres formas distintas de decir lo
- * mismo obligan a leer las tres para descubrir que llevan al mismo lado.
+ *  - El compositor: escribis el mensaje ACA y recien el boton abre WhatsApp
+ *    con tu texto puesto.
+ *  - El formulario: se manda a nuestro backend y no te saca de la pagina.
+ *
+ * ACA NO VAN EL NUMERO NI EL MAIL. Estuvieron una version, como una tira
+ * debajo de las dos columnas, y en la captura se veia el problema: el pie de
+ * pagina dibuja esas dos mismas filas —mismo texto, mismos iconos— 200px mas
+ * abajo y en la misma pantalla. Dos veces lo mismo a un palmo de distancia no
+ * es redundancia util, es ruido; el pie ya es el lugar de los datos crudos y
+ * esta seccion es la de los dos caminos.
  */
 export function Contacto() {
-  const directos = [
-    {
-      href: whatsappUrl(),
-      icono: <MessageCircle className="size-4 shrink-0" aria-hidden />,
-      texto: site.whatsappDisplay,
-      externo: true,
-    },
-    {
-      href: mailtoUrl,
-      icono: <Mail className="size-4 shrink-0" aria-hidden />,
-      texto: site.email,
-      externo: false,
-    },
-  ];
-
   return (
     <Seccion
       id="contacto"
@@ -46,38 +36,56 @@ export function Contacto() {
           y lo armamos
         </span>
       }
-      bajada="Escribinos por WhatsApp y te respondemos el mismo día. Sin compromiso: entendemos tu negocio y te pasamos una propuesta a medida, con precio y plazo."
+      // La bajada ya no puede arrancar con "Escribinos por WhatsApp": son dos
+      // canales y cada columna anuncia el suyo. Queda la mitad persuasiva.
+      bajada="Contestamos el mismo día. Sin compromiso: entendemos tu negocio y te pasamos una propuesta a medida, con precio y plazo."
     >
-      <div className="flex flex-col gap-12 md:flex-row md:gap-20">
-        <Revelar className="md:flex-[2]">
-          {/* La accion primaria va primero y sola: es la que queremos. */}
-          <CtaWhatsApp>Contactanos</CtaWhatsApp>
+      {/*
+        El corte es en `lg` y no en `md`: a 768px, 2/3 menos el gap deja el
+        panel del compositor en unos 380px con 32px de padding adentro, que al
+        lado de un formulario de cuatro campos queda apretado. De 768 a 1023
+        apila, que a ese ancho se lee mejor. Mismo criterio que
+        components/servicios/BloqueServicio.tsx.
+      */}
+      <div className="flex flex-col gap-12 lg:flex-row lg:gap-20">
+        {/*
+          El compositor va PRIMERO en el DOM y recien se corre a la derecha en
+          `lg`. En telefono el traspaso a wa.me es lo mejor que tiene la pagina
+          (abre la app con el texto ya puesto), asi que ahi tiene que ser lo
+          primero que se ve; el orden visual de escritorio lo pidio Facundo y
+          lo resuelve `order`, no una segunda copia del markup.
 
-          <p className="mt-6 max-w-[38ch] text-[15px] leading-relaxed text-text-muted">
-            Es la vía más rápida: nos escribís, entendemos qué querés y te
-            respondemos el mismo día.
-          </p>
-
-          <ul className="mt-10 border-t border-line">
-            {directos.map((d) => (
-              <li key={d.texto} className="border-b border-line">
-                <a
-                  href={d.href}
-                  {...(d.externo
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  className="flex min-h-12 items-center gap-3 text-sm text-text-muted transition-colors duration-[var(--duration-micro)] hover:text-text"
-                >
-                  {d.icono}
-                  {d.texto}
-                </a>
-              </li>
-            ))}
-          </ul>
+          Si: dar vuelta el `order` desincroniza el foco del orden visual en
+          escritorio, y con teclado se entra primero a la columna derecha. Pasa
+          igual porque las dos columnas son alternativas independientes y
+          equivalentes, no una secuencia: caer en cualquiera de las dos es un
+          lugar coherente. No valdria si una dependiera de la otra.
+        */}
+        <Revelar className="lg:order-2 lg:flex-[3]">
+          <MensajeWhatsApp />
         </Revelar>
 
-        <Revelar demora={100} className="md:flex-[3]">
-          <Formulario />
+        {/*
+          La `demora` va en el segundo del DOM y no en la columna izquierda: en
+          escritorio las dos cruzan el observer en el mismo cuadro y 100ms de
+          una aparicion de 820ms no se ven, pero en mobile cruzan con segundos
+          de diferencia y el escalonado tiene que seguir el orden real de
+          lectura.
+
+          El encabezado NO puede ser "O dejanos tus datos": en escritorio esta
+          columna se lee primero, y un "o" que aparece antes de aquello de lo
+          que es alternativa esta roto.
+        */}
+        <Revelar demora={100} className="lg:order-1 lg:flex-[2]">
+          <h3 className="text-2xl">Dejanos tus datos</h3>
+
+          <p className="mt-3 max-w-[38ch] text-[15px] leading-relaxed text-text-muted">
+            Nos llega al mail y te contestamos por donde vos nos digas.
+          </p>
+
+          <div className="mt-6">
+            <Formulario />
+          </div>
         </Revelar>
       </div>
     </Seccion>

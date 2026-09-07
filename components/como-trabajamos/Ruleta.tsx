@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import { etapas } from "@/lib/comoTrabajamos";
 
@@ -20,16 +21,16 @@ import { etapas } from "@/lib/comoTrabajamos";
  * cambia la velocidad —, pero la seccion queda quieta mientras dura su propio
  * recorrido. Es la misma deuda que ya tiene `ProyectosPista`.
  *
- * PASA DE TARJETA, NO SE QUEDA EN EL MEDIO. El paso entre etapa y etapa no es
- * lineal: cada tramo de scroll arranca y termina con la tarjeta parada en su
- * lugar (los dos extremos del tramo son mesetas) y el viaje ocurre en el medio.
- * Al soltar la rueda en cualquier punto lo mas probable es quedar sobre una
- * etapa entera y no a mitad de camino. Se hace asi y no con `scroll-snap` ni
- * con un `scrollTo` al terminar el gesto porque las dos cosas pelean con Lenis,
- * que ya mueve el scroll a mano cuadro a cuadro (ver lib/useLenis.ts).
+ * EL AVANCE ES LINEAL, no escalonado. La primera version metia una meseta en
+ * cada punta del tramo para que al soltar la rueda quedaras siempre sobre una
+ * etapa entera. Se saco (pedido de Facundo, 07/09/2026): esas mesetas son
+ * tramos donde la pagina sigue scrolleando y en pantalla no se mueve nada, y
+ * eso se siente como si el scroll de toda la pagina se trabara. Ahora el
+ * angulo sigue al scroll uno a uno y lo suaviza Lenis, que es como funciona el
+ * componente original.
  *
  * No hay render de React por cuadro: el efecto escribe `translate`, `scale`,
- * `opacity` y `filter` directo sobre los nodos.
+ * `opacity`, `filter` y `rotate` directo sobre los nodos.
  *
  * Este componente NO se monta en mobile/tablet ni con prefers-reduced-motion:
  * ahi va el camino apilado de `Camino.tsx`, que es scroll nativo.
@@ -44,13 +45,6 @@ const ENTRADA_VH = 25;
 /** Aire despues de la ultima, para que no se vaya en el mismo pixel que llega. */
 const COLA_VH = 35;
 const RECORRIDO_VH = (N - 1) * PASO_VH + ENTRADA_VH + COLA_VH;
-
-/**
- * Fraccion de cada paso en la que la tarjeta esta QUIETA, repartida mitad al
- * principio y mitad al final. Con 0,46 el 23% inicial y el 23% final del tramo
- * son meseta pura y el viaje se hace en el 54% del medio.
- */
-const MESETA = 0.46;
 
 /** Angulo entre etapa y etapa. Fija la curvatura: dx/dy = tan(angulo/2). */
 const ANGULO = 0.46;
@@ -68,21 +62,9 @@ function limitar(v: number, min: number, max: number): number {
   return v;
 }
 
-/**
- * Progreso continuo -> progreso escalonado. Ver el parrafo de "pasa de
- * tarjeta" arriba. La curva del tramo es smootherstep: velocidad Y aceleracion
- * cero en los dos extremos, que es lo que alarga la sensacion de meseta mas
- * alla de la meseta real.
- */
-function escalonar(v: number): number {
-  const entero = Math.floor(v);
-  const t = v - entero;
-  const u = limitar((t - MESETA / 2) / (1 - MESETA), 0, 1);
-  return entero + u * u * u * (u * (u * 6 - 15) + 10);
-}
-
 export function Ruleta() {
   const seccionRef = useRef<HTMLDivElement>(null);
+  const ruedaRef = useRef<HTMLDivElement>(null);
   const titulosRef = useRef<(HTMLDivElement | null)[]>([]);
   const tarjetasRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -93,8 +75,14 @@ export function Ruleta() {
 
   function pintar(p: number) {
     // p (0..1 sobre el recorrido del pin) -> posicion continua entre etapas.
-    const crudo = (p * RECORRIDO_VH - ENTRADA_VH) / PASO_VH;
-    const pos = escalonar(limitar(crudo, 0, N - 1));
+    const pos = limitar((p * RECORRIDO_VH - ENTRADA_VH) / PASO_VH, 0, N - 1);
+
+    // La rueda gira lo mismo que avanzan las etapas: es la misma pieza. Va en
+    // grados porque `rotate` de CSS no entiende radianes.
+    const rueda = ruedaRef.current;
+    if (rueda) {
+      rueda.style.rotate = `${((-pos * ANGULO * 180) / Math.PI).toFixed(2)}deg`;
+    }
 
     for (let i = 0; i < N; i++) {
       const angulo = (i - pos) * ANGULO;
@@ -169,14 +157,57 @@ export function Ruleta() {
           y con un recorte duro se cortarian de un hachazo a media palabra. El
           degradado las apaga antes de que lleguen al filo.
         */}
+        {/*
+          El escenario ocupa el ANCHO COMPLETO y el limite de 1400px se lo pone
+          la lista de adentro. La rueda tiene que salirse por el borde de la
+          pantalla, no por el del contenedor: si viviera dentro de los 1400px,
+          en un monitor ancho quedaria una franja negra a su izquierda y el
+          disco se leeria como un circulo flotando, no como una rueda que entra
+          desde afuera.
+        */}
         <div
-          className="relative mx-auto w-full max-w-[1400px] flex-1 px-5 sm:px-8"
+          className="relative w-full flex-1"
           style={{
             maskImage:
               "linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%)",
           }}
         >
-          <ol className="absolute inset-0">
+          {/*
+            La rueda. Un disco enorme del que solo se ve el filo derecho: el
+            resto se va por el costado izquierdo y lo recorta el `overflow` del
+            pin. Gira exactamente lo que avanzan las etapas (ANGULO por etapa),
+            asi que es la pieza que las mueve y no un adorno que gira al lado.
+
+            Va rellena con la MISMA imagen del hero, que es de donde sale el
+            azul. No es un degradado inventado: es la unica superficie azul que
+            tiene la pagina, y el disco la trae de vuelta una vez mas.
+
+            El velo encima no es cosmetico: esa imagen tiene zonas claras y el
+            titulo enfocado le pasa por arriba con texto blanco. El hero lleva
+            su propio velo por la misma razon.
+          */}
+          <div
+            ref={ruedaRef}
+            aria-hidden
+            className="pointer-events-none absolute left-[15%] top-1/2 z-0 size-[1320px] overflow-hidden rounded-full"
+            // `translate` y `rotate` son propiedades separadas y se aplican en
+            // ese orden: primero se coloca el disco (su filo derecho queda en
+            // el 15% del escenario) y despues gira sobre su propio centro.
+            style={{ translate: "-100% -50%" }}
+          >
+            <Image
+              src="/images/hero-bg.jpg"
+              alt=""
+              fill
+              // 750px para un disco de 1320: la textura es suave y va debajo de
+              // un velo, asi que el reescalado no se ve y baja ~5x el peso.
+              sizes="700px"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-[rgba(6,7,12,0.45)]" />
+          </div>
+
+          <ol className="absolute inset-0 mx-auto max-w-[1400px] px-5 sm:px-8">
             {etapas.map((etapa, i) => (
               <li key={etapa.numero} className="absolute inset-0">
                 {/*

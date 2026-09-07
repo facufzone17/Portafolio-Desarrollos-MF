@@ -1,4 +1,5 @@
 import { Isotipo } from "@/components/ui/Isotipo";
+import { Ola } from "@/components/ui/Ola";
 import { Revelar } from "@/components/ui/Revelar";
 
 /**
@@ -8,13 +9,12 @@ import { Revelar } from "@/components/ui/Revelar";
  * firma, el nombre de la marca como titulo y dos parrafos centrados sobre el
  * negro.
  *
- * (07/09/2026) Se saco la maquina de escribir. Escribia "Somos Facundo y
- * Mateo", y esa frase ahora abre el primer parrafo; el titulo pasa a ser
- * "Trevoo". El preloader ya escribe TREVOO letra por letra en cada carga:
- * volver a tipear aca seria contar dos veces lo mismo. El titulo aparece con
- * el `Revelar` de siempre, igual que el resto de la pagina.
+ * (07/09/2026) El titulo "Trevoo" se escribe con una ola (`Ola`) al entrar en
+ * pantalla — reemplaza al typewriter plano que antes escribia "Somos Facundo y
+ * Mateo", frase que ahora abre el primer parrafo. Los dos parrafos van
+ * justificados y con guionado, por pedido.
  *
- * Con movimiento reducido / sin JS se ve todo el texto de una.
+ * Con movimiento reducido / sin JS se ve todo el texto quieto y completo.
  */
 export function QuienesSomos() {
   return (
@@ -27,17 +27,15 @@ export function QuienesSomos() {
         <div className="mx-auto max-w-[64ch] text-center">
           <Isotipo className="mx-auto h-8 w-auto text-azul" />
 
-          <Revelar>
-            <h2
-              id="titulo-quienes-somos"
-              className="mt-8 text-[clamp(2rem,4.6vw,3.5rem)] text-text"
-            >
-              Trevoo
-            </h2>
-          </Revelar>
+          <Ola
+            as="h2"
+            id="titulo-quienes-somos"
+            texto="Trevoo"
+            className="mt-8 text-[clamp(2rem,4.6vw,3.5rem)] text-text"
+          />
 
           <Revelar demora={60}>
-            <p className="mx-auto mt-6 max-w-[46ch] font-display text-[clamp(1.1rem,1.8vw,1.4rem)] leading-[1.5] font-medium tracking-[-0.03em] text-text">
+            <p className="mx-auto mt-6 max-w-[48ch] font-display text-[clamp(1.1rem,1.8vw,1.4rem)] font-medium leading-[1.5] tracking-[-0.03em] text-text text-justify hyphens-auto [text-align-last:center]">
               Somos Facundo y Mateo. Nos dedicamos a detectar qué necesita tu
               negocio en lo digital y a construir la solución que lo resuelve: un
               sitio que te traiga clientes, una tienda online que venda sin que
@@ -47,7 +45,7 @@ export function QuienesSomos() {
           </Revelar>
 
           <Revelar demora={120}>
-            <p className="mx-auto mt-8 max-w-[54ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
+            <p className="mx-auto mt-8 max-w-[54ch] text-[15px] leading-relaxed text-text-muted sm:text-base text-justify hyphens-auto [text-align-last:center]">
               Primero entendemos cómo funciona tu negocio, después lo
               desarrollamos a medida y no lo damos por terminado hasta verlo
               funcionando con tus datos reales.

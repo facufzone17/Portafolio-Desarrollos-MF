@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DemoFrame } from "@/components/ui/DemoFrame";
-import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { proyectos, proyectoPorSlug } from "@/lib/proyectos";
-import { mensajes, site } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export function generateStaticParams() {
   return proyectos.map((p) => ({ slug: p.slug }));
@@ -138,7 +137,23 @@ export default async function FichaProyecto({
             <p className="max-w-[46ch] text-lg text-text-muted">
               Contanos qué necesita tu negocio y te decimos cómo lo resolvemos.
             </p>
-            <CtaWhatsApp mensaje={mensajes.proyecto(proyecto.nombre)}>Contactanos</CtaWhatsApp>
+            {/*
+              Lleva a la seccion de contacto de la home, NO directo a WhatsApp.
+              Ahi estan las cuatro vias —WhatsApp con compositor, mail,
+              Instagram y telefono— y el visitante elige por cual le queda
+              comodo; sacandolo derecho a WhatsApp le eligiamos nosotros.
+
+              El scroll a la seccion lo termina `ScrollAlNavegar`.
+            */}
+            <Link
+              href="/#contacto"
+              data-analytics="cta-proyecto"
+              data-boton="claro"
+              className="group min-h-[52px] px-6 text-base"
+            >
+              <TextoDeslizante>Contactanos</TextoDeslizante>
+              <ArrowRight className="size-[1.15em] shrink-0" aria-hidden />
+            </Link>
           </div>
         </article>
       </main>

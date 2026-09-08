@@ -20,10 +20,15 @@ export const site = {
   email: "trevoo.proyectos@gmail.com",
 
   /**
-   * FALTA: usuario de Instagram. Mientras sea null el icono no se renderiza.
-   * Un icono que lleva a ningun lado es peor que no tenerlo (§9.1).
+   * Usuario de Instagram (08/09/2026). Mientras fue null el icono no se
+   * renderizaba: un icono que lleva a ningun lado es peor que no tenerlo
+   * (§9.1). Con el usuario puesto, el bloque aparece solo en el contacto y en
+   * el pie.
+   *
+   * Son TRES guiones bajos al final, no dos ni cuatro. Es facil equivocarse
+   * copiandolo a mano.
    */
-  instagram: null as string | null,
+  instagram: "trevoo___" as string | null,
 
   /** Se reemplaza cuando se compre el dominio. */
   url: "http://localhost:3000",
@@ -33,8 +38,6 @@ export const site = {
 export const mensajes = {
   general:
     "Hola, vi el portafolio de Trevoo y quiero consultarles por un proyecto.",
-  proyecto: (proyecto: string) =>
-    `Hola, vi la demo de ${proyecto} en el portafolio y quiero algo así para mi negocio.`,
   servicio: (servicio: string) =>
     `Hola, vi la sección de ${servicio} en el portafolio de Trevoo y quiero algo así para mi negocio.`,
 
@@ -57,8 +60,27 @@ export function whatsappUrl(mensaje: string = mensajes.general): string {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(mensaje)}`;
 }
 
-/** Link de mail. */
+/**
+ * Link de mail para quien SI tiene cliente de correo: el celular, sobre todo,
+ * donde `mailto:` abre Gmail o Mail y anda perfecto.
+ */
 export const mailtoUrl = `mailto:${site.email}`;
+
+/**
+ * Compositor de Gmail en el navegador, con el destinatario ya puesto.
+ *
+ * En escritorio `mailto:` es una trampa: Chrome sin handler de correo
+ * registrado abre una pestaña en blanco de Google y el visitante se queda sin
+ * escribir nada, sin ningun error que se lo explique. No hay forma de detectar
+ * desde la web si hay cliente configurado, asi que la decision se toma por el
+ * tipo de dispositivo (ver components/ui/LinkMail.tsx).
+ *
+ * `view=cm&fs=1` es "compose, pantalla completa". Si la persona no tiene sesion
+ * abierta, Gmail la manda a entrar y vuelve al compositor con el `to` intacto.
+ */
+export const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+  site.email,
+)}`;
 
 /**
  * Link de llamada. Es el MISMO telefono que el de WhatsApp, por eso sale de la

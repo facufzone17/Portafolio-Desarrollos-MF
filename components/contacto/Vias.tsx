@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Check, Copy, Mail, MessageCircle, Phone } from "lucide-react";
 import { IconInstagram } from "@/components/ui/IconInstagram";
-import { instagramUrl, mailtoUrl, site, telUrl } from "@/lib/site";
+import { LinkMail } from "@/components/ui/LinkMail";
+import { instagramUrl, site, telUrl } from "@/lib/site";
 
 /**
  * Las vias de contacto, una por bloque.
@@ -96,18 +97,18 @@ export function Vias() {
       </li>
 
       {/*
-        Mail. El bloque es un <a mailto:> y el boton de copiar va AL LADO, no
-        adentro: un <button> dentro de un <a> es HTML invalido y el navegador
-        lo desarma como quiere.
+        Mail. El bloque es un link y el boton de copiar va AL LADO, no adentro:
+        un <button> dentro de un <a> es HTML invalido y el navegador lo desarma
+        como quiere.
 
-        Lo de copiar no es adorno. Si la maquina del visitante no tiene cliente
-        de mail configurado, un mailto no hace absolutamente nada y no hay
-        forma de detectarlo desde la web: sin el boton, ese visitante se queda
-        sin la direccion.
+        A donde lleva el link lo decide `LinkMail`: en escritorio al compositor
+        de Gmail, en el celular al `mailto:`. Ver ahi por que.
+
+        Lo de copiar sigue haciendo falta igual: es la salida para el que usa
+        otro correo que no es Gmail.
       */}
       <li className={`group ${BLOQUE} pr-2`}>
-        <a
-          href={mailtoUrl}
+        <LinkMail
           data-analytics="via-mail"
           className="flex min-w-0 flex-1 items-center gap-4 py-4"
         >
@@ -115,7 +116,7 @@ export function Vias() {
             <Mail className="size-5" aria-hidden />
           </span>
           <Cuerpo nombre="Mail" dato={site.email} />
-        </a>
+        </LinkMail>
 
         <button
           type="button"

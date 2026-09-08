@@ -330,9 +330,15 @@ try {
   );
 
   const hrefs = vias.map((v) => v.href);
+  // El destino del bloque de mail depende del dispositivo (ver
+  // components/ui/LinkMail.tsx): con mouse va al compositor de Gmail, con dedo
+  // al mailto. Headless corre con puntero fino, asi que aca se espera Gmail,
+  // pero se acepta cualquiera de los dos mientras lleve la direccion real.
+  const hrefMail = hrefs.find((h) => h && /mailto:|mail\.google\.com/.test(h));
   checar(
-    "el bloque de mail apunta al mail real",
-    hrefs.includes("mailto:desarrollosmf00@gmail.com"),
+    "el bloque de mail apunta al mail real (Gmail en escritorio, mailto en celular)",
+    Boolean(hrefMail) &&
+      decodeURIComponent(hrefMail).includes("trevoo.proyectos@gmail.com"),
     JSON.stringify(hrefs),
   );
   checar(
@@ -390,20 +396,29 @@ try {
   })()`);
   checar(
     "copiar deja el mail en el portapapeles y lo anuncia",
-    copiado.portapapeles === "desarrollosmf00@gmail.com" &&
+    copiado.portapapeles === "trevoo.proyectos@gmail.com" &&
       /copiada/i.test(copiado.avisa),
     JSON.stringify(copiado),
   );
 
-  // --- 13. Instagram no se dibuja mientras no haya usuario (§9.1) ---
-  const insta = await evaluar(
-    ws,
-    `document.querySelectorAll('#contacto [data-analytics="via-instagram"]').length`,
-  );
+  // --- 13. Instagram: hay usuario desde el 08/09/2026, asi que el bloque va ---
+  // Antes esto verificaba lo contrario (que NO se dibujara mientras
+  // `site.instagram` fuera null, §9.1). La regla de fondo no cambio: el bloque
+  // existe si y solo si hay usuario, y tiene que llevar a esa cuenta.
+  const insta = await evaluar(ws, `(() => {
+    const a = document.querySelector('#contacto [data-analytics="via-instagram"]');
+    return { cantidad: document.querySelectorAll('#contacto [data-analytics="via-instagram"]').length,
+             href: a && a.getAttribute('href'),
+             target: a && a.getAttribute('target'),
+             rel: a && a.getAttribute('rel') };
+  })()`);
   checar(
-    "sin usuario de Instagram, el bloque no se dibuja",
-    insta === 0,
-    `bloques: ${insta}`,
+    "el bloque de Instagram lleva a la cuenta, en pestaña nueva y con rel seguro",
+    insta.cantidad === 1 &&
+      insta.href === "https://instagram.com/trevoo___" &&
+      insta.target === "_blank" &&
+      /noopener/.test(insta.rel || ""),
+    JSON.stringify(insta),
   );
 
   // --- 14. El formulario y su endpoint se fueron del todo ---

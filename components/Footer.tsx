@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
 import { IconInstagram } from "@/components/ui/IconInstagram";
+import { LinkMail } from "@/components/ui/LinkMail";
 import { Logo } from "@/components/ui/Logo";
-import { instagramUrl, mailtoUrl, site, whatsappUrl } from "@/lib/site";
+import { instagramUrl, site, whatsappUrl } from "@/lib/site";
 
 /**
  * Pie. Instagram solo aparece si hay usuario: nunca un link a ningun lado.
@@ -29,13 +30,10 @@ export function Footer() {
             <MessageCircle className="size-4 shrink-0" aria-hidden />
             {site.whatsappDisplay}
           </a>
-          <a
-            href={mailtoUrl}
-            className="inline-flex min-h-11 items-center gap-2.5 text-text-muted transition-colors hover:text-text"
-          >
+          <LinkMail className="inline-flex min-h-11 items-center gap-2.5 text-text-muted transition-colors hover:text-text">
             <Mail className="size-4 shrink-0" aria-hidden />
             {site.email}
-          </a>
+          </LinkMail>
           {instagram && (
             <a
               href={instagram}

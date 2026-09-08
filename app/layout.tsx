@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { ScrollAlNavegar } from "@/components/ScrollAlNavegar";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         with the finish review, the verdict, and DESIGN.md
       */}
         <SmoothScroll />
+        <ScrollAlNavegar />
         {children}
       </body>
     </html>

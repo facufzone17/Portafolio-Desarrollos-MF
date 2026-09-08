@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { lenisActual } from "@/lib/useLenis";
+import { irASeccion } from "@/lib/irASeccion";
 import { secciones, site, whatsappUrl } from "@/lib/site";
 
 /**
@@ -57,6 +58,25 @@ export function Header() {
     window.history.replaceState(null, "", "/");
   };
 
+  /**
+   * Los links de seccion apuntan a `/#id`, no a `#id` a secas.
+   *
+   * Con `#id` el ancla se resuelve contra la pagina actual: parado en
+   * /aviso-legal o /privacidad ese elemento no existe y el click no hacia
+   * nada. Con `/#id` el `<Link>` navega a la home y el scroll lo termina
+   * `ScrollAlNavegar`.
+   *
+   * Estando ya en la home no dejamos navegar: el salto nativo del ancla pelea
+   * con Lenis por el mismo numero. Lo hacemos nosotros, suave y descontando el
+   * alto de la barra, y la URL se actualiza igual para que se pueda copiar.
+   */
+  const alClicSeccion = (e: React.MouseEvent, id: string) => {
+    if (pathname !== "/") return;
+    if (!irASeccion(id)) return;
+    e.preventDefault();
+    window.history.replaceState(null, "", `/#${id}`);
+  };
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-6">
       <div
@@ -89,13 +109,14 @@ export function Header() {
           className="hidden items-center gap-0.5 lg:flex"
         >
           {secciones.map((s) => (
-            <a
+            <Link
               key={s.id}
-              href={`#${s.id}`}
+              href={`/#${s.id}`}
+              onClick={(e) => alClicSeccion(e, s.id)}
               className="group rounded-card px-3 py-2 text-[15px] whitespace-nowrap text-white/75 transition-colors duration-[var(--duration-micro)] hover:text-white"
             >
               <TextoDeslizante>{s.label}</TextoDeslizante>
-            </a>
+            </Link>
           ))}
         </nav>
 

@@ -143,10 +143,13 @@ export default async function FichaProyecto({
               Instagram y telefono— y el visitante elige por cual le queda
               comodo; sacandolo derecho a WhatsApp le eligiamos nosotros.
 
-              El scroll a la seccion lo termina `ScrollAlNavegar`.
+              El `?proyecto=` no se pierde en el camino: el compositor lo lee y
+              arranca con "Vi la demo de <proyecto>...", asi la consulta llega
+              igual con el origen puesto (que era lo unico bueno de mandar
+              derecho a WhatsApp). El scroll lo termina `ScrollAlNavegar`.
             */}
             <Link
-              href="/#contacto"
+              href={`/?proyecto=${encodeURIComponent(proyecto.nombre)}#contacto`}
               data-analytics="cta-proyecto"
               data-boton="claro"
               className="group min-h-[52px] px-6 text-base"

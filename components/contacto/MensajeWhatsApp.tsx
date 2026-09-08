@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { CtaWhatsApp } from "@/components/ui/CtaWhatsApp";
 import { mensajes } from "@/lib/site";
 
@@ -23,8 +23,46 @@ const TOPE = 1000;
 /** Desde donde se muestra el contador. Ver el comentario de abajo. */
 const AVISO = 800;
 
+/** Tope de lo que se acepta del parametro: es texto que llega por la URL. */
+const TOPE_PROYECTO = 80;
+
+/**
+ * De donde sale la semilla: la ficha de proyecto linkea a
+ * `/?proyecto=<nombre>#contacto` y el nombre se lee de ahi.
+ *
+ * `popstate` cubre el atras/adelante del navegador. La navegacion normal entre
+ * rutas remonta este componente, asi que la lectura se rehace sola.
+ */
+function suscribirAUrl(alCambiar: () => void) {
+  window.addEventListener("popstate", alCambiar);
+  return () => window.removeEventListener("popstate", alCambiar);
+}
+
+function leerSemilla(): string {
+  const nombre = new URLSearchParams(window.location.search)
+    .get("proyecto")
+    ?.slice(0, TOPE_PROYECTO)
+    .trim();
+  return nombre ? mensajes.desdeProyecto(nombre) : "";
+}
+
 export function MensajeWhatsApp() {
-  const [texto, setTexto] = useState("");
+  /**
+   * Se lee con `useSyncExternalStore` y no con `useState` + `useEffect`: en el
+   * servidor no hay URL que mirar, asi que el snapshot de servidor es cadena
+   * vacia y el primer render del cliente dice lo mismo. Sin desajuste de
+   * hidratacion y sin un `setState` adentro de un efecto.
+   */
+  const semilla = useSyncExternalStore(suscribirAUrl, leerSemilla, () => "");
+
+  /**
+   * `null` = el visitante todavia no toco el campo, asi que se muestra la
+   * semilla. En cuanto escribe —aunque sea para borrar todo— pasa a mandar lo
+   * suyo y la semilla no vuelve a aparecer. Por eso es `string | null` y no un
+   * `""`: hay que poder distinguir "no lo toque" de "lo vacie a proposito".
+   */
+  const [editado, setEditado] = useState<string | null>(null);
+  const texto = editado ?? semilla;
 
   const limpio = texto.trim();
   // Vacio manda la frase de siempre: hay gente que solo quiere el chat abierto
@@ -51,7 +89,7 @@ export function MensajeWhatsApp() {
           rows={5}
           maxLength={TOPE}
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => setEditado(e.target.value)}
           aria-describedby="mensaje-whatsapp-nota"
           placeholder="Tengo una peluquería y quiero que la gente saque turno sola, sin escribirme."
           // `bg-bg-alto` y no `bg-bg-elev`: es el escalon para lo que apoya

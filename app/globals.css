@@ -167,8 +167,46 @@ html.lenis {
   overflow: hidden;
 }
 
+/*
+ * Mientras la pagina se esta moviendo, los iframes son inertes. Es la regla
+ * que recomienda Lenis y ademas es la que sostiene el reparto de scroll de la
+ * demo embebida (ver mas abajo): venir bajando fuerte y pasar por encima del
+ * recuadro no deja la rueda atrapada, porque hasta que el scroll no frena el
+ * iframe no existe para el puntero.
+ */
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* =====================================================================
+ * Demo embebida (components/ui/DemoFrame.tsx)
+ *
+ * CON MOUSE el iframe esta SIEMPRE vivo: el cursor adentro del recuadro
+ * navega la demo, el cursor afuera scrollea la pagina. Sin esperar, sin
+ * clickear, sin estacionar el cursor.
+ *
+ * Antes habia que dejarlo quieto 200ms encima para que la demo "tomara" el
+ * control, y eso dependia de como moviera el mouse cada persona: a veces no
+ * enganchaba. La regla nueva no tiene estados intermedios y se explica en una
+ * frase, que es la unica forma de que nadie tenga que leer el cartel.
+ *
+ * EN TACTIL NO se aplica: no hay cursor que sacar del recuadro, asi que un
+ * iframe siempre vivo se comeria el gesto y dejaria la pagina trabada. Ahi
+ * manda el `pointer-events-none` que pone el componente hasta que se toca una
+ * vez.
+ *
+ * Va sin `@layer` a proposito: asi le gana a la utilidad de Tailwind que el
+ * componente escribe en la clase.
+ * ===================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  [data-demo-capa] {
+    pointer-events: auto;
+  }
+
+  /* Con el cursor encima ya estas navegando: el aviso sobra. */
+  [data-demo-marco]:hover [data-demo-aviso] {
+    opacity: 0;
+  }
 }
 
 /**

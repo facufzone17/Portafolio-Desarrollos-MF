@@ -19,13 +19,6 @@ const ANCHOS: Record<Dispositivo, { w: number; h: number }> = {
 const BARRA_ESTADO = 44;
 
 /**
- * Cuanto tiene que quedarse quieto el cursor encima antes de que la demo tome
- * el control. Corto para que se sienta inmediato, pero suficiente para que
- * pasar el mouse de largo no active nada.
- */
-const RETARDO_HOVER_MS = 200;
-
-/**
  * Demo embebida (§4.4).
  *
  * Lo que se mantiene del brief:
@@ -34,14 +27,29 @@ const RETARDO_HOVER_MS = 200;
  *  - Hasta que carga se ve el poster: nunca hay un rectangulo en blanco.
  *  - En celular, iframe a 390px sin escalar dentro de un marco de telefono.
  *
- * Como se resuelve el scroll sin pedir un click:
- *  - Mientras la demo no esta activa, el iframe tiene pointer-events: none, y
- *    la rueda del mouse lo atraviesa: la pagina scrollea normal.
- *  - Se activa cuando el cursor se queda quieto encima. Cualquier scroll de la
- *    pagina cancela y desactiva, asi que pasar scrolleando por arriba nunca
- *    deja la rueda atrapada.
- *  - Al sacar el cursor se desactiva sola. Esa es la salida, y no hace falta
- *    explicarla.
+ * COMO SE REPARTE EL SCROLL (reescrito el 08/09/2026, pedido de Facundo).
+ *
+ * Con mouse la regla es una sola y no tiene pasos: **el cursor adentro del
+ * recuadro navega la demo, el cursor afuera scrollea la pagina.** Sin esperar,
+ * sin clickear y sin tener que estacionar el cursor.
+ *
+ * La version anterior activaba la demo recien despues de 200ms con el cursor
+ * quieto encima, y eso era justo el problema: dependia de como moviera el
+ * mouse cada persona, a veces no enganchaba, y obligaba a leer un cartel para
+ * entender por que.
+ *
+ * El unico riesgo de tener el iframe siempre vivo —venir scrolleando fuerte,
+ * pasar por encima y que la rueda quede atrapada— ya lo cubre la regla de
+ * Lenis que vive en globals.css: mientras la pagina se esta moviendo, los
+ * iframes son inertes. Recien cuando el scroll frena la demo toma el control.
+ *
+ * EN TACTIL NO SE PUEDE HACER LO MISMO: no hay cursor que sacar del recuadro,
+ * asi que un iframe siempre vivo se come el gesto y deja la pagina trabada.
+ * Ahi sigue habiendo que tocar una vez (`interactivo`), y cualquier scroll de
+ * la pagina lo suelta, que es la unica forma de recuperar el dedo.
+ *
+ * El reparto en si lo hace el CSS por media query (`[data-demo-capa]` en
+ * globals.css), no JavaScript: es una decision por dispositivo, no por estado.
  */
 export function DemoFrame({
   url,
@@ -58,14 +66,6 @@ export function DemoFrame({
   const [interactivo, setInteractivo] = useState(false);
 
   const marcoRef = useRef<HTMLDivElement>(null);
-  const reloj = useRef<number | null>(null);
-
-  const cancelar = () => {
-    if (reloj.current !== null) {
-      window.clearTimeout(reloj.current);
-      reloj.current = null;
-    }
-  };
 
   // El iframe se monta al acercarse al viewport, no al cargar la pagina.
   useEffect(() => {
@@ -85,44 +85,18 @@ export function DemoFrame({
     return () => io.disconnect();
   }, []);
 
-  // Si la pagina se mueve, la demo suelta el control.
-  useEffect(() => {
-    const alScrollear = () => {
-      cancelar();
-      // Devolver el mismo valor evita el re-render: el listener sale barato.
-      setInteractivo((v) => (v ? false : v));
-    };
-    window.addEventListener("scroll", alScrollear, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", alScrollear);
-      cancelar();
-    };
-  }, []);
-
   /**
-   * Programa la activacion. Va tanto en pointerenter como en pointermove:
-   * pointerenter solo no alcanza, porque si el cursor ya estaba encima cuando
-   * el iframe monto (o al cambiar de vista) ese evento no vuelve a dispararse
-   * y la demo se quedaria muerta.
-   *
-   * No reprograma si ya hay una cuenta en marcha: mover el mouse dentro del
-   * marco no tiene que reiniciar la espera una y otra vez.
+   * En tactil, cualquier scroll de la pagina suelta la demo: una vez que se la
+   * activo de un toque, es la unica forma de recuperar el dedo para seguir
+   * bajando. En escritorio no cambia nada — ahi el control lo decide el CSS
+   * segun donde este el cursor, no este estado.
    */
-  function programarActivacion(e: React.PointerEvent) {
-    // En tactil no hay hover: ahi se activa al tocar.
-    if (e.pointerType !== "mouse") return;
-    if (interactivo || reloj.current !== null) return;
-
-    reloj.current = window.setTimeout(() => {
-      reloj.current = null;
-      setInteractivo(true);
-    }, RETARDO_HOVER_MS);
-  }
-
-  function alSalir() {
-    cancelar();
-    setInteractivo(false);
-  }
+  useEffect(() => {
+    // Devolver el mismo valor evita el re-render: el listener sale barato.
+    const alScrollear = () => setInteractivo((v) => (v ? false : v));
+    window.addEventListener("scroll", alScrollear, { passive: true });
+    return () => window.removeEventListener("scroll", alScrollear);
+  }, []);
 
   function cambiarDispositivo(d: Dispositivo) {
     setDispositivo(d);
@@ -180,15 +154,17 @@ export function DemoFrame({
 
       <div
         ref={marcoRef}
-        onPointerEnter={programarActivacion}
-        onPointerMove={programarActivacion}
-        onPointerLeave={alSalir}
+        data-demo-marco
+        // El click solo hace falta en tactil; con mouse el iframe ya esta vivo
+        // y este handler no llega a dispararse (un click adentro de un iframe
+        // de otro origen no burbujea al documento de afuera).
         onClick={() => setInteractivo(true)}
         className="relative overflow-hidden rounded-[var(--radius-card)] border border-line bg-bg-elev"
       >
         {dispositivo === "escritorio" ? (
           <div className="relative aspect-[16/10] w-full [container-type:inline-size]">
             <div
+              data-demo-capa
               className={`absolute top-0 left-1/2 origin-top ${
                 interactivo ? "" : "pointer-events-none"
               }`}
@@ -221,6 +197,7 @@ export function DemoFrame({
               style={{ height: "calc(872px * var(--escala))" }}
             >
               <div
+                data-demo-capa
                 className={`absolute top-0 left-1/2 -ml-[206px] origin-top ${
                   interactivo ? "" : "pointer-events-none"
                 }`}
@@ -269,18 +246,26 @@ function PosterEncima({
   );
 }
 
-/** Aviso de que la demo se puede navegar. Nunca intercepta el puntero. */
+/**
+ * Aviso de que la demo se puede navegar. Nunca intercepta el puntero.
+ *
+ * Con mouse ya no es una instruccion que haya que obedecer para que la demo
+ * funcione —funciona sola— sino la respuesta a "esto de aca, ¿se toca?". Por
+ * eso se desvanece apenas el cursor entra al recuadro (regla en globals.css):
+ * a esa altura ya estas navegando y el cartel sobra.
+ */
 function Cartel({ visible }: { visible: boolean }) {
   return (
     <div
       aria-hidden
+      data-demo-aviso
       className={`pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-5 transition-opacity duration-300 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
       <span className="rounded-card border border-line bg-bg/85 px-4 py-2 text-sm text-text-muted backdrop-blur-sm">
         <span className="hidden [@media(hover:hover)]:inline">
-          Pasá el cursor para navegar la demo
+          Scrolleá acá adentro para navegar la demo
         </span>
         <span className="[@media(hover:hover)]:hidden">
           Tocá para navegar la demo

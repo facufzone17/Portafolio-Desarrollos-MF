@@ -53,6 +53,19 @@ export const mensajes = {
    */
   compuesto: (texto: string) =>
     `Hola, les escribo desde el sitio de Trevoo.\n\n${texto.trim()}`,
+
+  /**
+   * Con lo que arranca el compositor cuando se llega desde la ficha de un
+   * proyecto (`/?proyecto=<nombre>#contacto`).
+   *
+   * NO empieza con "Hola" a proposito: esto entra dentro de `compuesto()`, que
+   * ya pone el saludo y la linea de origen. Empezando con "Hola" el mensaje
+   * final saludaba dos veces.
+   *
+   * Es una semilla, no un texto fijo: el visitante la puede editar o borrar.
+   */
+  desdeProyecto: (proyecto: string) =>
+    `Vi la demo de ${proyecto} y quiero algo así para mi negocio.`,
 } as const;
 
 /** Link a WhatsApp con mensaje prellenado. */

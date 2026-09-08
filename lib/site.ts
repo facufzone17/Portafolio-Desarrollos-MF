@@ -17,7 +17,7 @@ export const site = {
   /** Formato local, para mostrar. */
   whatsappDisplay: "+54 9 11 2272-8576",
 
-  email: "desarrollosmf00@gmail.com",
+  email: "trevoo.proyectos@gmail.com",
 
   /**
    * FALTA: usuario de Instagram. Mientras sea null el icono no se renderiza.

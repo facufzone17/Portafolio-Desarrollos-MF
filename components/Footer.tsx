@@ -51,10 +51,10 @@ export function Footer() {
 
         <nav className="flex flex-col gap-3 text-sm" aria-label="Legales">
           <Link
-            href="/aviso-legal"
+            href="/terminos"
             className="inline-flex min-h-11 items-center text-text-muted transition-colors hover:text-text"
           >
-            Aviso legal
+            Términos y condiciones
           </Link>
           <Link
             href="/privacidad"

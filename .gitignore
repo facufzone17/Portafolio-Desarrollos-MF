@@ -44,3 +44,11 @@ next-env.d.ts
 # Las escriben los scripts de scripts/ para mirar una animacion cuadro a cuadro.
 # Son 19MB de PNG regenerables: el repo no es el lugar.
 /capturas/
+
+# placas de carrusel exportadas (scripts/carrusel.mjs)
+# El PNG se regenera de la ruta /carrusel/[slug]; lo que se versiona es el
+# contenido en lib/carruseles.ts, no la imagen.
+/scripts/salida/
+
+# cache local del hook de diseño (impeccable). design.json si se versiona.
+/.impeccable/hook.cache.json

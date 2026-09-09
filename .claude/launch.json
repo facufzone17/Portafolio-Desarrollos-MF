@@ -3,9 +3,10 @@
   "configurations": [
     {
       "name": "portafolio-mf",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "--webpack"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

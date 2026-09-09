@@ -58,13 +58,39 @@ export function irASeccion(id: string, inmediato = false): boolean {
   return true;
 }
 
-/** Vuelve arriba de todo, sin animacion. Para despues de navegar. */
-export function irArriba() {
+/**
+ * Vuelve arriba de todo, sin animacion. Para despues de navegar.
+ *
+ * `completo` hace el trabajo caro —recalcular el alto y cortar la inercia— y va
+ * solo en la primera pasada: quien insiste cuadro a cuadro despues no necesita
+ * volver a medir el documento, y hacerlo sesenta veces por segundo seria un
+ * layout forzado por cuadro justo cuando la ficha esta apareciendo.
+ */
+export function irArriba(completo = true) {
   window.scrollTo(0, 0);
+
   const lenis = lenisActual();
+  if (!lenis) return;
+
+  if (!completo) {
+    lenis.scrollTo(0, { immediate: true, force: true });
+    return;
+  }
+
   // Mismo motivo que arriba: sin `resize()`, Lenis sigue interpolando hacia el
   // numero que traia de la pagina anterior y la nueva abre a mitad de camino
   // (o al final, si es mas corta).
-  lenis?.resize();
-  lenis?.scrollTo(0, { immediate: true, force: true });
+  lenis.resize();
+
+  // `stop()` antes del salto MATA LA INERCIA EN CURSO, y esa es la causa de que
+  // algunas fichas abrieran al final "aleatoriamente": el visitante baja hasta
+  // las tarjetas y hace click todavia con la rueda planeando. La animacion de
+  // Lenis dura hasta 1,2 s y sigue escribiendo SU numero cuadro a cuadro
+  // despues de la navegacion; recortado al alto de la ficha (mucho mas corta
+  // que la home) ese numero es el final de la pagina. Sin inercia en el aire no
+  // pasaba, y por eso se veia al azar: dependia de si clickeabas frenado o
+  // todavia en movimiento.
+  lenis.stop();
+  lenis.scrollTo(0, { immediate: true, force: true });
+  lenis.start();
 }

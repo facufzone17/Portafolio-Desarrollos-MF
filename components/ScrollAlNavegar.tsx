@@ -58,21 +58,66 @@ function alTerminarLaEntrada(hacer: () => void): () => void {
 }
 
 /**
- * Deja la pagina donde va, y lo vuelve a hacer un par de veces.
+ * Deja la pagina donde va, y lo sigue haciendo hasta que la inercia se apaga.
  *
  * No alcanza con hacerlo una vez: despues de nuestro efecto todavia corren el
  * scroll-a-cero propio de Next y el cuadro siguiente de Lenis, que escribe SU
- * numero. Cuando el preloader corre esto no se nota (llegamos 3,6s tarde, solos
- * en la cancha), pero al volver a la home sin entrada —desde una ficha, por
- * ejemplo— el scroll se perdia entero. Insistir es mas barato y mas robusto
- * que adivinar el orden exacto de esos tres.
+ * numero. Y no alcanza con un par de cuadros: si el visitante clickea la
+ * tarjeta todavia con la rueda planeando, la animacion de Lenis dura hasta
+ * 1,2 s y en cada uno de esos cuadros vuelve a mandar el scroll al numero de la
+ * home, recortado al alto de la ficha — o sea, al final. Por eso pasaba
+ * "aleatoriamente": dependia de si llegabas frenado o en movimiento.
+ *
+ * Asi que se insiste durante toda esa ventana, cuadro a cuadro, y se corta
+ * apenas el visitante scrollea EL: una rueda, un dedo o una tecla de navegacion
+ * cancelan todo. Nadie queda peleandole a la pagina.
  */
-function insistir(hacer: () => void) {
-  requestAnimationFrame(() => {
-    hacer();
-    requestAnimationFrame(hacer);
-    setTimeout(hacer, 140);
-  });
+const VENTANA_INERCIA = 1300;
+
+function insistir(hacer: (primera: boolean) => void): () => void {
+  let cancelado = false;
+  let cuadro = 0;
+  const desde = performance.now();
+
+  const cancelar = () => {
+    cancelado = true;
+    cancelAnimationFrame(cuadro);
+    quitarEscuchas();
+  };
+
+  const opciones = { passive: true } as const;
+  const teclas = new Set([
+    "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ",
+  ]);
+  const alTeclado = (e: KeyboardEvent) => {
+    if (teclas.has(e.key)) cancelar();
+  };
+
+  function quitarEscuchas() {
+    window.removeEventListener("wheel", cancelar);
+    window.removeEventListener("touchstart", cancelar);
+    window.removeEventListener("keydown", alTeclado);
+  }
+
+  window.addEventListener("wheel", cancelar, opciones);
+  window.addEventListener("touchstart", cancelar, opciones);
+  window.addEventListener("keydown", alTeclado, opciones);
+
+  let primera = true;
+
+  function paso() {
+    if (cancelado) return;
+    hacer(primera);
+    primera = false;
+    if (performance.now() - desde >= VENTANA_INERCIA) {
+      quitarEscuchas();
+      return;
+    }
+    cuadro = requestAnimationFrame(paso);
+  }
+
+  cuadro = requestAnimationFrame(paso);
+  return cancelar;
 }
 
 export function ScrollAlNavegar() {
@@ -87,14 +132,21 @@ export function ScrollAlNavegar() {
 
     const ancla = window.location.hash.slice(1);
 
-    return alTerminarLaEntrada(() =>
-      insistir(() => {
+    let cortar = () => {};
+
+    const soltar = alTerminarLaEntrada(() => {
+      cortar = insistir((primera) => {
         // `irASeccion` devuelve false si el ancla no esta en esta pagina; ahi
         // vale lo mismo que si no hubiera ancla: arriba de todo.
         if (ancla && irASeccion(ancla, true)) return;
-        irArriba();
-      }),
-    );
+        irArriba(primera);
+      });
+    });
+
+    return () => {
+      soltar();
+      cortar();
+    };
   }, [pathname]);
 
   return null;

@@ -169,10 +169,11 @@ html.lenis {
 
 /*
  * Mientras la pagina se esta moviendo, los iframes son inertes. Es la regla
- * que recomienda Lenis y ademas es la que sostiene el reparto de scroll de la
- * demo embebida (ver mas abajo): venir bajando fuerte y pasar por encima del
- * recuadro no deja la rueda atrapada, porque hasta que el scroll no frena el
- * iframe no existe para el puntero.
+ * que recomienda Lenis, y sirve para cualquier iframe que se sume al sitio.
+ *
+ * LA DEMO EMBEBIDA ES LA EXCEPCION CUANDO HAY MOUSE (ver el bloque de abajo):
+ * ahi el reparto de la rueda es por donde esta el cursor, nunca por si la
+ * pagina se esta moviendo o no.
  */
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
@@ -185,21 +186,61 @@ html.lenis {
  * navega la demo, el cursor afuera scrollea la pagina. Sin esperar, sin
  * clickear, sin estacionar el cursor.
  *
- * Antes habia que dejarlo quieto 200ms encima para que la demo "tomara" el
- * control, y eso dependia de como moviera el mouse cada persona: a veces no
- * enganchaba. La regla nueva no tiene estados intermedios y se explica en una
- * frase, que es la unica forma de que nadie tenga que leer el cartel.
+ * El reparto es SOLO ESPACIAL. Ninguna regla mira el tiempo, y es a proposito:
+ * las dos versiones anteriores lo hacian y las dos se sintieron igual de mal,
+ * como tener que "estacionar" el cursor encima hasta que la demo se diera
+ * cuenta.
  *
- * EN TACTIL NO se aplica: no hay cursor que sacar del recuadro, asi que un
- * iframe siempre vivo se comeria el gesto y dejaria la pagina trabada. Ahi
- * manda el `pointer-events-none` que pone el componente hasta que se toca una
- * vez.
+ *  1. La primera esperaba 200ms con el cursor quieto encima (temporizador en
+ *     JavaScript). Enganchaba o no segun como moviera el mouse cada persona.
+ *  2. La segunda dejaba que la apagara `.lenis-scrolling iframe`, la regla de
+ *     arriba. Peor todavia: Lenis mantiene esa clase durante toda la inercia
+ *     —1,2s por gesto de rueda, y encadenando gestos no se va nunca— asi que
+ *     para pasarle la rueda a la demo habia que frenar del todo Y esperar a
+ *     que la pagina se asentara. Viniendo bajando, que es como se llega, la
+ *     demo no tomaba la rueda NUNCA.
+ *
+ * MEDIDO, no estimado (scripts/verificar-scroll-demo.mjs y la barrida que le
+ * dio origen): soltando la rueda con el cursor sobre el recuadro, la demo
+ * tomaba el scroll recien despues de 1,1-1,5s con la regla vieja, y a los
+ * 250-280ms con esta. Y peor que el numero era el circulo: cada rueda que
+ * mandabas mientras esperabas volvia a la pagina y reiniciaba la inercia de
+ * 1,2s de Lenis, asi que insistiendo no se entraba nunca.
+ *
+ * Los 250-280ms que quedan NO son de esta hoja y no se pueden sacar: son el
+ * latching de gestos de rueda de Chrome, que le deja el gesto entero al
+ * frame donde empezo. Se comprobo contando las ruedas que le llegan al
+ * window de afuera: durante ese rato llegan todas, tenga el iframe los
+ * pointer-events que tenga. Le pasa igual a cualquier iframe de otro origen
+ * (un mapa embebido, un video). Llegando de un tiron, el tiron termina en la
+ * pagina y la demo agarra en el siguiente.
+ *
+ * Por eso la regla `.lenis.lenis-scrolling [data-demo-capa] iframe` de aca
+ * abajo: la demo no se apaga mientras la pagina se mueve. Si el cursor esta
+ * quieto y el recuadro le pasa por debajo, el scroll sigue adentro de la demo
+ * en el acto; para seguir bajando la pagina, el cursor se corre afuera del
+ * recuadro.
+ *
+ * EN TACTIL NO se aplica nada de esto: no hay cursor que sacar del recuadro,
+ * asi que un iframe siempre vivo se comeria el gesto y dejaria la pagina
+ * trabada. Ahi manda el `pointer-events-none` que pone el componente hasta que
+ * se toca una vez, y la regla de arriba suelta el dedo en cuanto la pagina se
+ * mueve.
  *
  * Va sin `@layer` a proposito: asi le gana a la utilidad de Tailwind que el
  * componente escribe en la clase.
  * ===================================================================== */
 @media (hover: hover) and (pointer: fine) {
   [data-demo-capa] {
+    pointer-events: auto;
+  }
+
+  /*
+   * La excepcion a `.lenis.lenis-scrolling iframe`. Gana por especificidad
+   * (0,3,1 contra 0,2,1), no por orden: si alguien mueve los bloques de lugar
+   * sigue funcionando.
+   */
+  .lenis.lenis-scrolling [data-demo-capa] iframe {
     pointer-events: auto;
   }
 

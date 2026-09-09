@@ -27,21 +27,36 @@ const BARRA_ESTADO = 44;
  *  - Hasta que carga se ve el poster: nunca hay un rectangulo en blanco.
  *  - En celular, iframe a 390px sin escalar dentro de un marco de telefono.
  *
- * COMO SE REPARTE EL SCROLL (reescrito el 08/09/2026, pedido de Facundo).
+ * COMO SE REPARTE EL SCROLL (segunda reescritura, 08/09/2026, pedido de
+ * Facundo las dos veces).
  *
- * Con mouse la regla es una sola y no tiene pasos: **el cursor adentro del
- * recuadro navega la demo, el cursor afuera scrollea la pagina.** Sin esperar,
- * sin clickear y sin tener que estacionar el cursor.
+ * Con mouse la regla es una sola, es ESPACIAL y no tiene pasos: **el cursor
+ * adentro del recuadro navega la demo, el cursor afuera scrollea la pagina.**
+ * Sin esperar, sin clickear y sin tener que estacionar el cursor. Si el
+ * visitante viene bajando con el cursor quieto y el recuadro le pasa por
+ * debajo, el scroll sigue adentro de la demo EN EL ACTO; para seguir bajando
+ * la pagina, corre el cursor a un costado del recuadro.
  *
- * La version anterior activaba la demo recien despues de 200ms con el cursor
- * quieto encima, y eso era justo el problema: dependia de como moviera el
- * mouse cada persona, a veces no enganchaba, y obligaba a leer un cartel para
- * entender por que.
+ * Hubo dos intentos antes y los dos se sintieron igual: como tener que
+ * "estacionar" el cursor encima hasta que la demo se diera cuenta. Los dos
+ * fallaban por lo mismo, que era mirar el TIEMPO en vez de mirar DONDE esta
+ * el cursor.
  *
- * El unico riesgo de tener el iframe siempre vivo —venir scrolleando fuerte,
- * pasar por encima y que la rueda quede atrapada— ya lo cubre la regla de
- * Lenis que vive en globals.css: mientras la pagina se esta moviendo, los
- * iframes son inertes. Recien cuando el scroll frena la demo toma el control.
+ *  1. El primero activaba la demo despues de 200ms con el cursor quieto
+ *     encima (temporizador en JavaScript): dependia de como moviera el mouse
+ *     cada persona y a veces no enganchaba.
+ *  2. El segundo sacaba el temporizador pero se apoyaba en la regla de Lenis
+ *     `.lenis-scrolling iframe { pointer-events: none }` para que venir
+ *     bajando fuerte no atrapara la rueda. Peor: Lenis deja esa clase puesta
+ *     durante toda la inercia —1,2s por gesto, y encadenando gestos no se va
+ *     nunca— asi que para pasarle la rueda a la demo habia que frenar del
+ *     todo Y esperar a que la pagina se asentara. Viniendo bajando, que es
+ *     como se llega a la demo, no tomaba la rueda nunca.
+ *
+ * Hoy globals.css exceptua a la demo de esa regla
+ * (`.lenis.lenis-scrolling [data-demo-capa] iframe`). Que la rueda quede
+ * atrapada al pasar por encima dejo de ser un riesgo a cubrir: es exactamente
+ * lo que se pidio.
  *
  * EN TACTIL NO SE PUEDE HACER LO MISMO: no hay cursor que sacar del recuadro,
  * asi que un iframe siempre vivo se come el gesto y deja la pagina trabada.

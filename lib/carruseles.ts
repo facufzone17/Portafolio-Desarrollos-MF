@@ -70,7 +70,22 @@ export type Placa =
       /** true si la captura es un telefono (vertical, sobre fondo transparente). */
       retrato?: boolean;
     }
-  /** Placa 6: isotipo grande, la pregunta y el CTA. `resalte` se pinta de azul. */
+  /**
+   * Placas 2–6 del C1: una fricción del catálogo por WhatsApp por placa. Sin
+   * imagen —solo texto y el ícono de WhatsApp—. La última lleva el CTA.
+   */
+  | {
+      tipo: "punto";
+      /** 1..5. Va en el rótulo de arriba ("2 de 5"). */
+      paso: number;
+      /** La fricción, como la diría el que vende. Va grande. */
+      titulo: string;
+      /** Por qué eso te cuesta pedidos, en voz de la persona. */
+      cuerpo: string;
+      /** Solo en la última placa: el cierre con el CTA. `palabra` va en azul. */
+      cierre?: { antes: string; palabra: string; despues: string };
+    }
+  /** Placa final del 06/C7: isotipo grande, la pregunta y el CTA. `resalte` se pinta de azul. */
   | { tipo: "cierre"; titulo: string; bajada: string; resalte: string };
 
 export type Carrusel = {
@@ -200,6 +215,60 @@ export const carruseles: readonly Carrusel[] = [
         bajada:
           "Mandanos un DM contando qué te está comiendo el día. Te decimos cuál necesitás — y si no necesitás ninguno, también.",
         resalte: "un DM",
+      },
+    ],
+  },
+  {
+    slug: "c1",
+    nombre: "Vender por catálogo de WhatsApp: 5 cosas que te cuestan pedidos",
+    placas: [
+      {
+        tipo: "portada",
+        titulo: ["Tu catálogo de", "WhatsApp te está", "costando pedidos."],
+        bajada:
+          "Cinco cosas que hacés todos los días sin registrar que te están dejando ventas afuera. Deslizá.",
+        pie: "Para distribuidoras y mayoristas",
+      },
+      {
+        tipo: "punto",
+        paso: 1,
+        titulo: "El catálogo que mandás ya quedó viejo",
+        cuerpo:
+          "Lo armaste hace un mes. Desde entonces cambiaste veinte precios y se te acabaron tres cosas. El cliente pide por ese PDF, vos le vas corrigiendo medio pedido, y para cuando terminás ya lo hiciste dudar.",
+      },
+      {
+        tipo: "punto",
+        paso: 2,
+        titulo: "«Dejame que confirmo stock y te aviso»",
+        cuerpo:
+          "Esa frase es media venta que se va. El que estaba listo para comprar ahora tiene que esperarte. Y mientras espera, mira el catálogo del de al lado.",
+      },
+      {
+        tipo: "punto",
+        paso: 3,
+        titulo: "Cada precio lo tipeás a mano",
+        cuerpo:
+          "«¿Cuánto está la gaseosa grande?» — treinta veces por día, siempre la misma pregunta. Y aun así el cliente no sabe cuánto le sale el pedido hasta que vos te sentás a sumarlo.",
+      },
+      {
+        tipo: "punto",
+        paso: 4,
+        titulo: "El pedido se pierde entre veinte mensajes",
+        cuerpo:
+          "Tres audios, un «agregame también dos de esas», un «uh no, sacá lo último». Cuando lo vas a armar tenés que subir y bajar todo el chat. Algo se te va a escapar.",
+      },
+      {
+        tipo: "punto",
+        paso: 5,
+        titulo: "Te enterás de que falta algo cuando ya lo vendiste",
+        cuerpo:
+          "Sin stock a la vista, el faltante lo descubrís tarde: cuando el cliente abre la caja y la mitad no está. Esa llamada no la querés hacer.",
+        cierre: {
+          antes: "Un catálogo de verdad arregla las cinco de una. Comentá ",
+          palabra: "CATÁLOGO",
+          despues:
+            " y te paso una demo de distribuidora andando para que la recorras.",
+        },
       },
     ],
   },

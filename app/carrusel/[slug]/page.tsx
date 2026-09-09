@@ -133,33 +133,25 @@ function Contenido({
   if (placa.tipo === "punto") {
     return (
       <div className={`flex h-full flex-col ${PAD} pt-[104px] pb-[76px]`}>
-        <div className="flex flex-1 flex-col items-center justify-center gap-7 text-center">
-          <span className="flex items-center gap-2.5 text-[19px] uppercase tracking-[0.14em] text-text-muted">
-            <IconoWhatsApp className="h-[22px] w-[22px]" />
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          {/* Rótulo chico: el error es el que manda, esto solo lo ubica. */}
+          <span className="flex items-center gap-3 text-[20px] uppercase tracking-[0.16em] text-text-muted">
+            <IconoWhatsApp className="h-[23px] w-[23px]" />
+            <span className="font-medium tabular-nums text-azul">
+              0{placa.paso}
+            </span>
+            <span aria-hidden>·</span>
             Catálogo por WhatsApp
           </span>
 
-          <span className="font-display text-[124px] font-medium leading-none tracking-[-0.04em] text-azul tabular-nums">
-            {placa.paso}
-          </span>
-
-          <h2 className="max-w-[860px] font-display text-[52px] font-medium leading-[1.1] tracking-[-0.03em] text-balance">
+          {/* El error, como gancho: es lo más grande de la placa. */}
+          <h2 className="mt-7 max-w-[920px] font-display text-[74px] font-medium leading-[1.03] tracking-[-0.04em] text-balance">
             {placa.titulo}
           </h2>
 
-          <p className="max-w-[720px] text-[28px] leading-[1.5] text-text-muted text-pretty">
+          <p className="mt-10 max-w-[680px] text-[26px] leading-[1.5] text-text-muted text-pretty">
             {placa.cuerpo}
           </p>
-
-          {placa.cierre && (
-            <p className="mt-3 max-w-[740px] border-t border-line pt-8 text-[25px] leading-[1.5] text-pretty">
-              {placa.cierre.antes}
-              <span className="font-medium text-azul">
-                {placa.cierre.palabra}
-              </span>
-              {placa.cierre.despues}
-            </p>
-          )}
         </div>
 
         <PieDePlaca n={n} total={total} />

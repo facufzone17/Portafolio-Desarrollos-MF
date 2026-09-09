@@ -95,7 +95,7 @@ export function Hero() {
         cuando termina de irse por arriba.
       */}
       <div className="p-3">
-        <div className="relative h-[calc(100svh+420px)] overflow-clip rounded-[10px]">
+        <div className="relative h-[calc(100svh+260px)] overflow-clip rounded-[10px] sm:h-[calc(100svh+420px)]">
           <Image
             src="/images/hero-bg.jpg"
             alt=""
@@ -203,10 +203,17 @@ export function Hero() {
             del bloque de botones (mismo 23svh del padding de arriba + el alto
             aproximado de marca + titular + botones), y el `max` deja que en
             pantallas altas gane el 72svh de siempre — ahi no hace falta bajarlos.
+
+            En movil (base, sin `sm:`) los telefonos arrancan a `23svh + 330px`,
+            ~85px mas arriba: pegados al pie de los botones para que el hero sea
+            corto y no empuje el pliegue. El contenedor tambien baja a
+            `100svh + 260px` (contra 420 en desktop) porque con los aparatos mas
+            cerca sobra menos recorrido para el cruce. El parallax es el mismo:
+            solo cambia el punto de partida.
           */}
           <motion.div
             style={{ y: yTelefonos }}
-            className="pointer-events-none absolute inset-x-0 top-[max(72svh,calc(23svh+416px))]"
+            className="pointer-events-none absolute inset-x-0 top-[calc(23svh+330px)] sm:top-[max(72svh,calc(23svh+416px))]"
             aria-hidden
           >
             <div

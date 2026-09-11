@@ -343,7 +343,7 @@ try {
   );
   checar(
     "el bloque de llamada es un tel: con el numero del sitio",
-    hrefs.includes("tel:+5491122728576"),
+    hrefs.includes("tel:+5491130256777"),
     JSON.stringify(hrefs),
   );
 

@@ -36,9 +36,9 @@ Dos datos siguen faltando, y los dos los tiene que traer Facundo:
   directamente no se dibuja (§9.1: un ícono que no lleva a ningún lado es peor
   que no tenerlo). Se completa en `lib/site.ts` y aparece solo.
 - **El `tel:` hay que probarlo en un teléfono real.** Sale de `site.whatsapp`,
-  que lleva el `9` del formato internacional (`tel:+5491122728576`). Desde
+  que lleva el `9` del formato internacional (`tel:+5491130256777`). Desde
   afuera del país es lo correcto; adentro, algunos discadores lo toleran y
-  otros no. Si falla, la versión sin el `9` es `tel:+541122728576`.
+  otros no. Si falla, la versión sin el `9` es `tel:+541130256777`.
 
 ## Verificación
 

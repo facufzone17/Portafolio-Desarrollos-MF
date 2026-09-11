@@ -13,9 +13,9 @@ export const site = {
     "Construimos sitios web, tiendas online, paneles de gestión y automatizaciones para negocios. Mirá nuestros proyectos funcionando.",
 
   /** Formato internacional sin signos, para wa.me: 54 + 9 + 11 + numero. */
-  whatsapp: "5491122728576",
+  whatsapp: "5491130256777",
   /** Formato local, para mostrar. */
-  whatsappDisplay: "+54 9 11 2272-8576",
+  whatsappDisplay: "+54 9 11 3025-6777",
 
   email: "trevoo.proyectos@gmail.com",
 
@@ -100,10 +100,10 @@ export const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeU
  * misma constante y no de un numero suelto que despues se desincroniza.
  *
  * OJO CON EL 9: en formato internacional los celulares argentinos llevan un 9
- * despues del +54, y asi esta guardado (`5491122728576`). Desde afuera del
+ * despues del +54, y asi esta guardado (`5491130256777`). Desde afuera del
  * pais es lo correcto; adentro, algunos discadores lo toleran y otros no.
  * ESTO HAY QUE PROBARLO EN UN TELEFONO DE VERDAD antes de darlo por bueno: si
- * falla, la version sin el 9 es `tel:+541122728576`.
+ * falla, la version sin el 9 es `tel:+541130256777`.
  */
 export const telUrl = `tel:+${site.whatsapp}`;
 

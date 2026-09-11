@@ -409,7 +409,7 @@ Lo único que **no** se puede escribir sin Facundo, porque son datos reales y no
 ### 5.5 Datos de marca
 
 - Nombre: **Desarrollos MF**
-- WhatsApp: **+54 9 11 2272-8576** → `https://wa.me/5491122728576` con mensaje prellenado
+- WhatsApp: **+54 9 11 3025-6777** → `https://wa.me/5491130256777` con mensaje prellenado
 - Mail: **desarrollosmf00@gmail.com**
 - Instagram: **[FALTA el usuario]** — el hero lo necesita
 - Dominio: se compra más adelante. Hasta entonces se trabaja sobre el `*.vercel.app` del portafolio. `wa.me`, metadatos OG y `frame-ancestors` quedan **parametrizados en un solo archivo de config** para cambiar el dominio sin tocar todo el código.

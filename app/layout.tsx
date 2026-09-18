@@ -30,6 +30,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
+  // Sin esto, Next arma la URL de la imagen OG contra localhost y el que
+  // comparte el link no ve ninguna tarjeta.
+  metadataBase: new URL(site.url),
   title: site.title,
   description: site.description,
   openGraph: {

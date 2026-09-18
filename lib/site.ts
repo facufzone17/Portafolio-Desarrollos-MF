@@ -30,8 +30,7 @@ export const site = {
    */
   instagram: "trevoo___" as string | null,
 
-  /** Se reemplaza cuando se compre el dominio. */
-  url: "http://localhost:3000",
+  url: "https://trevoo.com.ar",
 } as const;
 
 /** Mensajes prellenados de WhatsApp (§10.7). */

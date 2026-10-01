@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DemoFrame } from "@/components/ui/DemoFrame";
@@ -119,16 +119,6 @@ export default async function FichaProyecto({
                   </li>
                 ))}
               </ul>
-
-              <a
-                href={proyecto.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-8 inline-flex min-h-11 items-center gap-2 text-sm text-text-muted transition-colors hover:text-text"
-              >
-                {proyecto.url.replace(/^https?:\/\//, "")}
-                <ArrowUpRight className="size-4" aria-hidden />
-              </a>
             </div>
           </div>
 

@@ -87,6 +87,33 @@ export type Proyecto = {
 
 export const proyectos: Proyecto[] = [
   {
+    slug: "inmobiliaria",
+    nombre: "Inmobiliaria",
+    rubro: "Inmobiliaria de barrio en Villa Devoto",
+    categorias: ["Sitio web", "Panel admin"],
+    resumen:
+      "Una inmobiliaria con cartera repartida por toda la Capital, que hasta ahora dependía de los portales para que la encontraran y de una llamada para contar cada propiedad.",
+    detalle: [
+      "Buscador en la portada por operación, tipo de propiedad y barrio: el que llega sabiendo lo que busca entra directo al resultado.",
+      "Cartera completa con filtros de operación, tipo, zona, precio y ambientes, y el conteo de resultados siempre a la vista.",
+      "Ficha de cada propiedad con fotos, ambientes y metros, descripción, servicios del edificio, ubicación en el mapa y propiedades similares al pie.",
+      "Consulta por WhatsApp desde la ficha, con la propiedad ya mencionada en el mensaje.",
+      "Página de tasación con el paso a paso y un formulario que arma el mensaje de WhatsApp completo: el dueño lo revisa y lo manda.",
+      "Panel propio con login para administrar la cartera y ver las métricas del sitio.",
+    ],
+    stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    url: "https://dakar-propiedades.vercel.app",
+    imagen: inmobiliariaMiniatura,
+    proporcion: "lg:aspect-[16/9]",
+    ubicacion: "lg:col-start-1 lg:col-span-7 lg:row-start-1",
+    pista: { alto: "h-[46vh]", aspecto: "aspect-[8/5]", carril: "self-center -translate-y-[6vh]" },
+    sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 60vw, 820px",
+    poster: inmobiliariaPoster,
+    // La cartera, la direccion, el telefono y la resena son del negocio real:
+    // no son datos de ejemplo. Lo unico de relleno es el numero de WhatsApp.
+    esDemo: false,
+  },
+  {
     slug: "duo-administracion",
     nombre: "Duo Administración",
     rubro: "Administradora de consorcios",
@@ -107,7 +134,7 @@ export const proyectos: Proyecto[] = [
     url: "https://www.duoadministracion.com.ar",
     imagen: duoMiniatura,
     proporcion: "lg:aspect-[4/5]",
-    ubicacion: "lg:col-start-1 lg:col-span-5 lg:row-start-1",
+    ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:mt-[30vh]",
     pista: { alto: "h-[62vh]", aspecto: "aspect-[4/5]", carril: "self-center" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: duoPoster,
@@ -131,8 +158,8 @@ export const proyectos: Proyecto[] = [
     url: "https://tienda-mates-facufzone17s-projects.vercel.app/",
     imagen: tiendaMatesMiniatura,
     proporcion: "lg:aspect-[16/9]",
-    ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:mt-[30vh]",
-    pista: { alto: "h-[40vh]", aspecto: "aspect-[16/9]", carril: "self-center -translate-y-[6vh]" },
+    ubicacion: "lg:col-start-2 lg:col-span-5 lg:row-start-2 lg:mt-[10vh]",
+    pista: { alto: "h-[40vh]", aspecto: "aspect-[16/9]", carril: "self-center translate-y-[6vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: tiendaMatesPoster,
     // Demo para pitchear el servicio: productos, precios y fotos son de
@@ -160,41 +187,14 @@ export const proyectos: Proyecto[] = [
     url: "https://don-antonio-distribuidora-demo.vercel.app",
     imagen: distribuidoraMiniatura,
     proporcion: "lg:aspect-[3/1]",
-    ubicacion: "lg:col-start-2 lg:col-span-11 lg:row-start-2 lg:mt-[14vh]",
-    pista: { alto: "h-[48vh]", aspecto: "aspect-[3/2]", carril: "self-center translate-y-[4vh]" },
+    ubicacion: "lg:col-start-2 lg:col-span-11 lg:row-start-3 lg:mt-[14vh]",
+    pista: { alto: "h-[48vh]", aspecto: "aspect-[3/2]", carril: "self-start mt-[3vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 90vw, 1280px",
     poster: distribuidoraPoster,
     // Demo para mostrar el servicio: el nombre del negocio, la direccion, los
     // telefonos y las resenas son de ejemplo (el propio sitio lo avisa en una
     // barra arriba). El catalogo si es de un surtido real de distribuidora.
     esDemo: true,
-  },
-  {
-    slug: "inmobiliaria",
-    nombre: "Inmobiliaria",
-    rubro: "Inmobiliaria de barrio en Villa Devoto",
-    categorias: ["Sitio web", "Panel admin"],
-    resumen:
-      "Una inmobiliaria con cartera repartida por toda la Capital, que hasta ahora dependía de los portales para que la encontraran y de una llamada para contar cada propiedad.",
-    detalle: [
-      "Buscador en la portada por operación, tipo de propiedad y barrio: el que llega sabiendo lo que busca entra directo al resultado.",
-      "Cartera completa con filtros de operación, tipo, zona, precio y ambientes, y el conteo de resultados siempre a la vista.",
-      "Ficha de cada propiedad con fotos, ambientes y metros, descripción, servicios del edificio, ubicación en el mapa y propiedades similares al pie.",
-      "Consulta por WhatsApp desde la ficha, con la propiedad ya mencionada en el mensaje.",
-      "Página de tasación con el paso a paso y un formulario que arma el mensaje de WhatsApp completo: el dueño lo revisa y lo manda.",
-      "Panel propio con login para administrar la cartera y ver las métricas del sitio.",
-    ],
-    stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-    url: "https://dakar-propiedades.vercel.app",
-    imagen: inmobiliariaMiniatura,
-    proporcion: "lg:aspect-[16/9]",
-    ubicacion: "lg:col-start-1 lg:col-span-7 lg:row-start-3 lg:mt-[10vh]",
-    pista: { alto: "h-[46vh]", aspecto: "aspect-[8/5]", carril: "self-start mt-[3vh]" },
-    sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 60vw, 820px",
-    poster: inmobiliariaPoster,
-    // La cartera, la direccion, el telefono y la resena son del negocio real:
-    // no son datos de ejemplo. Lo unico de relleno es el numero de WhatsApp.
-    esDemo: false,
   },
 ];
 

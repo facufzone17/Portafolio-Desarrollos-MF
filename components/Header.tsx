@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { lenisActual } from "@/lib/useLenis";
@@ -33,9 +33,76 @@ import { secciones, site, whatsappUrl } from "@/lib/site";
 /** Px de scroll a partir de los cuales la barra se contrae. */
 const UMBRAL = 40;
 
+/**
+ * La barra se estaciona arriba de la demo embebida en vez de taparla.
+ *
+ * Fija, la barra le caia encima al header del sitio que corre adentro del
+ * iframe y no se podia navegar (pedido de Facundo, 13/10/2026). Ahora:
+ *
+ *  - Bajando, cuando el borde de arriba del recuadro llega a `PEGADA` px del
+ *    filo de la pantalla, la barra se engancha a el y sube con la pagina,
+ *    como si estuviera apoyada encima. Atada al scroll, sin transicion: se
+ *    frena justo donde no tapa y se va con el recuadro.
+ *  - Mientras el recuadro ocupa la franja de la barra, la barra queda afuera.
+ *  - Cuando el recuadro termina de pasar por arriba, la barra vuelve a entrar
+ *    deslizandose. Subiendo es el camino inverso: se va al aparecer el
+ *    recuadro por arriba y se vuelve a enganchar al borde de arriba.
+ *
+ * La entrada de abajo es una transicion y no va atada al scroll a proposito:
+ * engancharla al borde de abajo del recuadro la haria subir desde el medio de
+ * la pantalla, y bajarla mientras la pagina sube la cruzaria con la demo.
+ */
+const TOPE = 24; // pt-6 del <header>
+const ALTO = 67;
+/** Distancia entre la barra estacionada y el recuadro (medida en la captura). */
+const SEPARACION = 14;
+/** Linea donde se estaciona el borde de arriba del recuadro. */
+const PEGADA = TOPE + ALTO + SEPARACION;
+/** Cuanto subir la barra para sacarla de pantalla, sombra incluida. */
+const FUERA = TOPE + ALTO + 60;
+
 export function Header() {
   const [contraida, setContraida] = useState(false);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    let actual = 0;
+
+    const ubicar = () => {
+      // Se busca en cada cuadro: el recuadro vive en la pagina, no en el
+      // layout, y aparece o desaparece al navegar sin que el header remonte.
+      const marco = document.querySelector("[data-demo-marco]");
+      let destino = 0;
+      if (marco) {
+        const r = marco.getBoundingClientRect();
+        if (r.top < PEGADA && r.bottom > TOPE - SEPARACION) {
+          destino = Math.max(r.top - PEGADA, -FUERA);
+        }
+      }
+      if (destino === actual) return;
+      // Un salto (entrar o salir con el recuadro ya pasado) se anima; el
+      // enganche al borde de arriba va cuadro a cuadro con el scroll.
+      const salto = Math.abs(destino - actual) > 40;
+      header.style.transition = salto
+        ? "transform 520ms var(--ease-out-soft)"
+        : "none";
+      header.style.transform = destino ? `translateY(${destino}px)` : "";
+      actual = destino;
+    };
+
+    ubicar();
+    window.addEventListener("scroll", ubicar, { passive: true });
+    window.addEventListener("resize", ubicar);
+    return () => {
+      window.removeEventListener("scroll", ubicar);
+      window.removeEventListener("resize", ubicar);
+      header.style.transform = "";
+      header.style.transition = "";
+    };
+  }, [pathname]);
 
   useEffect(() => {
     const alScroll = () => setContraida(window.scrollY > UMBRAL);
@@ -78,9 +145,12 @@ export function Header() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-6">
+    <header
+      ref={headerRef}
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-6"
+    >
       <div
-        className={`flex h-[67px] w-full items-center justify-between gap-6 rounded-[22px]
+        className={`pointer-events-auto flex h-[67px] w-full items-center justify-between gap-6 rounded-[22px]
           px-3 backdrop-blur-[5px] transition-[max-width,background-color,box-shadow,border-color]
           duration-[520ms] ease-[var(--ease-out-soft)] sm:px-4
           ${

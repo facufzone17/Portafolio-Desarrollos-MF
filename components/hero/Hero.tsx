@@ -7,8 +7,8 @@ import { Isotipo } from "@/components/ui/Isotipo";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { mensajes, whatsappUrl } from "@/lib/site";
 import { PalabraRotativa } from "./PalabraRotativa";
-import consorcios from "@/assets/dispositivos/consorcios.png";
-import tienda from "@/assets/dispositivos/tienda.png";
+import consorcios from "@/assets/dispositivos/consorcios.webp";
+import tienda from "@/assets/dispositivos/tienda.webp";
 
 /**
  * Hero, reconstruido sobre la referencia (applio.framer.website) medida en

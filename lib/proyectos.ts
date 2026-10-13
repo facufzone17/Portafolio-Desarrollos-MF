@@ -8,6 +8,8 @@ import distribuidoraMiniatura from "@/assets/proyectos/distribuidora-miniatura.w
 import distribuidoraPoster from "@/assets/proyectos/distribuidora-poster.webp";
 import inmobiliariaMiniatura from "@/assets/proyectos/inmobiliaria-miniatura.webp";
 import inmobiliariaPoster from "@/assets/proyectos/inmobiliaria-poster.webp";
+import restauranteMiniatura from "@/assets/proyectos/restaurante-miniatura.webp";
+import restaurantePoster from "@/assets/proyectos/restaurante-poster.webp";
 
 /**
  * Los proyectos son datos, no codigo.
@@ -114,6 +116,33 @@ export const proyectos: Proyecto[] = [
     esDemo: false,
   },
   {
+    slug: "restaurante",
+    nombre: "Restaurante",
+    rubro: "Parrilla, sushi y coctelería",
+    categorias: ["Sitio web"],
+    resumen:
+      "Una parrilla con barra de autor, salón privado y eventos, que tomaba cada reserva por mensaje y no tenía dónde mostrar la carta ni la casa.",
+    detalle: [
+      "Portada a pantalla completa con la foto del salón y una sola acción: reservar.",
+      "Carta completa de brasas, sushi, vinos y coctelería, con saltos a cada sección y filtro de vinos por uva.",
+      "Reservas en un solo lugar: mesa, evento o limousine, cada una con su formulario y su confirmación.",
+      "Eventos privados en tres escalas: mesa de festejo, Sala VIP para 16 personas y la casa entera.",
+      "Flores, bombones y limousine como complemento que se suma al reservar.",
+      "Agenda de música en vivo y una sección Nosotros con la historia de la casa.",
+    ],
+    stack: ["Next.js", "React", "TypeScript", "GSAP"],
+    url: "https://roger-demo.vercel.app",
+    imagen: restauranteMiniatura,
+    proporcion: "lg:aspect-[16/10]",
+    ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:mt-[16vh]",
+    pista: { alto: "h-[44vh]", aspecto: "aspect-[16/10]", carril: "self-center translate-y-[9vh]" },
+    sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
+    poster: restaurantePoster,
+    // Demo para mostrar el servicio: nombre, dirección y mail son de ejemplo
+    // (el sitio lo avisa al pie). Fotos y carta salen de un local real.
+    esDemo: true,
+  },
+  {
     slug: "duo-administracion",
     nombre: "Duo Administración",
     rubro: "Administradora de consorcios",
@@ -134,7 +163,7 @@ export const proyectos: Proyecto[] = [
     url: "https://www.duoadministracion.com.ar",
     imagen: duoMiniatura,
     proporcion: "lg:aspect-[4/5]",
-    ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:mt-[30vh]",
+    ubicacion: "lg:col-start-2 lg:col-span-5 lg:row-start-2 lg:mt-[12vh]",
     pista: { alto: "h-[62vh]", aspecto: "aspect-[4/5]", carril: "self-center" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: duoPoster,
@@ -158,7 +187,7 @@ export const proyectos: Proyecto[] = [
     url: "https://tienda-mates-facufzone17s-projects.vercel.app/",
     imagen: tiendaMatesMiniatura,
     proporcion: "lg:aspect-[16/9]",
-    ubicacion: "lg:col-start-2 lg:col-span-5 lg:row-start-2 lg:mt-[10vh]",
+    ubicacion: "lg:col-start-8 lg:col-span-5 lg:row-start-2 lg:mt-[34vh]",
     pista: { alto: "h-[40vh]", aspecto: "aspect-[16/9]", carril: "self-center translate-y-[6vh]" },
     sizes: "(max-width: 1024px) 100vw, (max-width: 1440px) 42vw, 600px",
     poster: tiendaMatesPoster,

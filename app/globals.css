@@ -830,3 +830,24 @@ html:not(.js) [data-ola] [data-ola-letra] {
     display: none;
   }
 }
+
+/* =====================================================================
+ * Aviso de turnos (components/AvisoTurnos.tsx)
+ *
+ * Mismo gesto que las apariciones: sube unos pixeles y aparece. Escondido no
+ * recibe clics, y con movimiento reducido solo cambia la opacidad.
+ * ===================================================================== */
+[data-aviso-turnos] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-state) var(--ease-out-soft),
+    transform var(--duration-state) var(--ease-out-soft);
+}
+
+[data-aviso-turnos][data-visible] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}

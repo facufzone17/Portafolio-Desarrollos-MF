@@ -1,3 +1,4 @@
+import { AvisoTurnos } from "@/components/AvisoTurnos";
 import { Header } from "@/components/Header";
 import { Preloader } from "@/components/preloader/Preloader";
 import { Footer } from "@/components/Footer";
@@ -30,6 +31,7 @@ export default function Home() {
         <Contacto />
       </main>
       <Footer />
+      <AvisoTurnos />
     </>
   );
 }

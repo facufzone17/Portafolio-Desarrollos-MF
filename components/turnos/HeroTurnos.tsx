@@ -4,21 +4,25 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { IrA } from "@/components/turnos/IrA";
-import { Telefono } from "@/components/turnos/Telefono";
+import { AgendaViva } from "@/components/turnos/AgendaViva";
 import { DESCUENTO, planes, pesos } from "@/lib/planes";
 
 /**
  * Hero de /turnos. Misma gramatica que el de la home (components/hero/Hero.tsx):
  * placa azul con margen de 12px, entrada escalonada con `data-hero-entra` y
  * dos capas que se rezagan distinto al scrollear — el texto se queda atras y
- * los celulares suben mas rapido y lo terminan tapando.
+ * la agenda sube mas rapido y lo termina tapando.
  *
- * Los celulares son las tres caras de lo que se vende: el bot, la web y el
- * panel. Solo el del medio tiene video; los costados son posters quietos y en
- * mobile no estan.
+ * Debajo del texto, la agenda de la semana de un negocio de ejemplo
+ * llenandose sola (components/turnos/AgendaViva.tsx). Reemplaza a los tres
+ * celulares, que mostraban pantallas sueltas sin contar que pasaba entre ellas.
+ *
+ * El alto de la placa sale de donde arranca la agenda (19svh + 500 en mobile,
+ * 19svh + 540 desde sm) mas lo que mide (~500 y ~600): atado solo al alto de
+ * pantalla, en pantallas bajas la agenda quedaba cortada al pie.
  */
 const REZAGO_TEXTO = 0.35;
-const REZAGO_TELEFONOS = 0.1;
+const REZAGO_AGENDA = 0.1;
 
 const RETARDO = { titulo: 0, bajada: 130, botones: 260, dispositivos: 420 } as const;
 
@@ -27,12 +31,12 @@ const retardo = (ms: number) => ({ "--hero-retardo": `${ms}ms` }) as React.CSSPr
 export function HeroTurnos() {
   const { scrollY } = useScroll();
   const yTexto = useTransform(scrollY, (v) => v * REZAGO_TEXTO);
-  const yTelefonos = useTransform(scrollY, (v) => v * REZAGO_TELEFONOS);
+  const yAgenda = useTransform(scrollY, (v) => v * REZAGO_AGENDA);
 
   return (
     <section className="relative">
       <div className="p-3">
-        <div className="relative h-[calc(100svh+170px)] min-h-[810px] overflow-clip rounded-[10px] sm:h-[calc(100svh+340px)] sm:min-h-[1040px]">
+        <div className="relative h-[calc(19svh+1060px)] overflow-clip rounded-[10px] sm:h-[max(calc(100svh+340px),calc(19svh+1180px))] sm:min-h-[1040px]">
           <Image
             src="/images/hero-bg.jpg"
             alt=""
@@ -92,28 +96,12 @@ export function HeroTurnos() {
           </motion.div>
 
           <motion.div
-            style={{ y: yTelefonos }}
-            className="pointer-events-none absolute inset-x-0 top-[calc(19svh+460px)] sm:top-[max(72svh,calc(19svh+540px))]"
+            style={{ y: yAgenda }}
+            className="pointer-events-none absolute inset-x-0 top-[calc(19svh+500px)] sm:top-[max(72svh,calc(19svh+540px))]"
           >
             <div data-hero-entra style={retardo(RETARDO.dispositivos)}>
-              <div className="relative mx-auto w-full max-w-[1000px] px-5">
-                <Telefono
-                  poster={planes[2].poster}
-                  etiqueta="Bot de WhatsApp de ejemplo respondiendo una consulta"
-                  className="absolute left-[6%] top-[70px] hidden w-[27%] rotate-[-6deg] md:block"
-                />
-                <Telefono
-                  poster="/turnos/panel.webp"
-                  etiqueta="Panel del negocio con la agenda del día"
-                  className="absolute right-[6%] top-[70px] hidden w-[27%] rotate-[6deg] md:block"
-                />
-                <Telefono
-                  video={planes[1].video}
-                  poster={planes[1].poster}
-                  etiqueta="Web de ejemplo de un centro de estética con reserva de turnos"
-                  prioridad
-                  className="relative mx-auto w-[min(70vw,300px)] md:w-[31%]"
-                />
+              <div className="mx-auto w-full max-w-[1040px] px-4 sm:px-8">
+                <AgendaViva />
               </div>
             </div>
           </motion.div>

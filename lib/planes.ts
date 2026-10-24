@@ -86,6 +86,7 @@ export const planes: Plan[] = [
     ],
     video: "/turnos/vidriera.mp4",
     poster: "/turnos/vidriera.webp",
+    destacado: "Recomendado",
   },
   {
     id: "piloto",
@@ -108,7 +109,6 @@ export const planes: Plan[] = [
     ],
     video: "/turnos/piloto.mp4",
     poster: "/turnos/piloto.webp",
-    destacado: "El más completo",
   },
 ];
 

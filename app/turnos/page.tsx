@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, ChevronDown } from "lucide-react";
+import { ArrowDown, Check, ChevronDown } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/ui/Logo";
 import { Revelar } from "@/components/ui/Revelar";
 import { Seccion } from "@/components/ui/Seccion";
+import { AntesDespues } from "@/components/turnos/AntesDespues";
+import { Ejemplos } from "@/components/turnos/Ejemplos";
 import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { HeroTurnos } from "@/components/turnos/HeroTurnos";
+import { PasosHistoria } from "@/components/turnos/PasosHistoria";
 import { Telefono } from "@/components/turnos/Telefono";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { DESCUENTO, MENSUAL, descuento, incluyeMensual, planes, pesos, type Plan } from "@/lib/planes";
@@ -43,10 +46,27 @@ export default function Turnos() {
       <Barra />
       <main className="flex-1">
         <HeroTurnos />
-        <Problema />
-        <Recorrido />
-        <Panel />
+        <AntesDespues />
+        <Seccion
+          id="como-funciona"
+          titulo="Así funciona, en tres pasos"
+          bajada="Un centro de estética de ejemplo con el plan más completo: un cliente reserva desde la web, otro saca turno hablando con el bot, y los dos aparecen solos en la agenda del negocio."
+        >
+          <PasosHistoria />
+        </Seccion>
+        <Ejemplos />
         <Planes />
+        <Seccion
+          id="demos"
+          titulo="Mirá cada plan funcionando"
+          bajada="Cada demo está armada sobre un centro de estética de ejemplo."
+        >
+          <div className="flex flex-col gap-24 sm:gap-32">
+            {planes.map((p, i) => (
+              <DetallePlan key={p.id} plan={p} invertido={i % 2 === 1} />
+            ))}
+          </div>
+        </Seccion>
         <Proceso />
         <Preguntas />
         <Seccion
@@ -69,6 +89,7 @@ export default function Turnos() {
 /** Secciones de la barra, en el orden en que aparecen en la pagina. */
 const SECCIONES = [
   { id: "como-funciona", nombre: "Cómo funciona" },
+  { id: "ejemplos", nombre: "Ejemplos" },
   { id: "planes", nombre: "Precios" },
   { id: "preguntas", nombre: "Preguntas" },
 ];
@@ -76,115 +97,40 @@ const SECCIONES = [
 /**
  * Barra propia de la landing: logo, secciones y la accion. Sin los links de la
  * home — desde un anuncio, cada salida que no es el formulario es una fuga. Las
- * secciones son anclas de esta misma pagina, asi que no sacan a nadie; en
- * mobile no entran y queda solo el boton.
+ * secciones son anclas de esta misma pagina, asi que no sacan a nadie.
+ *
+ * Tres columnas para que las secciones queden centradas en la barra y no
+ * pegadas al boton. En mobile no entran y queda solo el boton; por eso el
+ * boton va a la tercera columna a mano, si no el grid lo correria al medio.
  */
 function Barra() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:pt-6">
-      <div className="pointer-events-auto flex h-[60px] w-full max-w-[1220px] items-center justify-between gap-4 rounded-[22px] border border-line bg-bg-elev/85 px-3 shadow-[0_16px_40px_rgba(0,0,0,0.45)] backdrop-blur-[5px] sm:h-[67px] sm:px-4">
-        <Link href="/" className="flex shrink-0 items-center pl-2 text-white" aria-label="Trevoo, ir al inicio">
+      <div className="pointer-events-auto grid h-[60px] w-full max-w-[1220px] grid-cols-[1fr_auto_1fr] items-center gap-4 rounded-[22px] border border-line bg-bg-elev/85 px-3 shadow-[0_16px_40px_rgba(0,0,0,0.45)] backdrop-blur-[5px] sm:h-[67px] sm:px-4">
+        <Link href="/" className="flex items-center justify-self-start pl-2 text-white" aria-label="Trevoo, ir al inicio">
           <Logo className="text-[17px] sm:text-[18px]" />
         </Link>
-        <nav aria-label="Secciones" className="flex items-center gap-1">
+        <nav aria-label="Secciones" className="hidden items-center gap-1 md:flex">
           {SECCIONES.map((s) => (
             <IrA
               key={s.id}
               id={s.id}
-              className="hidden rounded-card px-3 py-2 text-[15px] text-white/75 transition-colors hover:text-white md:inline-flex"
+              className="rounded-card px-3 py-2 text-[15px] text-white/75 transition-colors hover:text-white"
             >
               {s.nombre}
             </IrA>
           ))}
-          <IrA id="formulario" data-boton="claro" data-analytics="turnos-barra" className="group">
-            <TextoDeslizante>Pedir demo gratis</TextoDeslizante>
-          </IrA>
         </nav>
+        <IrA
+          id="formulario"
+          data-boton="claro"
+          data-analytics="turnos-barra"
+          className="group col-start-3 justify-self-end"
+        >
+          <TextoDeslizante>Pedir demo gratis</TextoDeslizante>
+        </IrA>
       </div>
     </header>
-  );
-}
-
-const DOLORES = [
-  {
-    titulo: "Te escriben a las 11 de la noche",
-    texto: "Contestás al otro día y para entonces ya sacaron turno en otro lado.",
-  },
-  {
-    titulo: "«¿Tenés lugar el jueves?»",
-    texto: "Una pregunta que se convierte en diez mensajes de ida y vuelta hasta cerrar un horario.",
-  },
-  {
-    titulo: "Reservan y no vienen",
-    texto: "Nadie les recordó el turno, y ese hueco ya no lo llenás.",
-  },
-];
-
-function Problema() {
-  return (
-    <Seccion
-      titulo="Cada turno que coordinás a mano es tiempo que no estás atendiendo"
-      anchoTitulo="max-w-[860px]"
-    >
-      <ul className="mx-auto mt-14 grid max-w-[1100px] gap-4 md:grid-cols-3">
-        {DOLORES.map((d, i) => (
-          <Revelar as="li" key={d.titulo} demora={i * 90} className="rounded-card border border-line bg-bg-elev p-6 sm:p-7">
-            <h3 className="text-xl text-text sm:text-2xl">{d.titulo}</h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-text-muted">{d.texto}</p>
-          </Revelar>
-        ))}
-      </ul>
-    </Seccion>
-  );
-}
-
-/**
- * El video completo de la demo (el mismo que se le manda a un lead, sobre el
- * negocio de ejemplo). Con controles y sin autoplay: es un minuto, lo arranca
- * el que quiere verlo.
- */
-function Recorrido() {
-  return (
-    <section id="como-funciona" className="scroll-mt-24 py-20 sm:py-28">
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
-        <Revelar className="grid items-center gap-10 md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] md:gap-16 lg:gap-24">
-          <div>
-            <h2 className="text-[clamp(2rem,4.6vw,3.5rem)]">Así funciona, de punta a punta, en un minuto</h2>
-            <p className="mt-5 max-w-[50ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
-              Un centro de estética de ejemplo con el plan más completo: un
-              cliente reserva desde la web, otro saca turno hablando con el bot,
-              y los dos aparecen solos en la agenda del negocio.
-            </p>
-            <div className="mt-8">
-              <Lista
-                titulo="En el video"
-                items={[
-                  "La web del negocio, con servicios y precios",
-                  "Una reserva completa, sin escribirle a nadie",
-                  "El bot ofreciendo horarios y mandando el recordatorio",
-                  "El panel del dueño con los turnos del día",
-                ]}
-              />
-            </div>
-            <p className="mt-8 text-sm text-text-muted">
-              Así es la demo personalizada que te mandamos, pero con tu marca,
-              tus servicios y tus precios.
-            </p>
-          </div>
-          <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-card border border-line bg-bg-elev shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
-            <video
-              src="/turnos/recorrido.mp4"
-              poster="/turnos/recorrido.webp"
-              controls
-              playsInline
-              preload="none"
-              aria-label="Video de un minuto con la demo completa en un centro de estética de ejemplo"
-              className="aspect-[9/16] w-full bg-black object-cover"
-            />
-          </div>
-        </Revelar>
-      </div>
-    </section>
   );
 }
 
@@ -204,6 +150,14 @@ function Lista({ titulo, items }: { titulo: string; items: string[] }) {
   );
 }
 
+/**
+ * Un plan funcionando: su demo, para quien es y lo que gana el dueño. Lo que
+ * incluye ya esta en la tarjeta de precios, asi que aca no se repite.
+ *
+ * Los planes alternan de lado. Al invertir no alcanza con mover el celular:
+ * tambien se invierten los anchos de las columnas, si no el celular cae en la
+ * columna ancha y el texto queda apretado contra la izquierda.
+ */
 function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
   // El ancla envuelve al plan entero y no solo al texto: en mobile el celular
   // va arriba, y saltar al texto dejaba la demo fuera de pantalla.
@@ -211,7 +165,11 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
     <div id={`plan-${plan.id}`} className="scroll-mt-24">
       <Revelar
         as="article"
-        className="grid items-center gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 lg:gap-24"
+        className={`mx-auto grid max-w-[1100px] items-center gap-10 md:gap-16 lg:gap-24 ${
+          invertido
+            ? "md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+            : "md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+        }`}
       >
         <div className={`flex flex-col items-center ${invertido ? "md:order-2" : ""}`}>
           <div className="relative w-full max-w-[300px] rounded-[22px] bg-[linear-gradient(160deg,rgba(0,153,255,0.16),rgba(0,153,255,0)_60%)] px-6 pt-8 sm:max-w-[340px]">
@@ -223,19 +181,14 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
         <div>
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
             <h3 className="text-[clamp(2rem,4vw,3rem)] text-text">{plan.nombre}</h3>
-            {plan.destacado && (
-              <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
-                {plan.destacado}
-              </span>
-            )}
+            {plan.destacado && <Destacado texto={plan.destacado} />}
           </div>
           <p className="mt-3 text-lg leading-snug text-text sm:text-xl">{plan.resumen}</p>
           <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
             {plan.paraQuien}
           </p>
 
-          <div className="mt-8 grid gap-8 sm:grid-cols-2">
-            <Lista titulo="Incluye" items={plan.incluye} />
+          <div className="mt-8">
             <Lista titulo="Lo que ganás vos" items={plan.vos} />
           </div>
 
@@ -251,7 +204,6 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
               <p className="mt-1.5 text-sm text-text-muted">
                 Precio de lanzamiento · pago único + {pesos(MENSUAL)}/mes
               </p>
-              <p className="mt-1 text-sm text-text-muted">30% para arrancar, 70% cuando está terminado</p>
             </div>
             <IrA
               id="formulario"
@@ -266,6 +218,14 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
         </div>
       </Revelar>
     </div>
+  );
+}
+
+function Destacado({ texto }: { texto: string }) {
+  return (
+    <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
+      {texto}
+    </span>
   );
 }
 
@@ -291,50 +251,14 @@ function EtiquetaDescuento({ plan }: { plan: Plan }) {
   );
 }
 
-function Panel() {
-  return (
-    <section className="py-20 sm:py-28">
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
-        <Revelar className="grid items-center gap-10 rounded-card border border-line bg-bg-elev p-6 sm:p-10 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-16 lg:p-16">
-          <div>
-            <h2 className="text-[clamp(2rem,4.2vw,3.25rem)]">En los tres planes, tu agenda entra en el bolsillo</h2>
-            <p className="mt-5 max-w-[52ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
-              Todo lo que se reserva —por el link, por la web o por el bot— cae
-              en el mismo panel. Lo abrís desde el celular, sin instalar nada.
-            </p>
-            <div className="mt-8">
-              <Lista
-                titulo="Desde el panel"
-                items={[
-                  "Ves los turnos del día y de la semana, en lista o en grilla",
-                  "Te avisa cuando entra un turno nuevo",
-                  "Bloqueás horarios cuando no atendés",
-                  "Marcás quién vino y ves las cancelaciones",
-                ]}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <Telefono
-              video="/turnos/panel.mp4"
-              poster="/turnos/panel.webp"
-              etiqueta="Panel de ejemplo con la agenda del día y de la semana"
-              className="w-full max-w-[290px]"
-            />
-            <p className="mt-4 text-sm text-text-muted">Datos de ejemplo</p>
-          </div>
-        </Revelar>
-      </div>
-    </section>
-  );
-}
-
 /**
- * Planes y precios en una sola seccion. Antes eran dos: el detalle de cada
- * plan con su demo y, mas abajo, tres tarjetas que repetian nombre, precio y
- * lista. Ahora arriba va una tira con los tres precios para ver el abanico de
- * un vistazo (cada uno lleva a su plan) y debajo el detalle, que ya trae lo
- * que incluye, el precio y el boton.
+ * Las tres tarjetas de precio: para que es cada plan, el precio con su
+ * descuento, lo que incluye y el boton. La primera version era una tira con
+ * nombre y precio, y no le daba a nadie un motivo para elegir.
+ *
+ * El destacado es el del medio ("Recomendado"): el caro hace de ancla y el
+ * medio queda como la eleccion razonable. No dice "el mas elegido" porque
+ * todavia no hay clientes que lo respalden.
  */
 function Planes() {
   return (
@@ -344,40 +268,69 @@ function Planes() {
       bajada="Cada uno suma sobre el anterior. Pagás el 30% para arrancar y el 70% cuando te lo entregamos funcionando."
     >
       <Revelar>
-        <p className="mb-4 text-center text-[15px] text-text">
+        <p className="mb-6 text-center text-[15px] text-text">
           Precio de lanzamiento: <span className="text-azul">{DESCUENTO}% de descuento</span> en los tres planes
         </p>
-        <ul className="mx-auto grid max-w-[760px] grid-cols-3 gap-2 sm:gap-3">
-          {planes.map((p) => (
-            <li key={p.id}>
-              <IrA
-                id={`plan-${p.id}`}
-                className={`flex h-full flex-col items-center rounded-card border px-2 py-3 text-center transition-colors sm:px-4 sm:py-4 ${
-                  p.destacado
-                    ? "border-azul bg-azul/[0.07] hover:bg-azul/[0.12]"
-                    : "border-line bg-bg-elev hover:bg-bg-alto"
-                }`}
-              >
-                <span className="text-sm leading-tight text-text-muted sm:text-[15px]">{p.nombre}</span>
-                {/* mt-auto: en mobile "Piloto automático" ocupa dos renglones y
-                    sin esto sus precios quedaban mas abajo que los otros dos. */}
-                <PrecioLista plan={p} className="mt-auto pt-1 text-xs sm:text-sm" />
-                <span className="font-display text-lg font-medium tracking-[-0.03em] text-text sm:text-2xl">
-                  {pesos(p.precio)}
-                </span>
-              </IrA>
-            </li>
-          ))}
-        </ul>
       </Revelar>
 
-      <div className="mt-20 flex flex-col gap-24 sm:mt-24 sm:gap-32">
+      <div className="mx-auto grid max-w-[1180px] gap-4 lg:grid-cols-3">
         {planes.map((p, i) => (
-          <DetallePlan key={p.id} plan={p} invertido={i % 2 === 1} />
+          <Revelar
+            key={p.id}
+            demora={i * 90}
+            className={`flex flex-col rounded-card border p-6 sm:p-8 ${
+              p.destacado
+                ? "border-azul bg-azul/[0.07] shadow-[0_30px_80px_rgba(0,153,255,0.12)]"
+                : "border-line bg-bg-elev"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-2xl text-text">{p.nombre}</h3>
+              {p.destacado && <Destacado texto={p.destacado} />}
+            </div>
+            <p className="mt-2 text-[15px] leading-snug text-text-muted lg:min-h-[3em]">{p.resumen}</p>
+
+            <div className="mt-6">
+              <p className="flex items-center gap-2.5">
+                <PrecioLista plan={p} />
+                <EtiquetaDescuento plan={p} />
+              </p>
+              <p className="mt-1 font-display text-4xl font-medium leading-none tracking-[-0.04em] text-text">
+                {pesos(p.precio)}
+              </p>
+              <p className="mt-2.5 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</p>
+            </div>
+
+            <ul className="mt-6 flex flex-1 flex-col gap-3 border-t border-line pt-6">
+              {p.incluye.map((t) => (
+                <li key={t} className="flex gap-3 text-[15px] leading-snug text-text">
+                  <Check className="mt-0.5 size-4 shrink-0 text-azul" aria-hidden />
+                  {t}
+                </li>
+              ))}
+            </ul>
+
+            <IrA
+              id="formulario"
+              plan={p.id}
+              data-boton={p.destacado ? "claro" : "linea"}
+              data-analytics={`turnos-precio-${p.id}`}
+              className="group mt-8 min-h-[52px] w-full text-base"
+            >
+              <TextoDeslizante>{`Quiero ${p.nombre}`}</TextoDeslizante>
+            </IrA>
+            <IrA
+              id={`plan-${p.id}`}
+              className="mt-3 inline-flex items-center justify-center gap-1.5 self-center rounded-card px-3 py-2 text-sm text-text-muted transition-colors hover:text-text"
+            >
+              Ver la demo
+              <ArrowDown className="size-3.5" aria-hidden />
+            </IrA>
+          </Revelar>
         ))}
       </div>
 
-      <Revelar className="mx-auto mt-24 flex max-w-[1180px] sm:mt-32 flex-col gap-5 rounded-card border border-line bg-bg-elev p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+      <Revelar className="mx-auto mt-4 flex max-w-[1180px] flex-col gap-5 rounded-card border border-line bg-bg-elev p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-lg text-text">
             Mantenimiento: {pesos(MENSUAL)} por mes, igual en los tres planes

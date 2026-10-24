@@ -219,7 +219,7 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
           </div>
           <p className="mt-4 text-sm text-text-muted">Demo con un negocio de ejemplo</p>
         </div>
-  
+
         <div>
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
             <h3 className="text-[clamp(2rem,4vw,3rem)] text-text">{plan.nombre}</h3>
@@ -233,19 +233,22 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
           <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
             {plan.paraQuien}
           </p>
-  
+
           <div className="mt-8 grid gap-8 sm:grid-cols-2">
             <Lista titulo="Incluye" items={plan.incluye} />
             <Lista titulo="Lo que ganás vos" items={plan.vos} />
           </div>
-  
+
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-line pt-8">
-            <p>
-              <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
-                {pesos(plan.precio)}
-              </span>
-              <span className="ml-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</span>
-            </p>
+            <div>
+              <p>
+                <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
+                  {pesos(plan.precio)}
+                </span>
+                <span className="ml-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</span>
+              </p>
+              <p className="mt-1.5 text-sm text-text-muted">30% para arrancar, 70% cuando está terminado</p>
+            </div>
             <IrA
               id="formulario"
               plan={plan.id}
@@ -312,7 +315,7 @@ function Planes() {
     <Seccion
       id="planes"
       titulo="Tres planes, precio a la vista"
-      bajada="Cada uno suma sobre el anterior. Pagás una vez el armado y después un mensual fijo, igual en los tres."
+      bajada="Cada uno suma sobre el anterior. Pagás el 30% para arrancar y el 70% cuando te lo entregamos funcionando."
     >
       <Revelar>
         <ul className="mx-auto grid max-w-[760px] grid-cols-3 gap-2 sm:gap-3">
@@ -380,11 +383,11 @@ const PASOS = [
   },
   {
     titulo: "Lo armamos con tus datos",
-    texto: "Servicios, horarios, fotos y precios. Vos lo revisás antes de publicarlo.",
+    texto: "Con la seña del 30% arrancamos: servicios, horarios, fotos y precios. Vos lo revisás antes de publicarlo.",
   },
   {
     titulo: "Queda andando",
-    texto: "Te mostramos cómo usar el panel y empezás a recibir turnos.",
+    texto: "Con todo terminado pagás el 70% restante, te mostramos cómo usar el panel y empezás a recibir turnos.",
   },
 ];
 
@@ -425,8 +428,20 @@ const PREGUNTAS = [
     r: "Nos contás de tu negocio y te mandamos por WhatsApp un video de cómo quedaría el sistema con tu marca, tus servicios y tus precios. Es gratis y no te compromete a nada.",
   },
   {
+    p: "¿Cómo pago?",
+    r: "En dos partes: una seña del 30% para arrancar y el 70% restante cuando te entregamos el proyecto terminado. Podés pagar por el medio que te quede más cómodo.",
+  },
+  {
     p: "¿Qué incluye el mensual?",
     r: `${pesos(MENSUAL)} por mes, igual en los tres planes: hosting y dominio, mantenimiento y actualizaciones, y rondas de cambios para tus servicios, precios, textos y fotos.`,
+  },
+  {
+    p: "¿Qué pasa si dejo de pagar el mensual?",
+    r: "La web y el sistema de turnos se dan de baja, porque el mensual es lo que los mantiene andando. El dominio sigue siendo tuyo.",
+  },
+  {
+    p: "¿Puedo empezar con un plan y pasarme a otro después?",
+    r: "Sí. Pagás la diferencia entre los dos planes y sumamos lo que falta sobre lo que ya tenés.",
   },
   {
     p: "¿Puedo cambiar servicios, precios u horarios después?",

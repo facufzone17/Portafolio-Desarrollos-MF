@@ -1,7 +1,7 @@
 /**
  * Planes de la landing de turnos (/turnos). Fuente unica de nombres, precios y
- * que incluye cada uno: la tarjeta de precios, el detalle de cada plan, el
- * formulario y el mensaje de WhatsApp leen de aca.
+ * que incluye cada uno: la seccion de planes, el formulario y el mensaje de
+ * WhatsApp leen de aca.
  *
  * Precios que paso Facundo el 22/10/2026. Pago unico por armarlo, mas el
  * mensual, que es el mismo para los tres.
@@ -19,9 +19,7 @@ export type Plan = {
   precio: number;
   /** Lo que suma respecto del plan anterior (o todo, en el primero). */
   incluye: string[];
-  /** Lo que ve el cliente del negocio. */
-  tuCliente: string[];
-  /** Lo que ve el dueño. */
+  /** Lo que gana el dueño. */
   vos: string[];
   /** Clip vertical de la demo (public/turnos). */
   video: string;
@@ -51,11 +49,6 @@ export const planes: Plan[] = [
       "Tu cliente cancela o reprograma solo, sin escribirte",
       "Panel en el celular con tu agenda del día y de la semana",
     ],
-    tuCliente: [
-      "Toca el link de tu bio o de tu estado de WhatsApp",
-      "Elige servicio, día y un horario libre",
-      "Deja nombre y celular, confirma y lo agrega a su calendario",
-    ],
     vos: [
       "El turno aparece solo en tu agenda",
       "Bloqueás horarios y marcás asistencia desde el celular",
@@ -75,11 +68,6 @@ export const planes: Plan[] = [
       "Web propia con tu marca y tu dominio",
       "Servicios y precios, horarios y ubicación con mapa",
       "Galería de tus trabajos y botón directo a tu WhatsApp",
-    ],
-    tuCliente: [
-      "Entra a tu web y ve tus servicios, precios y trabajos",
-      "Mira tus horarios y cómo llegar",
-      "Reserva desde la misma página, sin escribirte",
     ],
     vos: [
       "Tenés una web que vende por vos y la compartís en todos lados",
@@ -101,11 +89,6 @@ export const planes: Plan[] = [
       "Ofrece horarios libres y agenda el turno en la conversación",
       "Recordatorio antes del turno: el cliente confirma con un 1",
       "Responde precios, horarios y dirección, y te pasa la charla cuando hace falta",
-    ],
-    tuCliente: [
-      "Escribe a tu WhatsApp a la hora que sea",
-      "El bot le ofrece horarios libres y le reserva el turno",
-      "Le llega un recordatorio y confirma con un toque",
     ],
     vos: [
       "No contestás más «¿tenés lugar mañana?»",

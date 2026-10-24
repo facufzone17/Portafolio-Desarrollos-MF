@@ -18,7 +18,7 @@ import { MENSUAL, incluyeMensual, planes, pesos, type Plan } from "@/lib/planes"
   formulario, que abre WhatsApp con las respuestas.
 
   Mismo sistema que la home (negro neutro, un solo azul, radio 10, Inter Tight
-  500) pero sin la entrada ni la barra de secciones: el que llega desde un
+  500) pero sin la entrada ni los links de la home: el que llega desde un
   anuncio no tiene que esperar 3,6 s ni irse al portafolio. Cada plan se
   muestra funcionando sobre un negocio de ejemplo (Estudio Nacar, del
   generador de demos), nunca sobre la marca de un prospecto real.
@@ -45,19 +45,8 @@ export default function Turnos() {
         <HeroTurnos />
         <Problema />
         <Recorrido />
-        <Seccion
-          id="planes"
-          titulo="Tres planes. Elegí hasta dónde querés automatizar."
-          bajada="Cada uno suma sobre el anterior. Mirá cómo funciona en un centro de estética de ejemplo."
-        >
-          <div className="mt-16 flex flex-col gap-24 sm:mt-20 sm:gap-32">
-            {planes.map((p, i) => (
-              <DetallePlan key={p.id} plan={p} invertido={i % 2 === 1} />
-            ))}
-          </div>
-        </Seccion>
         <Panel />
-        <Precios />
+        <Planes />
         <Proceso />
         <Preguntas />
         <Seccion
@@ -77,9 +66,18 @@ export default function Turnos() {
 
 /* ------------------------------------------------------------------------ */
 
+/** Secciones de la barra, en el orden en que aparecen en la pagina. */
+const SECCIONES = [
+  { id: "como-funciona", nombre: "Cómo funciona" },
+  { id: "planes", nombre: "Precios" },
+  { id: "preguntas", nombre: "Preguntas" },
+];
+
 /**
- * Barra propia de la landing: logo, planes y la accion. Sin los links de la
- * home — desde un anuncio, cada salida que no es el formulario es una fuga.
+ * Barra propia de la landing: logo, secciones y la accion. Sin los links de la
+ * home — desde un anuncio, cada salida que no es el formulario es una fuga. Las
+ * secciones son anclas de esta misma pagina, asi que no sacan a nadie; en
+ * mobile no entran y queda solo el boton.
  */
 function Barra() {
   return (
@@ -89,12 +87,15 @@ function Barra() {
           <Logo className="text-[17px] sm:text-[18px]" />
         </Link>
         <nav aria-label="Secciones" className="flex items-center gap-1">
-          <IrA
-            id="precios"
-            className="hidden rounded-card px-3 py-2 text-[15px] text-white/75 transition-colors hover:text-white sm:inline-flex"
-          >
-            Precios
-          </IrA>
+          {SECCIONES.map((s) => (
+            <IrA
+              key={s.id}
+              id={s.id}
+              className="hidden rounded-card px-3 py-2 text-[15px] text-white/75 transition-colors hover:text-white md:inline-flex"
+            >
+              {s.nombre}
+            </IrA>
+          ))}
           <IrA id="formulario" data-boton="claro" data-analytics="turnos-barra" className="group">
             <TextoDeslizante>Pedir demo gratis</TextoDeslizante>
           </IrA>
@@ -144,7 +145,7 @@ function Problema() {
  */
 function Recorrido() {
   return (
-    <section className="py-20 sm:py-28">
+    <section id="como-funciona" className="scroll-mt-24 py-20 sm:py-28">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
         <Revelar className="grid items-center gap-10 md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] md:gap-16 lg:gap-24">
           <div>
@@ -204,56 +205,60 @@ function Lista({ titulo, items }: { titulo: string; items: string[] }) {
 }
 
 function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
+  // El ancla envuelve al plan entero y no solo al texto: en mobile el celular
+  // va arriba, y saltar al texto dejaba la demo fuera de pantalla.
   return (
-    <Revelar
-      as="article"
-      className="grid items-center gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 lg:gap-24"
-    >
-      <div className={`flex flex-col items-center ${invertido ? "md:order-2" : ""}`}>
-        <div className="relative w-full max-w-[300px] rounded-[22px] bg-[linear-gradient(160deg,rgba(0,153,255,0.16),rgba(0,153,255,0)_60%)] px-6 pt-8 sm:max-w-[340px]">
-          <Telefono video={plan.video} poster={plan.poster} etiqueta={`Demo del plan ${plan.nombre}`} />
+    <div id={`plan-${plan.id}`} className="scroll-mt-24">
+      <Revelar
+        as="article"
+        className="grid items-center gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 lg:gap-24"
+      >
+        <div className={`flex flex-col items-center ${invertido ? "md:order-2" : ""}`}>
+          <div className="relative w-full max-w-[300px] rounded-[22px] bg-[linear-gradient(160deg,rgba(0,153,255,0.16),rgba(0,153,255,0)_60%)] px-6 pt-8 sm:max-w-[340px]">
+            <Telefono video={plan.video} poster={plan.poster} etiqueta={`Demo del plan ${plan.nombre}`} />
+          </div>
+          <p className="mt-4 text-sm text-text-muted">Demo con un negocio de ejemplo</p>
         </div>
-        <p className="mt-4 text-sm text-text-muted">Demo con un negocio de ejemplo</p>
-      </div>
-
-      <div id={`plan-${plan.id}`} className="scroll-mt-24">
-        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-          <h3 className="text-[clamp(2rem,4vw,3rem)] text-text">{plan.nombre}</h3>
-          {plan.destacado && (
-            <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
-              {plan.destacado}
-            </span>
-          )}
-        </div>
-        <p className="mt-3 text-lg leading-snug text-text sm:text-xl">{plan.resumen}</p>
-        <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
-          {plan.paraQuien}
-        </p>
-
-        <div className="mt-8 grid gap-8 sm:grid-cols-2">
-          <Lista titulo="Lo que hace tu cliente" items={plan.tuCliente} />
-          <Lista titulo="Lo que ganás vos" items={plan.vos} />
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-line pt-8">
-          <p>
-            <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
-              {pesos(plan.precio)}
-            </span>
-            <span className="ml-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</span>
+  
+        <div>
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+            <h3 className="text-[clamp(2rem,4vw,3rem)] text-text">{plan.nombre}</h3>
+            {plan.destacado && (
+              <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
+                {plan.destacado}
+              </span>
+            )}
+          </div>
+          <p className="mt-3 text-lg leading-snug text-text sm:text-xl">{plan.resumen}</p>
+          <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
+            {plan.paraQuien}
           </p>
-          <IrA
-            id="formulario"
-            plan={plan.id}
-            data-boton="claro"
-            data-analytics={`turnos-plan-${plan.id}`}
-            className="group"
-          >
-            <TextoDeslizante>{`Quiero ${plan.nombre}`}</TextoDeslizante>
-          </IrA>
+  
+          <div className="mt-8 grid gap-8 sm:grid-cols-2">
+            <Lista titulo="Incluye" items={plan.incluye} />
+            <Lista titulo="Lo que ganás vos" items={plan.vos} />
+          </div>
+  
+          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-line pt-8">
+            <p>
+              <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
+                {pesos(plan.precio)}
+              </span>
+              <span className="ml-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</span>
+            </p>
+            <IrA
+              id="formulario"
+              plan={plan.id}
+              data-boton="claro"
+              data-analytics={`turnos-plan-${plan.id}`}
+              className="group"
+            >
+              <TextoDeslizante>{`Quiero ${plan.nombre}`}</TextoDeslizante>
+            </IrA>
+          </div>
         </div>
-      </div>
-    </Revelar>
+      </Revelar>
+    </div>
   );
 }
 
@@ -295,59 +300,51 @@ function Panel() {
   );
 }
 
-function Precios() {
+/**
+ * Planes y precios en una sola seccion. Antes eran dos: el detalle de cada
+ * plan con su demo y, mas abajo, tres tarjetas que repetian nombre, precio y
+ * lista. Ahora arriba va una tira con los tres precios para ver el abanico de
+ * un vistazo (cada uno lleva a su plan) y debajo el detalle, que ya trae lo
+ * que incluye, el precio y el boton.
+ */
+function Planes() {
   return (
     <Seccion
-      id="precios"
-      titulo="Precios claros, pago único"
-      bajada="Lo armamos una vez y es tuyo. Después, un mensual chico para que siga andando."
+      id="planes"
+      titulo="Tres planes, precio a la vista"
+      bajada="Cada uno suma sobre el anterior. Pagás una vez el armado y después un mensual fijo, igual en los tres."
     >
-      <div className="mx-auto mt-14 grid max-w-[1180px] gap-4 lg:grid-cols-3">
-        {planes.map((p, i) => (
-          <Revelar
-            key={p.id}
-            demora={i * 90}
-            className={`flex flex-col rounded-card border p-6 sm:p-8 ${
-              p.destacado ? "border-azul bg-azul/[0.07]" : "border-line bg-bg-elev"
-            }`}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-2xl text-text">{p.nombre}</h3>
-              {p.destacado && (
-                <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
-                  {p.destacado}
+      <Revelar>
+        <ul className="mx-auto grid max-w-[760px] grid-cols-3 gap-2 sm:gap-3">
+          {planes.map((p) => (
+            <li key={p.id}>
+              <IrA
+                id={`plan-${p.id}`}
+                className={`flex h-full flex-col items-center rounded-card border px-2 py-3 text-center transition-colors sm:px-4 sm:py-4 ${
+                  p.destacado
+                    ? "border-azul bg-azul/[0.07] hover:bg-azul/[0.12]"
+                    : "border-line bg-bg-elev hover:bg-bg-alto"
+                }`}
+              >
+                <span className="text-sm leading-tight text-text-muted sm:text-[15px]">{p.nombre}</span>
+                {/* mt-auto: en mobile "Piloto automático" ocupa dos renglones y
+                    sin esto su precio quedaba mas abajo que los otros dos. */}
+                <span className="mt-auto pt-1 font-display text-lg font-medium tracking-[-0.03em] text-text sm:text-2xl">
+                  {pesos(p.precio)}
                 </span>
-              )}
-            </div>
-            <p className="mt-2 min-h-[3em] text-[15px] leading-snug text-text-muted">{p.resumen}</p>
-            <p className="mt-6">
-              <span className="font-display text-[2.6rem] font-medium leading-none tracking-[-0.04em] text-text">
-                {pesos(p.precio)}
-              </span>
-            </p>
-            <p className="mt-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</p>
-            <ul className="mt-7 flex flex-1 flex-col gap-3 border-t border-line pt-7">
-              {p.incluye.map((t) => (
-                <li key={t} className="flex gap-3 text-[15px] leading-snug text-text">
-                  <Check className="mt-0.5 size-4 shrink-0 text-azul" aria-hidden />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <IrA
-              id="formulario"
-              plan={p.id}
-              data-boton={p.destacado ? "claro" : "linea"}
-              data-analytics={`turnos-precio-${p.id}`}
-              className="group mt-8 min-h-[52px] w-full text-base"
-            >
-              <TextoDeslizante>{`Quiero ${p.nombre}`}</TextoDeslizante>
-            </IrA>
-          </Revelar>
+              </IrA>
+            </li>
+          ))}
+        </ul>
+      </Revelar>
+
+      <div className="mt-20 flex flex-col gap-24 sm:mt-24 sm:gap-32">
+        {planes.map((p, i) => (
+          <DetallePlan key={p.id} plan={p} invertido={i % 2 === 1} />
         ))}
       </div>
 
-      <Revelar className="mx-auto mt-4 flex max-w-[1180px] flex-col gap-5 rounded-card border border-line bg-bg-elev p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+      <Revelar className="mx-auto mt-24 flex max-w-[1180px] sm:mt-32 flex-col gap-5 rounded-card border border-line bg-bg-elev p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-lg text-text">
             Mantenimiento: {pesos(MENSUAL)} por mes, igual en los tres planes
@@ -412,6 +409,14 @@ const PREGUNTAS = [
     r: "Si trabajás con turnos, sí: peluquerías y barberías, uñas y pestañas, estética, masajes, consultorios, entrenadores, canchas. Los servicios, las duraciones y los horarios se arman a la medida de tu negocio.",
   },
   {
+    p: "¿Mis clientes tienen que bajarse una app?",
+    r: "No. Reservan desde un link que se abre en el navegador del celular: eligen servicio, día y horario, y dejan su nombre y celular. No instalan nada ni se crean una cuenta.",
+  },
+  {
+    p: "Ya uso otra app de turnos, ¿me conviene cambiar?",
+    r: "Si la que tenés te resuelve, capaz que no. Lo que cambia con Trevoo es que la página de reservas tiene tu marca y no la de una app, la armamos nosotros con tus servicios y horarios, y sobre la misma agenda podés sumar tu web y el bot de WhatsApp.",
+  },
+  {
     p: "¿En cuánto tiempo está listo?",
     r: "Depende del plan y de que tengamos tus servicios, precios y fotos. Antes de arrancar te damos una fecha de entrega concreta.",
   },
@@ -422,6 +427,14 @@ const PREGUNTAS = [
   {
     p: "¿Qué incluye el mensual?",
     r: `${pesos(MENSUAL)} por mes, igual en los tres planes: hosting y dominio, mantenimiento y actualizaciones, y rondas de cambios para tus servicios, precios, textos y fotos.`,
+  },
+  {
+    p: "¿Puedo cambiar servicios, precios u horarios después?",
+    r: "Sí. Los horarios en los que no atendés los bloqueás vos desde el panel. Los cambios de servicios, precios, textos y fotos entran en el mensual: nos los pedís y los cargamos.",
+  },
+  {
+    p: "¿Qué pasa si un cliente cancela?",
+    r: "Cancela o reprograma solo, sin escribirte. El horario vuelve a quedar libre para otro cliente y vos lo ves en el panel.",
   },
   {
     p: "¿Tengo que saber de tecnología?",
@@ -435,7 +448,7 @@ const PREGUNTAS = [
 
 function Preguntas() {
   return (
-    <Seccion titulo="Preguntas frecuentes">
+    <Seccion id="preguntas" titulo="Preguntas frecuentes">
       <div className="mx-auto mt-12 max-w-[820px] divide-y divide-line border-y border-line">
         {PREGUNTAS.map((q) => (
           <details key={q.p} className="group">

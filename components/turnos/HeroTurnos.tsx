@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { IrA } from "@/components/turnos/IrA";
 import { Telefono } from "@/components/turnos/Telefono";
-import { planes, pesos } from "@/lib/planes";
+import { DESCUENTO, planes, pesos } from "@/lib/planes";
 
 /**
  * Hero de /turnos. Misma gramatica que el de la home (components/hero/Hero.tsx):
@@ -86,7 +86,7 @@ export function HeroTurnos() {
                 </IrA>
               </div>
               <p className="mt-5 text-sm text-white/70">
-                Desde {pesos(planes[0].precio)}, pago único · Precios a la vista
+                Precio de lanzamiento, {DESCUENTO}% de descuento · Desde {pesos(planes[0].precio)}, pago único
               </p>
             </div>
           </motion.div>

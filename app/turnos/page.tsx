@@ -10,7 +10,7 @@ import { IrA } from "@/components/turnos/IrA";
 import { HeroTurnos } from "@/components/turnos/HeroTurnos";
 import { Telefono } from "@/components/turnos/Telefono";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
-import { MENSUAL, incluyeMensual, planes, pesos, type Plan } from "@/lib/planes";
+import { DESCUENTO, MENSUAL, descuento, incluyeMensual, planes, pesos, type Plan } from "@/lib/planes";
 
 /*
   Landing de turnos (22/10/2026). Destino de la pauta de Meta: vende los tres
@@ -241,13 +241,17 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
 
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-line pt-8">
             <div>
-              <p>
+              <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <PrecioLista plan={plan} className="text-lg" />
                 <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
                   {pesos(plan.precio)}
                 </span>
-                <span className="ml-2 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</span>
+                <EtiquetaDescuento plan={plan} />
               </p>
-              <p className="mt-1.5 text-sm text-text-muted">30% para arrancar, 70% cuando está terminado</p>
+              <p className="mt-1.5 text-sm text-text-muted">
+                Precio de lanzamiento · pago único + {pesos(MENSUAL)}/mes
+              </p>
+              <p className="mt-1 text-sm text-text-muted">30% para arrancar, 70% cuando está terminado</p>
             </div>
             <IrA
               id="formulario"
@@ -262,6 +266,28 @@ function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
         </div>
       </Revelar>
     </div>
+  );
+}
+
+/**
+ * Precio de lista tachado. El `<s>` solo no lo anuncia ningun lector de
+ * pantalla, asi que lleva el rotulo escondido.
+ */
+function PrecioLista({ plan, className = "" }: { plan: Plan; className?: string }) {
+  return (
+    <span className={`text-text-muted ${className}`}>
+      <span className="sr-only">Precio de lista: </span>
+      <s>{pesos(plan.precioLista)}</s>
+      <span className="sr-only">. Precio de lanzamiento:</span>
+    </span>
+  );
+}
+
+function EtiquetaDescuento({ plan }: { plan: Plan }) {
+  return (
+    <span className="self-center whitespace-nowrap rounded-card border border-azul/50 px-2 py-0.5 text-sm text-azul">
+      −{descuento(plan)}%
+    </span>
   );
 }
 
@@ -318,6 +344,9 @@ function Planes() {
       bajada="Cada uno suma sobre el anterior. Pagás el 30% para arrancar y el 70% cuando te lo entregamos funcionando."
     >
       <Revelar>
+        <p className="mb-4 text-center text-[15px] text-text">
+          Precio de lanzamiento: <span className="text-azul">{DESCUENTO}% de descuento</span> en los tres planes
+        </p>
         <ul className="mx-auto grid max-w-[760px] grid-cols-3 gap-2 sm:gap-3">
           {planes.map((p) => (
             <li key={p.id}>
@@ -331,8 +360,9 @@ function Planes() {
               >
                 <span className="text-sm leading-tight text-text-muted sm:text-[15px]">{p.nombre}</span>
                 {/* mt-auto: en mobile "Piloto automático" ocupa dos renglones y
-                    sin esto su precio quedaba mas abajo que los otros dos. */}
-                <span className="mt-auto pt-1 font-display text-lg font-medium tracking-[-0.03em] text-text sm:text-2xl">
+                    sin esto sus precios quedaban mas abajo que los otros dos. */}
+                <PrecioLista plan={p} className="mt-auto pt-1 text-xs sm:text-sm" />
+                <span className="font-display text-lg font-medium tracking-[-0.03em] text-text sm:text-2xl">
                   {pesos(p.precio)}
                 </span>
               </IrA>

@@ -5,6 +5,13 @@
  *
  * Precios que paso Facundo el 22/10/2026. Pago unico por armarlo, mas el
  * mensual, que es el mismo para los tres.
+ *
+ * Precio de lanzamiento (23/10/2026): `precio` es lo que se cobra hoy y
+ * `precioLista` lo que se cobra cuando termina el lanzamiento, y se muestra
+ * tachado. Los $345.000 de Agenda son un precio que ya se cobro; los de
+ * Vidriera y Piloto salen de aplicarles el mismo ~20% y redondear a un 20%
+ * justo. El tachado solo es honesto si despues del lanzamiento esos pasan a
+ * ser los precios de verdad.
  */
 
 export type IdPlan = "agenda" | "vidriera" | "piloto";
@@ -17,6 +24,8 @@ export type Plan = {
   /** Para quien conviene. */
   paraQuien: string;
   precio: number;
+  /** Precio despues del lanzamiento; va tachado al lado de `precio`. */
+  precioLista: number;
   /** Lo que suma respecto del plan anterior (o todo, en el primero). */
   incluye: string[];
   /** Lo que gana el dueño. */
@@ -43,6 +52,7 @@ export const planes: Plan[] = [
     paraQuien:
       "Para el que ya se mueve por Instagram y WhatsApp y quiere dejar de coordinar turnos mensaje por mensaje.",
     precio: 275000,
+    precioLista: 345000,
     incluye: [
       "Página de reservas con tu marca, tus servicios y tus precios",
       "Sólo se ven los horarios libres: cero turnos superpuestos",
@@ -63,6 +73,7 @@ export const planes: Plan[] = [
     paraQuien:
       "Para el que quiere una dirección propia que mostrar: lo que hacés, cuánto sale, dónde estás y el botón para reservar.",
     precio: 450000,
+    precioLista: 562500,
     incluye: [
       "Todo lo de Agenda",
       "Web propia con tu marca y tu dominio",
@@ -83,6 +94,7 @@ export const planes: Plan[] = [
     paraQuien:
       "Para el que recibe muchas consultas por WhatsApp y no quiere contestar lo mismo veinte veces por día.",
     precio: 700000,
+    precioLista: 875000,
     incluye: [
       "Todo lo de Vidriera",
       "Bot de WhatsApp que responde al instante, de día y de noche",
@@ -99,6 +111,18 @@ export const planes: Plan[] = [
     destacado: "El más completo",
   },
 ];
+
+/**
+ * Porcentaje de descuento sobre el precio de lista, redondeado para abajo:
+ * Agenda baja un 20,3% y se anuncia 20, nunca mas de lo que es.
+ */
+export function descuento(p: Plan): number {
+  // Con enteros: `1 - 0.8` en flotante da 0.1999… y el floor diria 19.
+  return Math.floor(((p.precioLista - p.precio) * 100) / p.precioLista);
+}
+
+/** El descuento que se anuncia para todos: el menor de los tres. */
+export const DESCUENTO = Math.min(...planes.map(descuento));
 
 /** $275.000, con punto de miles como se escribe aca. */
 export function pesos(n: number): string {

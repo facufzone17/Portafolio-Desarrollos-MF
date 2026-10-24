@@ -362,7 +362,7 @@ export function ReservaEnVivo({ encabezado, pie }: { encabezado: React.ReactNode
                   <p className="mt-2 text-[11px] text-[#8a7f72]">Celular</p>
                   <p className="mt-1 rounded-[8px] border border-[#e1d8cb] bg-white px-3 py-2 text-[13px]">{CLIENTE.celular}</p>
                   <p className="mt-2 text-[11px] leading-snug text-[#8a7f72]">
-                    Le llegan la confirmación y el recordatorio por WhatsApp.
+                    Le llega la confirmación del turno por WhatsApp.
                   </p>
                   <dl className="mt-3 rounded-[10px] border border-[#e7dfd3] bg-white px-3 text-[12px]">
                     <Fila t="Servicio" v={srvNombre} />
@@ -405,7 +405,7 @@ export function ReservaEnVivo({ encabezado, pie }: { encabezado: React.ReactNode
                   </div>
                   <p className="mt-5 flex items-start gap-2 rounded-[10px] border border-[#e7dfd3] bg-white px-3 py-2.5 text-[12px] leading-snug">
                     <MessageCircle className="mt-px size-4 shrink-0 text-[#2f9a4f]" aria-hidden />
-                    Le llega la confirmación por WhatsApp y, 24 h antes, el recordatorio.
+                    Le llega la confirmación por WhatsApp, con el día y la hora.
                   </p>
                   <p className="mt-2 flex items-start gap-2 rounded-[10px] bg-[#2b2520] px-3 py-2.5 text-[12px] leading-snug text-[#f6f2ec]">
                     <Bell className="mt-px size-4 shrink-0" aria-hidden />

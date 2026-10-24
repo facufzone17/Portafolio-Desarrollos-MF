@@ -76,7 +76,17 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
                   prioridad
                 />
               </div>
-              <p className="mt-4 text-sm text-text-muted">Demo con un negocio de ejemplo</p>
+              <p className="mt-4 text-sm text-text-muted">
+                Demo con un negocio de ejemplo ·{" "}
+                <a
+                  href="/turnos/recorrido.mp4"
+                  target="_blank"
+                  rel="noopener"
+                  className="text-text underline decoration-line-alto underline-offset-4 transition-colors hover:decoration-text"
+                >
+                  Ver el recorrido completo (1 min)
+                </a>
+              </p>
             </div>
 
             {/* En mobile el texto va arriba del celular: primero que es, despues verlo. */}

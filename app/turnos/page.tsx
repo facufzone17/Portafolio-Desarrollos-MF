@@ -10,7 +10,7 @@ import { Ejemplos } from "@/components/turnos/Ejemplos";
 import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { HeroTurnos } from "@/components/turnos/HeroTurnos";
-import { PasosHistoria } from "@/components/turnos/PasosHistoria";
+import { VidaDeUnTurno } from "@/components/turnos/VidaDeUnTurno";
 import { Destacado, Etiqueta, EtiquetaDescuento, PrecioLista } from "@/components/turnos/piezas";
 import { Preguntas } from "@/components/turnos/Preguntas";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
@@ -53,10 +53,10 @@ export default function Turnos() {
         <Seccion
           id="como-funciona"
           ancho="max-w-[980px]"
-          titulo="Así funciona, en tres pasos"
-          bajada="Un centro de estética de ejemplo con el plan más completo: un cliente reserva desde la web, otro saca turno hablando con el bot, y los dos aparecen solos en la agenda del negocio."
+          titulo="La vida de un turno"
+          bajada="Seguí a una clienta desde que ve tu historia hasta que se sienta en tu silla: lo que hace el sistema, y lo que hacés vos."
         >
-          <PasosHistoria />
+          <VidaDeUnTurno />
         </Seccion>
         <Ejemplos />
         <Planes />

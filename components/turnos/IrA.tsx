@@ -7,6 +7,14 @@ import type { IdPlan } from "@/lib/planes";
 export const EVENTO_PLAN = "turnos:elegir-plan";
 
 /**
+ * Evento con el que el hero le pasa al formulario el nombre del negocio y el
+ * rubro que el visitante ya cargo en la vista previa.
+ */
+export const EVENTO_NEGOCIO = "turnos:negocio";
+
+export type DatosNegocio = { negocio: string; rubro: string };
+
+/**
  * Link a una seccion de la misma pagina. Va por `irASeccion` y no por el salto
  * nativo del ancla, que pelea con Lenis por el mismo numero.
  *

@@ -24,6 +24,7 @@ export function Seccion({
   children,
   className = "",
   anchoTitulo = "max-w-[46ch]",
+  ancho,
 }: {
   id?: string;
   titulo?: React.ReactNode;
@@ -35,6 +36,10 @@ export function Seccion({
   /** Cap de ancho del bloque titulo+bajada. Se abre cuando un titulo largo
    *  necesitaria tres renglones con el cap por defecto. */
   anchoTitulo?: string;
+  /** Ancho del bloque de contenido de abajo (p. ej. "max-w-[980px]"). Si
+   *  esta, titulo y bajada ocupan ese mismo ancho en vez de los caps en ch:
+   *  el encabezado queda alineado con lo que presenta. Lo usa /turnos. */
+  ancho?: string;
 }) {
   return (
     <section
@@ -47,10 +52,10 @@ export function Seccion({
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
         {titulo && (
           <Revelar>
-            <div className={`mx-auto ${anchoTitulo} text-center`}>
+            <div className={`mx-auto ${ancho ?? anchoTitulo} text-center`}>
               <h2 className="text-[clamp(2rem,4.6vw,3.5rem)]">{titulo}</h2>
               {bajada && (
-                <p className="mx-auto mt-5 max-w-[44ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
+                <p className={`mx-auto mt-5 ${ancho ? "" : "max-w-[44ch]"} text-[15px] leading-relaxed text-text-muted sm:text-base`}>
                   {bajada}
                 </p>
               )}

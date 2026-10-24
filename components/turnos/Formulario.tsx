@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { registrarLead } from "@/components/PixelMeta";
-import { EVENTO_PLAN } from "@/components/turnos/IrA";
+import { EVENTO_NEGOCIO, EVENTO_PLAN, type DatosNegocio } from "@/components/turnos/IrA";
 import { planes, pesos, type IdPlan } from "@/lib/planes";
 import { whatsappUrl } from "@/lib/site";
 
@@ -44,14 +44,27 @@ type Objetivo = keyof typeof OBJETIVOS;
 const campo =
   "mt-2 block w-full rounded-card border border-line-alto bg-bg-elev px-4 py-3 text-base text-text placeholder:text-text-muted/70 transition-colors focus:border-azul focus:outline-none";
 
-export function Formulario() {
-  const [plan, setPlan] = useState<IdPlan | "no-se">("no-se");
+export function Formulario({ planInicial = "no-se" }: { planInicial?: IdPlan | "no-se" }) {
+  // En la pagina de un plan llega ya elegido.
+  const [plan, setPlan] = useState<IdPlan | "no-se">(planInicial);
   const [objetivo, setObjetivo] = useState<Objetivo>("demo");
+  // Controlados para que el hero pueda dejarlos cargados (EVENTO_NEGOCIO).
+  const [negocio, setNegocio] = useState("");
+  const [rubro, setRubro] = useState("");
 
   useEffect(() => {
     const alElegir = (e: Event) => setPlan((e as CustomEvent<IdPlan>).detail);
+    const alCargar = (e: Event) => {
+      const d = (e as CustomEvent<DatosNegocio>).detail;
+      if (d.negocio) setNegocio(d.negocio);
+      if (RUBROS.includes(d.rubro)) setRubro(d.rubro);
+    };
     window.addEventListener(EVENTO_PLAN, alElegir);
-    return () => window.removeEventListener(EVENTO_PLAN, alElegir);
+    window.addEventListener(EVENTO_NEGOCIO, alCargar);
+    return () => {
+      window.removeEventListener(EVENTO_PLAN, alElegir);
+      window.removeEventListener(EVENTO_NEGOCIO, alCargar);
+    };
   }, []);
 
   const enviar = (e: React.FormEvent<HTMLFormElement>) => {
@@ -113,11 +126,18 @@ export function Formulario() {
         </label>
         <label className="block text-sm text-text-muted">
           Nombre del negocio
-          <input name="negocio" required autoComplete="organization" className={campo} />
+          <input
+            name="negocio"
+            required
+            autoComplete="organization"
+            value={negocio}
+            onChange={(e) => setNegocio(e.target.value)}
+            className={campo}
+          />
         </label>
         <label className="block text-sm text-text-muted">
           Rubro
-          <select name="rubro" required defaultValue="" className={campo}>
+          <select name="rubro" required value={rubro} onChange={(e) => setRubro(e.target.value)} className={campo}>
             <option value="" disabled>
               Elegí uno
             </option>

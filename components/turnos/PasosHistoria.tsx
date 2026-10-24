@@ -87,7 +87,7 @@ export function PasosHistoria() {
   const actual = PASOS[paso];
 
   return (
-    <div className="mx-auto grid max-w-[980px] items-center gap-10 md:grid-cols-[minmax(0,330px)_minmax(0,1fr)] md:gap-16">
+    <div className="mx-auto grid max-w-[980px] items-center gap-6 md:grid-cols-[minmax(0,330px)_minmax(0,1fr)] md:gap-16">
       <div ref={caja} className="relative mx-auto w-full max-w-[330px]">
         <div className="relative overflow-hidden rounded-card border border-line bg-bg-elev shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
           <video
@@ -123,11 +123,41 @@ export function PasosHistoria() {
               </span>
             ))}
           </div>
+
+          {/* Mobile: como en una historia, tocar a la izquierda vuelve y a la
+              derecha avanza. Con movimiento reducido no estan: el video lleva
+              controles y la lista de pasos sigue a la vista. */}
+          {!quieto && (
+            <div className="absolute inset-0 top-8 flex md:hidden">
+              <button
+                type="button"
+                aria-label="Paso anterior"
+                onClick={() => elegir((paso + PASOS.length - 1) % PASOS.length)}
+                className="h-full w-1/3"
+              />
+              <button
+                type="button"
+                aria-label="Paso siguiente"
+                onClick={() => elegir((paso + 1) % PASOS.length)}
+                className="h-full w-2/3"
+              />
+            </div>
+          )}
         </div>
+
+        {/* Mobile: el texto del paso que se ve, como epigrafe. Las tres
+            tarjetas debajo del video lo empujaban fuera de pantalla. */}
+        {!quieto && (
+          <div aria-live="polite" className="mt-5 md:hidden">
+            <p className="text-xl text-text">{actual.titulo}</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-text-muted">{actual.texto}</p>
+            <p className="mt-3 text-sm text-azul">{actual.planes}</p>
+          </div>
+        )}
       </div>
 
       <div>
-        <ol className="flex flex-col gap-3">
+        <ol className={`${quieto ? "flex" : "hidden md:flex"} flex-col gap-3`}>
           {PASOS.map((p, i) => (
             <li key={p.video}>
               <button
@@ -153,7 +183,7 @@ export function PasosHistoria() {
           ))}
         </ol>
 
-        <p className="mt-6 text-sm leading-relaxed text-text-muted">
+        <p className={`${quieto ? "mt-6" : "md:mt-6"} text-sm leading-relaxed text-text-muted`}>
           Así es la demo personalizada que te mandamos, pero con tu marca, tus servicios y tus precios.{" "}
           <a
             href="/turnos/recorrido.mp4"

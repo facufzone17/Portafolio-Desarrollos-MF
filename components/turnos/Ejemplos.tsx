@@ -52,6 +52,7 @@ export function Ejemplos() {
   return (
     <Seccion
       id="ejemplos"
+      ancho="max-w-[1180px]"
       titulo="Cómo se usa en negocios como el tuyo"
       bajada="Un ejemplo por plan, para que te imagines el tuyo funcionando."
     >

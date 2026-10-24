@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { planes } from "@/lib/planes";
 import { proyectos } from "@/lib/proyectos";
 import { site } from "@/lib/site";
 
@@ -16,5 +17,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...paginasFijas, ...fichasProyectos];
+  const paginasPlanes: MetadataRoute.Sitemap = planes.map((p) => ({
+    url: `${site.url}/turnos/${p.id}`,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [...paginasFijas, ...paginasPlanes, ...fichasProyectos];
 }

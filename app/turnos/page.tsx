@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowDown, Check, ChevronDown } from "lucide-react";
+import { Check, Play } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/ui/Logo";
 import { Revelar } from "@/components/ui/Revelar";
@@ -11,9 +11,11 @@ import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { HeroTurnos } from "@/components/turnos/HeroTurnos";
 import { PasosHistoria } from "@/components/turnos/PasosHistoria";
-import { Telefono } from "@/components/turnos/Telefono";
+import { Destacado, Etiqueta, EtiquetaDescuento, PrecioLista } from "@/components/turnos/piezas";
+import { Preguntas } from "@/components/turnos/Preguntas";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
-import { DESCUENTO, MENSUAL, descuento, incluyeMensual, planes, pesos, type Plan } from "@/lib/planes";
+import { DESCUENTO, MENSUAL, incluyeMensual, planes, pesos } from "@/lib/planes";
+import { preguntasLanding } from "@/lib/preguntasTurnos";
 
 /*
   Landing de turnos (22/10/2026). Destino de la pauta de Meta: vende los tres
@@ -22,8 +24,9 @@ import { DESCUENTO, MENSUAL, descuento, incluyeMensual, planes, pesos, type Plan
 
   Mismo sistema que la home (negro neutro, un solo azul, radio 10, Inter Tight
   500) pero sin la entrada ni los links de la home: el que llega desde un
-  anuncio no tiene que esperar 3,6 s ni irse al portafolio. Cada plan se
-  muestra funcionando sobre un negocio de ejemplo (Estudio Nacar, del
+  anuncio no tiene que esperar 3,6 s ni irse al portafolio. Cada plan tiene
+  ademas su propia pagina con la demo (app/turnos/[plan]), y se muestra
+  funcionando sobre un negocio de ejemplo (Estudio Nacar, del
   generador de demos), nunca sobre la marca de un prospecto real.
 */
 
@@ -49,6 +52,7 @@ export default function Turnos() {
         <AntesDespues />
         <Seccion
           id="como-funciona"
+          ancho="max-w-[980px]"
           titulo="Así funciona, en tres pasos"
           bajada="Un centro de estética de ejemplo con el plan más completo: un cliente reserva desde la web, otro saca turno hablando con el bot, y los dos aparecen solos en la agenda del negocio."
         >
@@ -56,21 +60,11 @@ export default function Turnos() {
         </Seccion>
         <Ejemplos />
         <Planes />
-        <Seccion
-          id="demos"
-          titulo="Mirá cada plan funcionando"
-          bajada="Cada demo está armada sobre un centro de estética de ejemplo."
-        >
-          <div className="flex flex-col gap-24 sm:gap-32">
-            {planes.map((p, i) => (
-              <DetallePlan key={p.id} plan={p} invertido={i % 2 === 1} />
-            ))}
-          </div>
-        </Seccion>
         <Proceso />
-        <Preguntas />
+        <Preguntas id="preguntas" preguntas={preguntasLanding} />
         <Seccion
           id="formulario"
+          ancho="max-w-[760px]"
           titulo="Pedí tu demo personalizada"
           bajada="Contanos de tu negocio y te mandamos por WhatsApp un video de cómo quedaría con tu marca, tus servicios y tus precios. Gratis y sin compromiso."
         >
@@ -134,129 +128,16 @@ function Barra() {
   );
 }
 
-function Lista({ titulo, items }: { titulo: string; items: string[] }) {
-  return (
-    <div>
-      <p className="text-sm text-text-muted">{titulo}</p>
-      <ul className="mt-3 flex flex-col gap-2.5">
-        {items.map((t) => (
-          <li key={t} className="flex gap-3 text-[15px] leading-snug text-text sm:text-base">
-            <Check className="mt-0.5 size-4 shrink-0 text-azul" aria-hidden />
-            {t}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/**
- * Un plan funcionando: su demo, para quien es y lo que gana el dueño. Lo que
- * incluye ya esta en la tarjeta de precios, asi que aca no se repite.
- *
- * Los planes alternan de lado. Al invertir no alcanza con mover el celular:
- * tambien se invierten los anchos de las columnas, si no el celular cae en la
- * columna ancha y el texto queda apretado contra la izquierda.
- */
-function DetallePlan({ plan, invertido }: { plan: Plan; invertido: boolean }) {
-  // El ancla envuelve al plan entero y no solo al texto: en mobile el celular
-  // va arriba, y saltar al texto dejaba la demo fuera de pantalla.
-  return (
-    <div id={`plan-${plan.id}`} className="scroll-mt-24">
-      <Revelar
-        as="article"
-        className={`mx-auto grid max-w-[1100px] items-center gap-10 md:gap-16 lg:gap-24 ${
-          invertido
-            ? "md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
-            : "md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
-        }`}
-      >
-        <div className={`flex flex-col items-center ${invertido ? "md:order-2" : ""}`}>
-          <div className="relative w-full max-w-[300px] rounded-[22px] bg-[linear-gradient(160deg,rgba(0,153,255,0.16),rgba(0,153,255,0)_60%)] px-6 pt-8 sm:max-w-[340px]">
-            <Telefono video={plan.video} poster={plan.poster} etiqueta={`Demo del plan ${plan.nombre}`} />
-          </div>
-          <p className="mt-4 text-sm text-text-muted">Demo con un negocio de ejemplo</p>
-        </div>
-
-        <div>
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-            <h3 className="text-[clamp(2rem,4vw,3rem)] text-text">{plan.nombre}</h3>
-            {plan.destacado && <Destacado texto={plan.destacado} />}
-          </div>
-          <p className="mt-3 text-lg leading-snug text-text sm:text-xl">{plan.resumen}</p>
-          <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
-            {plan.paraQuien}
-          </p>
-
-          <div className="mt-8">
-            <Lista titulo="Lo que ganás vos" items={plan.vos} />
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-line pt-8">
-            <div>
-              <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                <PrecioLista plan={plan} className="text-lg" />
-                <span className="font-display text-3xl font-medium tracking-[-0.04em] text-text">
-                  {pesos(plan.precio)}
-                </span>
-                <EtiquetaDescuento plan={plan} />
-              </p>
-              <p className="mt-1.5 text-sm text-text-muted">
-                Precio de lanzamiento · pago único + {pesos(MENSUAL)}/mes
-              </p>
-            </div>
-            <IrA
-              id="formulario"
-              plan={plan.id}
-              data-boton="claro"
-              data-analytics={`turnos-plan-${plan.id}`}
-              className="group"
-            >
-              <TextoDeslizante>{`Quiero ${plan.nombre}`}</TextoDeslizante>
-            </IrA>
-          </div>
-        </div>
-      </Revelar>
-    </div>
-  );
-}
-
-function Destacado({ texto }: { texto: string }) {
-  return (
-    <span className="whitespace-nowrap rounded-card bg-azul px-2.5 py-1 text-sm font-medium text-[#04121f]">
-      {texto}
-    </span>
-  );
-}
-
-/**
- * Precio de lista tachado. El `<s>` solo no lo anuncia ningun lector de
- * pantalla, asi que lleva el rotulo escondido.
- */
-function PrecioLista({ plan, className = "" }: { plan: Plan; className?: string }) {
-  return (
-    <span className={`text-text-muted ${className}`}>
-      <span className="sr-only">Precio de lista: </span>
-      <s>{pesos(plan.precioLista)}</s>
-      <span className="sr-only">. Precio de lanzamiento:</span>
-    </span>
-  );
-}
-
-function EtiquetaDescuento({ plan }: { plan: Plan }) {
-  return (
-    <span className="self-center whitespace-nowrap rounded-card border border-azul/50 px-2 py-0.5 text-sm text-azul">
-      −{descuento(plan)}%
-    </span>
-  );
-}
-
 /**
  * Las tres tarjetas de precio: para que es cada plan, el precio con su
- * descuento, lo que incluye y el boton. La primera version era una tira con
+ * descuento, lo que incluye y dos botones del mismo tamaño: "Quiero" y "Ver
+ * la demo", que lleva a la pagina del plan (/turnos/[plan]). Para el que
+ * recien llega, ver la demo es el paso mas facil y no se esconde. La primera version era una tira con
  * nombre y precio, y no le daba a nadie un motivo para elegir.
  *
- * El destacado es el del medio ("Recomendado"): el caro hace de ancla y el
+ * El destacado es el del medio ("Recomendado", en azul y con sombra); el
+ * tercero lleva "El mas completo" en verde y con un resalte mas suave, para
+ * venderlo sin pisarle el lugar al del medio. El caro hace de ancla y el
  * medio queda como la eleccion razonable. No dice "el mas elegido" porque
  * todavia no hay clientes que lo respalden.
  */
@@ -264,6 +145,7 @@ function Planes() {
   return (
     <Seccion
       id="planes"
+      ancho="max-w-[1180px]"
       titulo="Tres planes, precio a la vista"
       bajada="Cada uno suma sobre el anterior. Pagás el 30% para arrancar y el 70% cuando te lo entregamos funcionando."
     >
@@ -281,12 +163,15 @@ function Planes() {
             className={`flex flex-col rounded-card border p-6 sm:p-8 ${
               p.destacado
                 ? "border-azul bg-azul/[0.07] shadow-[0_30px_80px_rgba(0,153,255,0.12)]"
-                : "border-line bg-bg-elev"
+                : p.etiqueta
+                  ? "border-verde/55 bg-verde/[0.04]"
+                  : "border-line bg-bg-elev"
             }`}
           >
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
               <h3 className="text-2xl text-text">{p.nombre}</h3>
               {p.destacado && <Destacado texto={p.destacado} />}
+              {p.etiqueta && <Etiqueta texto={p.etiqueta} />}
             </div>
             <p className="mt-2 text-[15px] leading-snug text-text-muted lg:min-h-[3em]">{p.resumen}</p>
 
@@ -310,22 +195,26 @@ function Planes() {
               ))}
             </ul>
 
-            <IrA
-              id="formulario"
-              plan={p.id}
-              data-boton={p.destacado ? "claro" : "linea"}
-              data-analytics={`turnos-precio-${p.id}`}
-              className="group mt-8 min-h-[52px] w-full text-base"
-            >
-              <TextoDeslizante>{`Quiero ${p.nombre}`}</TextoDeslizante>
-            </IrA>
-            <IrA
-              id={`plan-${p.id}`}
-              className="mt-3 inline-flex items-center justify-center gap-1.5 self-center rounded-card px-3 py-2 text-sm text-text-muted transition-colors hover:text-text"
-            >
-              Ver la demo
-              <ArrowDown className="size-3.5" aria-hidden />
-            </IrA>
+            <div className="mt-8 flex flex-col gap-2.5">
+              <IrA
+                id="formulario"
+                plan={p.id}
+                data-boton="claro"
+                data-analytics={`turnos-precio-${p.id}`}
+                className="group min-h-[52px] w-full text-base"
+              >
+                <TextoDeslizante>{`Quiero ${p.nombre}`}</TextoDeslizante>
+              </IrA>
+              <Link
+                href={`/turnos/${p.id}`}
+                data-boton="linea"
+                data-analytics={`turnos-demo-${p.id}`}
+                className="group min-h-[52px] w-full text-base"
+              >
+                <Play className="size-4 shrink-0" aria-hidden />
+                <TextoDeslizante>Ver la demo</TextoDeslizante>
+              </Link>
+            </div>
           </Revelar>
         ))}
       </div>
@@ -376,7 +265,7 @@ const PASOS = [
 
 function Proceso() {
   return (
-    <Seccion titulo="Cómo arrancamos" bajada="Sin reuniones eternas ni nada que instalar.">
+    <Seccion ancho="max-w-[1180px]" titulo="Cómo arrancamos" bajada="Sin reuniones eternas ni nada que instalar.">
       <ol className="mx-auto mt-14 grid max-w-[1180px] gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
         {PASOS.map((p, i) => (
           <Revelar as="li" key={p.titulo} demora={i * 90} className="bg-bg p-6 sm:p-8">
@@ -385,82 +274,6 @@ function Proceso() {
           </Revelar>
         ))}
       </ol>
-    </Seccion>
-  );
-}
-
-const PREGUNTAS = [
-  {
-    p: "¿Me sirve para mi rubro?",
-    r: "Si trabajás con turnos, sí: peluquerías y barberías, uñas y pestañas, estética, masajes, consultorios, entrenadores, canchas. Los servicios, las duraciones y los horarios se arman a la medida de tu negocio.",
-  },
-  {
-    p: "¿Mis clientes tienen que bajarse una app?",
-    r: "No. Reservan desde un link que se abre en el navegador del celular: eligen servicio, día y horario, y dejan su nombre y celular. No instalan nada ni se crean una cuenta.",
-  },
-  {
-    p: "Ya uso otra app de turnos, ¿me conviene cambiar?",
-    r: "Si la que tenés te resuelve, capaz que no. Lo que cambia con Trevoo es que la página de reservas tiene tu marca y no la de una app, la armamos nosotros con tus servicios y horarios, y sobre la misma agenda podés sumar tu web y el bot de WhatsApp.",
-  },
-  {
-    p: "¿En cuánto tiempo está listo?",
-    r: "Depende del plan y de que tengamos tus servicios, precios y fotos. Antes de arrancar te damos una fecha de entrega concreta.",
-  },
-  {
-    p: "¿Qué es la demo personalizada?",
-    r: "Nos contás de tu negocio y te mandamos por WhatsApp un video de cómo quedaría el sistema con tu marca, tus servicios y tus precios. Es gratis y no te compromete a nada.",
-  },
-  {
-    p: "¿Cómo pago?",
-    r: "En dos partes: una seña del 30% para arrancar y el 70% restante cuando te entregamos el proyecto terminado. Podés pagar por el medio que te quede más cómodo.",
-  },
-  {
-    p: "¿Qué incluye el mensual?",
-    r: `${pesos(MENSUAL)} por mes, igual en los tres planes: hosting y dominio, mantenimiento y actualizaciones, y rondas de cambios para tus servicios, precios, textos y fotos.`,
-  },
-  {
-    p: "¿Qué pasa si dejo de pagar el mensual?",
-    r: "La web y el sistema de turnos se dan de baja, porque el mensual es lo que los mantiene andando. El dominio sigue siendo tuyo.",
-  },
-  {
-    p: "¿Puedo empezar con un plan y pasarme a otro después?",
-    r: "Sí. Pagás la diferencia entre los dos planes y sumamos lo que falta sobre lo que ya tenés.",
-  },
-  {
-    p: "¿Puedo cambiar servicios, precios u horarios después?",
-    r: "Sí. Los horarios en los que no atendés los bloqueás vos desde el panel. Los cambios de servicios, precios, textos y fotos entran en el mensual: nos los pedís y los cargamos.",
-  },
-  {
-    p: "¿Qué pasa si un cliente cancela?",
-    r: "Cancela o reprograma solo, sin escribirte. El horario vuelve a quedar libre para otro cliente y vos lo ves en el panel.",
-  },
-  {
-    p: "¿Tengo que saber de tecnología?",
-    r: "No. Lo dejamos funcionando y te mostramos cómo usar el panel. Si sabés usar WhatsApp, sabés usar esto.",
-  },
-  {
-    p: "¿El bot contesta desde mi WhatsApp?",
-    r: "Funciona con la API oficial de WhatsApp Business. Antes de arrancar vemos juntos con qué número conviene hacerlo. Cuando una consulta necesita a una persona, el bot te pasa la conversación.",
-  },
-];
-
-function Preguntas() {
-  return (
-    <Seccion id="preguntas" titulo="Preguntas frecuentes">
-      <div className="mx-auto mt-12 max-w-[820px] divide-y divide-line border-y border-line">
-        {PREGUNTAS.map((q) => (
-          <details key={q.p} className="group">
-            <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-5 text-lg text-text [&::-webkit-details-marker]:hidden">
-              {q.p}
-              <ChevronDown
-                className="size-5 shrink-0 text-text-muted transition-transform duration-[var(--duration-micro)] group-open:rotate-180"
-                aria-hidden
-              />
-            </summary>
-            <p className="max-w-[64ch] pb-6 text-[15px] leading-relaxed text-text-muted sm:text-base">{q.r}</p>
-          </details>
-        ))}
-      </div>
     </Seccion>
   );
 }

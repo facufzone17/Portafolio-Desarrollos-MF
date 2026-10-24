@@ -49,6 +49,11 @@
    */
   --color-azul: #0099ff;
   --color-azul-hondo: #0b4da8;
+  /**
+   * Verde: solo para la etiqueta "El mas completo" de /turnos, que tiene
+   * que distinguirse del azul del plan recomendado sin competirle.
+   */
+  --color-verde: #2fd480;
 
   /* --- Tipografia ---
    * Inter Tight para lo que se mira, Inter para lo que se lee. La referencia
@@ -850,27 +855,4 @@ html:not(.js) [data-ola] [data-ola-letra] {
   opacity: 1;
   transform: none;
   pointer-events: auto;
-}
-
-/* =====================================================================
- * Agenda viva del hero de /turnos (components/turnos/AgendaViva.tsx)
- *
- * Cada turno entra con el mismo gesto corto que las apariciones del sitio,
- * con su propio retardo en --turno-retardo. Con movimiento reducido la regla
- * global deja la animacion en 0,01 ms y la agenda aparece ya llena.
- * ===================================================================== */
-@keyframes turno-entra {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 8px, 0) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-[data-turno] {
-  animation: turno-entra 620ms var(--ease-out-soft) both;
-  animation-delay: var(--turno-retardo, 0ms);
 }

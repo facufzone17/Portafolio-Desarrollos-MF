@@ -34,6 +34,7 @@ const RESERVA = [
 export function AntesDespues() {
   return (
     <Seccion
+      ancho="max-w-[1000px]"
       titulo="Un turno, de dos maneras"
       bajada="Así se coordina hoy por mensaje, y así lo reserva tu cliente con un link."
     >

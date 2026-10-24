@@ -33,7 +33,10 @@ export type Plan = {
   /** Clip vertical de la demo (public/turnos). */
   video: string;
   poster: string;
+  /** Resalta la tarjeta y lleva esta etiqueta llena. Uno solo: el del medio. */
   destacado?: string;
+  /** Etiqueta verde y resalte suave de la tarjeta: distingue sin competir con el destacado. */
+  etiqueta?: string;
 };
 
 export const MENSUAL = 38600;
@@ -109,6 +112,7 @@ export const planes: Plan[] = [
     ],
     video: "/turnos/piloto.mp4",
     poster: "/turnos/piloto.webp",
+    etiqueta: "El más completo",
   },
 ];
 
@@ -127,4 +131,9 @@ export const DESCUENTO = Math.min(...planes.map(descuento));
 /** $275.000, con punto de miles como se escribe aca. */
 export function pesos(n: number): string {
   return `$${n.toLocaleString("es-AR")}`;
+}
+
+/** El plan de una pagina /turnos/[plan], o undefined si el id no existe. */
+export function planPorId(id: string): Plan | undefined {
+  return planes.find((p) => p.id === id);
 }

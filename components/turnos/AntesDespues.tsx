@@ -90,7 +90,7 @@ export function AntesDespues() {
             <div className="rounded-[12px] bg-text px-4 py-3 text-bg">
               <p className="text-[15px] font-medium">Turno confirmado ✓</p>
               <p className="mt-0.5 text-sm opacity-70">
-                Le llega la confirmación por WhatsApp y a vos te aparece en la agenda.
+                Le llega la confirmación y a vos te aparece en la agenda.
               </p>
             </div>
           </div>

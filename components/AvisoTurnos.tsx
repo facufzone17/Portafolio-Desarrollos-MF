@@ -101,7 +101,7 @@ export function AvisoTurnos() {
               ¿Tenés un negocio que trabaja con turnos?
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
-              Mirá cómo tus clientes pueden sacar turno solos, a cualquier hora.
+              Mirá cómo tus clientes pueden sacar turno solos, sin escribirte.
             </p>
           </div>
         </div>

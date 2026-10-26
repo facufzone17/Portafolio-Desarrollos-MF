@@ -49,11 +49,6 @@
    */
   --color-azul: #0099ff;
   --color-azul-hondo: #0b4da8;
-  /**
-   * Verde: solo para la etiqueta "El mas completo" de /turnos, que tiene
-   * que distinguirse del azul del plan recomendado sin competirle.
-   */
-  --color-verde: #2fd480;
 
   /* --- Tipografia ---
    * Inter Tight para lo que se mira, Inter para lo que se lee. La referencia

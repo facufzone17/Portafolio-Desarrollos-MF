@@ -11,8 +11,8 @@ import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { Preguntas } from "@/components/turnos/Preguntas";
 import { Telefono } from "@/components/turnos/Telefono";
-import { Destacado, Etiqueta, EtiquetaDescuento, Lista, PrecioLista } from "@/components/turnos/piezas";
-import { MENSUAL, planPorId, planes, pesos, type Plan } from "@/lib/planes";
+import { Destacado, Lista, Precio } from "@/components/turnos/piezas";
+import { planPorId, planes, pesos, type Plan } from "@/lib/planes";
 import { preguntasPorPlan } from "@/lib/preguntasTurnos";
 
 /*
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps<"/turnos/[plan]">):
   if (!plan) return {};
 
   const titulo = `Plan ${plan.nombre}: ${plan.resumen}`;
-  const descripcion = `${plan.paraQuien} Desde ${pesos(plan.precio)}, precio de lanzamiento. Mirá la demo y pedí la tuya gratis.`;
+  const descripcion = `${plan.paraQuien} ${pesos(plan.mensual)} por mes. Mirá la demo y pedí la tuya gratis.`;
   return {
     title: `Plan ${plan.nombre} | Trevoo`,
     description: descripcion,
@@ -94,7 +94,6 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <h1 className="text-[clamp(2.5rem,6vw,4.25rem)] text-text">{plan.nombre}</h1>
                 {plan.destacado && <Destacado texto={plan.destacado} />}
-                {plan.etiqueta && <Etiqueta texto={plan.etiqueta} />}
               </div>
               <p className="mt-4 text-xl leading-snug text-text">{plan.resumen}</p>
               <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-text-muted sm:text-base">
@@ -111,7 +110,7 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
             <Lista titulo="Lo que ganás vos" items={plan.vos} />
           </Revelar>
           <p className="mx-auto mt-6 max-w-[64ch] text-center text-sm leading-relaxed text-text-muted">
-            Mantenimiento: {pesos(MENSUAL)} por mes, con hosting, dominio, actualizaciones y cambios de
+            El mensual ({pesos(plan.mensual)}) incluye hosting, dominio, actualizaciones y cambios de
             servicios, precios, textos y fotos.
             {plan.id === "piloto" &&
               " Los mensajes de WhatsApp que cobra Meta van aparte y a nombre de tu negocio."}
@@ -120,7 +119,7 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
 
         <Preguntas titulo={`Preguntas sobre ${plan.nombre}`} preguntas={preguntasPorPlan[plan.id]} />
 
-        <Seccion ancho="max-w-[900px]" titulo="¿Otro plan?" bajada="Los tres planes suman uno sobre otro. Si arrancás con uno, después podés pasarte pagando la diferencia.">
+        <Seccion ancho="max-w-[900px]" titulo="¿Otro plan?" bajada="Los tres planes suman uno sobre otro. Si arrancás con uno, después podés pasarte: de Vidriera a Piloto solo cambia el mensual.">
           <div className="mx-auto grid max-w-[900px] gap-4 sm:grid-cols-2">
             {otros.map((p, i) => (
               <Revelar key={p.id} demora={i * 90}>
@@ -136,11 +135,11 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
                     />
                   </span>
                   <span className="mt-2 text-[15px] leading-snug text-text-muted">{p.resumen}</span>
-                  <span className="mt-5 flex items-baseline gap-2.5">
-                    <PrecioLista plan={p} className="text-sm" />
+                  <span className="mt-5 flex items-baseline gap-1.5">
                     <span className="font-display text-2xl font-medium tracking-[-0.03em] text-text">
-                      {pesos(p.precio)}
+                      {pesos(p.mensual)}
                     </span>
+                    <span className="text-sm text-text-muted">/mes</span>
                   </span>
                 </Link>
               </Revelar>
@@ -194,13 +193,7 @@ function BarraPlan() {
 function PrecioYBoton({ plan, className = "" }: { plan: Plan; className?: string }) {
   return (
     <div className={`border-t border-line pt-8 ${className}`}>
-      <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-        <PrecioLista plan={plan} className="text-lg" />
-        <span className="font-display text-4xl font-medium tracking-[-0.04em] text-text">{pesos(plan.precio)}</span>
-        <EtiquetaDescuento plan={plan} />
-      </p>
-      <p className="mt-2 text-sm text-text-muted">Precio de lanzamiento · pago único + {pesos(MENSUAL)}/mes</p>
-      <p className="mt-1 text-sm text-text-muted">30% para arrancar, 70% cuando está terminado</p>
+      <Precio plan={plan} />
       <IrA
         id="formulario"
         plan={plan.id}

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { LOGOTIPO, LOGOTIPO_D } from "@/lib/marca";
-import { planes, pesos } from "@/lib/planes";
+import { DESDE, pesos } from "@/lib/planes";
 
 export const alt = "Trevoo: turnos online, web y bot de WhatsApp para tu negocio";
 export const size = { width: 1200, height: 630 };
@@ -94,7 +94,7 @@ export default async function Image() {
             <div>Turnos online, web</div>
             <div>y bot de WhatsApp</div>
             <div style={{ marginTop: 18, color: "#f4f4f5" }}>
-              {`Desde ${pesos(planes[0].precio)}`}
+              {`Desde ${pesos(DESDE)} por mes`}
             </div>
           </div>
         </div>

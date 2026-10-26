@@ -1,4 +1,6 @@
-import { MENSUAL, pesos, type IdPlan } from "@/lib/planes";
+import { ADICIONAL_WHATSAPP, planes, pesos, type IdPlan } from "@/lib/planes";
+
+const [agenda, vidriera, piloto] = planes;
 
 /**
  * Preguntas frecuentes de /turnos y de la pagina de cada plan. Cada pregunta
@@ -6,7 +8,8 @@ import { MENSUAL, pesos, type IdPlan } from "@/lib/planes";
  * respuesta (el mensual, la seña) no queda distinta en dos lugares.
  *
  * Las condiciones comerciales (seña 30/70, que pasa sin el mensual, cambio
- * de plan) son las que confirmo Facundo el 23/10/2026.
+ * de plan) son las que confirmo Facundo el 23/10/2026; los precios y la
+ * permanencia de Agenda, los que aprobaron los dos socios el 24/10/2026.
  */
 
 export type Pregunta = { p: string; r: string };
@@ -34,11 +37,19 @@ const P = {
   },
   pago: {
     p: "¿Cómo pago?",
-    r: "En dos partes: una seña del 30% para arrancar y el 70% restante cuando te entregamos el proyecto terminado. Podés pagar por el medio que te quede más cómodo.",
+    r: "En Vidriera y Piloto, el armado se paga en dos partes: una seña del 30% para arrancar y el 70% restante cuando te entregamos todo terminado. Agenda no tiene armado: pagás el primer mes por adelantado. Después, cada mes, el mensual de tu plan.",
   },
   mensual: {
     p: "¿Qué incluye el mensual?",
-    r: `${pesos(MENSUAL)} por mes, igual en los tres planes: hosting y dominio, mantenimiento y actualizaciones, y rondas de cambios para tus servicios, precios, textos y fotos.`,
+    r: `${pesos(agenda.mensual)} en Agenda, ${pesos(vidriera.mensual)} en Vidriera y ${pesos(piloto.mensual)} en Piloto automático. Incluye hosting y dominio, mantenimiento y actualizaciones, y rondas de cambios para tus servicios, precios, textos y fotos.`,
+  },
+  permanencia: {
+    p: "¿Hay permanencia mínima?",
+    r: "Sólo en Agenda: 12 meses, porque el armado va incluido y no se cobra aparte. Vidriera y Piloto no tienen permanencia: el armado se paga una vez y el mensual, mientras lo uses.",
+  },
+  confirmacion: {
+    p: "¿Mis clientes reciben confirmación y recordatorio?",
+    r: `Sí. En Agenda y Vidriera les llegan por mail. En Piloto automático, por WhatsApp, y el cliente confirma el turno respondiendo 1. Si querés recordatorios por WhatsApp sin el bot, en Agenda y Vidriera se suman por ${pesos(ADICIONAL_WHATSAPP.precio)} más por mes, hasta ${ADICIONAL_WHATSAPP.recordatorios} recordatorios.`,
   },
   sinMensual: {
     p: "¿Qué pasa si dejo de pagar el mensual?",
@@ -46,7 +57,7 @@ const P = {
   },
   cambioPlan: {
     p: "¿Puedo empezar con un plan y pasarme a otro después?",
-    r: "Sí. Pagás la diferencia entre los dos planes y sumamos lo que falta sobre lo que ya tenés.",
+    r: "Sí, y sumamos lo que falta sobre lo que ya tenés. De Agenda a Vidriera o Piloto pagás el armado y pasás al mensual del plan nuevo. De Vidriera a Piloto no hay armado nuevo: sólo cambia el mensual.",
   },
   cambios: {
     p: "¿Puedo cambiar servicios, precios u horarios después?",
@@ -87,7 +98,7 @@ const P = {
   },
   costoMensajes: {
     p: "¿Los mensajes de WhatsApp tienen costo?",
-    r: "Sí, los cobra Meta aparte y a nombre de tu negocio, porque el bot usa la API oficial de WhatsApp Business. Antes de arrancar te explicamos cómo se cobran.",
+    r: "Sí. Los cobra Meta aparte, por mensaje y a nombre de tu negocio, porque el bot usa la API oficial de WhatsApp Business. No están incluidos en el mensual. Antes de arrancar te explicamos cómo se cobran y cuánto suele salir según tus turnos.",
   },
 } satisfies Record<string, Pregunta>;
 
@@ -99,16 +110,19 @@ export const preguntasLanding: Pregunta[] = [
   P.demo,
   P.pago,
   P.mensual,
+  P.permanencia,
+  P.confirmacion,
   P.sinMensual,
   P.cambioPlan,
   P.cambios,
   P.cancela,
   P.tecnologia,
   P.botNumero,
+  P.costoMensajes,
 ];
 
 export const preguntasPorPlan: Record<IdPlan, Pregunta[]> = {
-  agenda: [P.link, P.profesional, P.app, P.cancela, P.tiempo, P.pago, P.mensual, P.cambioPlan],
-  vidriera: [P.queVaEnLaWeb, P.dominio, P.cambios, P.app, P.tiempo, P.pago, P.mensual, P.cambioPlan],
+  agenda: [P.link, P.profesional, P.permanencia, P.confirmacion, P.app, P.cancela, P.pago, P.mensual, P.cambioPlan],
+  vidriera: [P.queVaEnLaWeb, P.dominio, P.confirmacion, P.cambios, P.app, P.tiempo, P.pago, P.mensual, P.cambioPlan],
   piloto: [P.queContesta, P.botNumero, P.costoMensajes, P.cancela, P.tiempo, P.pago, P.mensual, P.sinMensual],
 };

@@ -31,26 +31,41 @@ export function Destacado({ texto }: { texto: string }) {
 }
 
 /**
- * La etiqueta del tercer plan (`plan.etiqueta`): llena como Destacado pero en
- * verde, para que lo distinga y lo venda sin pisarse con el azul del medio.
+ * El precio de un plan: el mensual grande (es lo que el cliente compara con
+ * las apps de turnos) y debajo el armado, con el de lista tachado y el
+ * descuento de lanzamiento. Agenda no tiene armado: muestra su condicion.
  */
-export function Etiqueta({ texto }: { texto: string }) {
+export function Precio({ plan, className = "" }: { plan: Plan; className?: string }) {
   return (
-    <span className="whitespace-nowrap rounded-card bg-verde px-2.5 py-1 text-sm font-medium text-[#04170c]">
-      {texto}
-    </span>
+    <div className={className}>
+      <p className="flex items-baseline gap-1.5">
+        <span className="font-display text-4xl font-medium leading-none tracking-[-0.04em] text-text">
+          {pesos(plan.mensual)}
+        </span>
+        <span className="text-text-muted">/mes</span>
+      </p>
+      {plan.armado > 0 && (
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-text-muted">
+          Armado:
+          <ArmadoLista plan={plan} />
+          <span className="text-text">{pesos(plan.armado)}</span>
+          <EtiquetaDescuento plan={plan} />
+        </p>
+      )}
+      <p className="mt-2 text-sm text-text-muted">{plan.condicion}</p>
+    </div>
   );
 }
 
 /**
- * Precio de lista tachado. El `<s>` solo no lo anuncia ningun lector de
+ * Armado de lista tachado. El `<s>` solo no lo anuncia ningun lector de
  * pantalla, asi que lleva el rotulo escondido.
  */
-export function PrecioLista({ plan, className = "" }: { plan: Plan; className?: string }) {
+export function ArmadoLista({ plan, className = "" }: { plan: Plan; className?: string }) {
   return (
     <span className={`text-text-muted ${className}`}>
       <span className="sr-only">Precio de lista: </span>
-      <s>{pesos(plan.precioLista)}</s>
+      <s>{pesos(plan.armadoLista)}</s>
       <span className="sr-only">. Precio de lanzamiento:</span>
     </span>
   );

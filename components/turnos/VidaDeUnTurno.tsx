@@ -57,7 +57,7 @@ const MOMENTOS: Momento[] = [
     hora: "Al instante",
     rotulo: "Les llega a los dos",
     titulo: "A ella la confirmación, a vos el turno",
-    texto: "Le llega la confirmación por WhatsApp, y en tu panel aparece el turno nuevo sin que nadie te escriba.",
+    texto: "Le llega la confirmación (por mail, o por WhatsApp en Piloto automático), y en tu panel aparece el turno nuevo sin que nadie te escriba.",
     vos: "Lo ves cuando quieras: ya está en tu agenda.",
     Pantalla: PantallaConfirmacion,
   },

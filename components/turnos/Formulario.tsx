@@ -81,7 +81,7 @@ export function Formulario({ planInicial = "no-se" }: { planInicial?: IdPlan | "
       `• Negocio: ${texto("negocio")} (${texto("rubro")})`,
       ...(texto("redes") ? [`• Instagram o web: ${texto("redes")}`] : []),
       `• Hoy tomo turnos: ${texto("como")}`,
-      `• Plan: ${elegido ? `${elegido.nombre} (${pesos(elegido.precio)})` : "todavía no sé"}`,
+      `• Plan: ${elegido ? `${elegido.nombre} (${pesos(elegido.mensual)}/mes)` : "todavía no sé"}`,
     ];
 
     registrarLead({ content_name: elegido?.id ?? "no-se", objetivo });
@@ -166,7 +166,7 @@ export function Formulario({ planInicial = "no-se" }: { planInicial?: IdPlan | "
       <fieldset className="mt-6">
         <legend className="text-sm text-text-muted">¿Qué plan te interesa?</legend>
         <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {[...planes.map((p) => ({ id: p.id, nombre: p.nombre, precio: pesos(p.precio) })), { id: "no-se" as const, nombre: "Todavía no sé", precio: "Te ayudamos" }].map(
+          {[...planes.map((p) => ({ id: p.id, nombre: p.nombre, precio: `${pesos(p.mensual)}/mes` })), { id: "no-se" as const, nombre: "Todavía no sé", precio: "Te ayudamos" }].map(
             (p) => (
               <label
                 key={p.id}

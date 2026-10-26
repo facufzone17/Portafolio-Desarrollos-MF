@@ -11,10 +11,10 @@ import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { HeroTurnos } from "@/components/turnos/HeroTurnos";
 import { VidaDeUnTurno } from "@/components/turnos/VidaDeUnTurno";
-import { Destacado, Etiqueta, EtiquetaDescuento, PrecioLista } from "@/components/turnos/piezas";
+import { Destacado, Precio } from "@/components/turnos/piezas";
 import { Preguntas } from "@/components/turnos/Preguntas";
 import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
-import { DESCUENTO, MENSUAL, incluyeMensual, planes, pesos } from "@/lib/planes";
+import { ADICIONAL_WHATSAPP, DESCUENTO, DESDE, PROFESIONALES, incluyeMensual, planes, pesos } from "@/lib/planes";
 import { preguntasLanding } from "@/lib/preguntasTurnos";
 
 /*
@@ -32,9 +32,9 @@ import { preguntasLanding } from "@/lib/preguntasTurnos";
 
 const titulo = "Turnos online, web y bot de WhatsApp para tu negocio";
 const descripcion =
-  "Tus clientes sacan turno solos, a cualquier hora. Tres planes con precio a la vista, desde " +
-  pesos(planes[0].precio) +
-  ". Pedí tu demo personalizada gratis.";
+  "Un bot que contesta tu WhatsApp y agenda por vos, tu web y tus reservas online. Tres planes desde " +
+  pesos(DESDE) +
+  " por mes. Pedí tu demo personalizada gratis.";
 
 export const metadata: Metadata = {
   title: `${titulo} | Trevoo`,
@@ -129,17 +129,14 @@ function Barra() {
 }
 
 /**
- * Las tres tarjetas de precio: para que es cada plan, el precio con su
- * descuento, lo que incluye y dos botones del mismo tamaño: "Quiero" y "Ver
- * la demo", que lleva a la pagina del plan (/turnos/[plan]). Para el que
- * recien llega, ver la demo es el paso mas facil y no se esconde. La primera version era una tira con
- * nombre y precio, y no le daba a nadie un motivo para elegir.
+ * Las tres tarjetas de precio: para que es cada plan, el mensual con el
+ * armado debajo, lo que incluye y dos botones del mismo tamaño: "Quiero" y
+ * "Ver la demo", que lleva a la pagina del plan (/turnos/[plan]). Para el
+ * que recien llega, ver la demo es el paso mas facil y no se esconde.
  *
- * El destacado es el del medio ("Recomendado", en azul y con sombra); el
- * tercero lleva "El mas completo" en verde y con un resalte mas suave, para
- * venderlo sin pisarle el lugar al del medio. El caro hace de ancla y el
- * medio queda como la eleccion razonable. No dice "el mas elegido" porque
- * todavia no hay clientes que lo respalden.
+ * El destacado es Piloto ("Recomendado"): el bot es lo unico que no tienen
+ * las apps de turnos de $12.000, asi que es el plan que se vende. No dice
+ * "el mas elegido" porque todavia no hay clientes que lo respalden.
  */
 function Planes() {
   return (
@@ -147,11 +144,12 @@ function Planes() {
       id="planes"
       ancho="max-w-[1180px]"
       titulo="Tres planes, precio a la vista"
-      bajada="Cada uno suma sobre el anterior. Pagás el 30% para arrancar y el 70% cuando te lo entregamos funcionando."
+      bajada={`Cada uno suma sobre el anterior. Vidriera y Piloto tienen el mismo armado: Piloto suma el bot por ${pesos(planes[2].mensual - planes[1].mensual)} más por mes. Los tres incluyen ${PROFESIONALES.toLowerCase()}.`}
     >
       <Revelar>
         <p className="mb-6 text-center text-[15px] text-text">
-          Precio de lanzamiento: <span className="text-azul">{DESCUENTO}% de descuento</span> en los tres planes
+          Precio de lanzamiento para los primeros negocios:{" "}
+          <span className="text-azul">{DESCUENTO}% menos en el armado</span> y el primer mes gratis en Agenda
         </p>
       </Revelar>
 
@@ -163,28 +161,16 @@ function Planes() {
             className={`flex flex-col rounded-card border p-6 sm:p-8 ${
               p.destacado
                 ? "border-azul bg-azul/[0.07] shadow-[0_30px_80px_rgba(0,153,255,0.12)]"
-                : p.etiqueta
-                  ? "border-verde/55 bg-verde/[0.04]"
-                  : "border-line bg-bg-elev"
+                : "border-line bg-bg-elev"
             }`}
           >
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
               <h3 className="text-2xl text-text">{p.nombre}</h3>
               {p.destacado && <Destacado texto={p.destacado} />}
-              {p.etiqueta && <Etiqueta texto={p.etiqueta} />}
             </div>
             <p className="mt-2 text-[15px] leading-snug text-text-muted lg:min-h-[3em]">{p.resumen}</p>
 
-            <div className="mt-6">
-              <p className="flex items-center gap-2.5">
-                <PrecioLista plan={p} />
-                <EtiquetaDescuento plan={p} />
-              </p>
-              <p className="mt-1 font-display text-4xl font-medium leading-none tracking-[-0.04em] text-text">
-                {pesos(p.precio)}
-              </p>
-              <p className="mt-2.5 text-sm text-text-muted">pago único + {pesos(MENSUAL)}/mes</p>
-            </div>
+            <Precio plan={p} className="mt-6" />
 
             <ul className="mt-6 flex flex-1 flex-col gap-3 border-t border-line pt-6">
               {p.incluye.map((t) => (
@@ -221,9 +207,7 @@ function Planes() {
 
       <Revelar className="mx-auto mt-4 flex max-w-[1180px] flex-col gap-5 rounded-card border border-line bg-bg-elev p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-lg text-text">
-            Mantenimiento: {pesos(MENSUAL)} por mes, igual en los tres planes
-          </p>
+          <p className="text-lg text-text">El mensual de cada plan incluye</p>
           <p className="mt-1 text-sm text-text-muted">Para que todo siga andando sin que tengas que ocuparte.</p>
         </div>
         <ul className="flex flex-col gap-2 md:items-end md:text-right">
@@ -237,8 +221,10 @@ function Planes() {
       </Revelar>
 
       <p className="mx-auto mt-6 max-w-[70ch] text-center text-sm leading-relaxed text-text-muted">
-        El bot de Piloto automático funciona con la API oficial de WhatsApp Business.
-        Los mensajes que cobra Meta van aparte y a nombre de tu negocio.
+        ¿Querés recordatorios por WhatsApp sin el bot? Para Agenda y Vidriera:{" "}
+        +{pesos(ADICIONAL_WHATSAPP.precio)}/mes hasta {ADICIONAL_WHATSAPP.recordatorios} recordatorios. El bot de
+        Piloto funciona con la API oficial de WhatsApp Business: los mensajes que cobra Meta van
+        aparte y a nombre de tu negocio.
       </p>
     </Seccion>
   );
@@ -255,11 +241,11 @@ const PASOS = [
   },
   {
     titulo: "Lo armamos con tus datos",
-    texto: "Con la seña del 30% arrancamos: servicios, horarios, fotos y precios. Vos lo revisás antes de publicarlo.",
+    texto: "Cargamos tus servicios, horarios, fotos y precios, y vos lo revisás antes de publicarlo. En Vidriera y Piloto arrancamos con la seña del 30% del armado.",
   },
   {
     titulo: "Queda andando",
-    texto: "Con todo terminado pagás el 70% restante, te mostramos cómo usar el panel y empezás a recibir turnos.",
+    texto: "Te mostramos cómo usar el panel y empezás a recibir turnos. Desde ahí, el mensual de tu plan (y el 70% del armado, si tiene).",
   },
 ];
 

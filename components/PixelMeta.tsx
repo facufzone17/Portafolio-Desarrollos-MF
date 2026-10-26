@@ -4,10 +4,12 @@ import Script from "next/script";
  * Pixel de Meta. Solo se monta si existe NEXT_PUBLIC_META_PIXEL_ID: sin el ID
  * no carga nada, y el sitio anda igual.
  *
- * Registra PageView al entrar. El evento Lead lo dispara el formulario al
- * enviar (`registrarLead`), que es la conversion para la que conviene optimizar
- * la campaña: el que llego hasta abrir WhatsApp con sus datos, no el que
- * solo hizo clic en el anuncio.
+ * Registra PageView al entrar. Al enviar el formulario de /turnos dispara
+ * Contact (`registrarContacto`): la persona completo sus datos y abrio
+ * WhatsApp con el mensaje armado. Antes era Lead, pero la web no puede saber
+ * si despues apreto "enviar" en WhatsApp, y contarlo como Lead inflaba las
+ * conversiones con gente que nunca escribio. Un Lead de verdad solo se puede
+ * registrar cuando el contacto queda guardado o el mensaje llega.
  */
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
@@ -28,8 +30,8 @@ fbq('init','${PIXEL_ID}');fbq('track','PageView');`}
 
 type Fbq = (accion: "track", evento: string, datos?: Record<string, unknown>) => void;
 
-/** Evento Lead del formulario. No hace nada si el pixel no esta cargado. */
-export function registrarLead(datos: Record<string, unknown>) {
+/** Evento Contact del formulario. No hace nada si el pixel no esta cargado. */
+export function registrarContacto(datos: Record<string, unknown>) {
   const fbq = (window as unknown as { fbq?: Fbq }).fbq;
-  fbq?.("track", "Lead", datos);
+  fbq?.("track", "Contact", datos);
 }

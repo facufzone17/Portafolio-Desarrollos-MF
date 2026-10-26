@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
-import { registrarLead } from "@/components/PixelMeta";
+import { registrarContacto } from "@/components/PixelMeta";
 import { EVENTO_NEGOCIO, EVENTO_PLAN, type DatosNegocio } from "@/components/turnos/IrA";
 import { planes, pesos, type IdPlan } from "@/lib/planes";
 import { whatsappUrl } from "@/lib/site";
@@ -84,7 +84,7 @@ export function Formulario({ planInicial = "no-se" }: { planInicial?: IdPlan | "
       `• Plan: ${elegido ? `${elegido.nombre} (${pesos(elegido.mensual)}/mes)` : "todavía no sé"}`,
     ];
 
-    registrarLead({ content_name: elegido?.id ?? "no-se", objetivo });
+    registrarContacto({ content_name: elegido?.id ?? "no-se", objetivo });
     window.open(whatsappUrl(lineas.join("\n")), "_blank", "noopener,noreferrer");
   };
 

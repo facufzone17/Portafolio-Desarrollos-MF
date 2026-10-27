@@ -38,9 +38,17 @@ export type Plan = {
   /** Clip vertical de la demo (public/turnos). */
   video: string;
   poster: string;
+  /** El sistema real con el negocio de ejemplo, para probarlo en vivo. Sin esto, solo el video. */
+  demo?: string;
   /** Resalta la tarjeta y lleva esta etiqueta. Uno solo: el que se vende. */
   destacado?: string;
 };
+
+/**
+ * Donde vive Trevoo Turnos. Estudio Nacar es su negocio de ejemplo: las
+ * reservas se completan pero no ocupan el horario ni mandan avisos.
+ */
+export const DEMO_TURNOS = process.env.NEXT_PUBLIC_DEMO_TURNOS ?? "https://turnos.trevoo.com.ar";
 
 export const PROFESIONALES = "Hasta 3 profesionales";
 
@@ -77,6 +85,7 @@ export const planes: Plan[] = [
     ],
     video: "/turnos/agenda.mp4",
     poster: "/turnos/agenda.webp",
+    demo: `${DEMO_TURNOS}/estudio-nacar`,
   },
   {
     id: "vidriera",
@@ -100,6 +109,7 @@ export const planes: Plan[] = [
     ],
     video: "/turnos/vidriera.mp4",
     poster: "/turnos/vidriera.webp",
+    demo: `${DEMO_TURNOS}/estudio-nacar/vidriera`,
   },
   {
     id: "piloto",

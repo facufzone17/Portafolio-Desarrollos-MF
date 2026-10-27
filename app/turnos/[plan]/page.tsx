@@ -10,6 +10,7 @@ import { TextoDeslizante } from "@/components/ui/TextoDeslizante";
 import { Formulario } from "@/components/turnos/Formulario";
 import { IrA } from "@/components/turnos/IrA";
 import { Preguntas } from "@/components/turnos/Preguntas";
+import { DemoEnVivo } from "@/components/turnos/DemoEnVivo";
 import { Telefono } from "@/components/turnos/Telefono";
 import { Destacado, Lista, Precio } from "@/components/turnos/piezas";
 import { planPorId, planes, pesos, type Plan } from "@/lib/planes";
@@ -69,23 +70,48 @@ export default async function PaginaPlan({ params }: PageProps<"/turnos/[plan]">
           <div className="mt-10 grid items-center gap-12 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 lg:gap-24">
             <div className="flex flex-col items-center">
               <div className="relative w-full max-w-[300px] rounded-[22px] bg-[linear-gradient(160deg,rgba(0,153,255,0.16),rgba(0,153,255,0)_60%)] px-6 pt-8 sm:max-w-[340px]">
-                <Telefono
-                  video={plan.video}
-                  poster={plan.poster}
-                  etiqueta={`Demo del plan ${plan.nombre}`}
-                  prioridad
-                />
+                {plan.demo ? (
+                  <DemoEnVivo
+                    url={plan.demo}
+                    video={plan.video}
+                    poster={plan.poster}
+                    etiqueta={`Demo en vivo del plan ${plan.nombre}`}
+                  />
+                ) : (
+                  <Telefono
+                    video={plan.video}
+                    poster={plan.poster}
+                    etiqueta={`Demo del plan ${plan.nombre}`}
+                    prioridad
+                  />
+                )}
               </div>
-              <p className="mt-4 text-sm text-text-muted">
-                Demo con un negocio de ejemplo ·{" "}
-                <a
-                  href="/turnos/recorrido.mp4"
-                  target="_blank"
-                  rel="noopener"
-                  className="text-text underline decoration-line-alto underline-offset-4 transition-colors hover:decoration-text"
-                >
-                  Ver el recorrido completo (1 min)
-                </a>
+              <p className="mt-4 max-w-[340px] text-center text-sm text-text-muted">
+                {plan.demo ? (
+                  <>
+                    Es el sistema real con un negocio de ejemplo: probá reservar.{" "}
+                    <a
+                      href={plan.demo}
+                      target="_blank"
+                      rel="noopener"
+                      className="text-text underline decoration-line-alto underline-offset-4 transition-colors hover:decoration-text"
+                    >
+                      Abrir en pantalla completa
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    Simulación con un negocio de ejemplo ·{" "}
+                    <a
+                      href="/turnos/recorrido.mp4"
+                      target="_blank"
+                      rel="noopener"
+                      className="text-text underline decoration-line-alto underline-offset-4 transition-colors hover:decoration-text"
+                    >
+                      Ver el recorrido completo (1 min)
+                    </a>
+                  </>
+                )}
               </p>
             </div>
 

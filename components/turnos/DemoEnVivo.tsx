@@ -19,6 +19,11 @@ import { Telefono } from "@/components/turnos/Telefono";
  *
  * EN TACTIL una web adentro de otra se ve chica y el scroll se mezcla: ahi va
  * el video con un boton que abre la demo a pantalla completa.
+ *
+ * Se usa en el hero de /turnos, en la seccion de ejemplos y en la pagina de
+ * cada plan. Con `diferida` (las que quedan mas abajo) el iframe no se pide
+ * hasta que el celular esta por entrar en pantalla: el que llega desde un
+ * anuncio no tiene que bajar dos demos para ver la primera.
  */
 
 /** Ancho y alto reales de la pantalla que se embebe (los de los clips). */
@@ -39,22 +44,49 @@ export function DemoEnVivo({
   video,
   poster,
   etiqueta,
+  diferida = false,
+  analytics = "turnos-demo-en-vivo",
 }: {
   url: string;
   video: string;
   poster: string;
   etiqueta: string;
+  /** No carga la demo hasta que se acerca a la pantalla (para las que no estan arriba de todo). */
+  diferida?: boolean;
+  /** Nombre del boton "Probá la demo en vivo" en el registro de clics. */
+  analytics?: string;
 }) {
   // Como useMovimientoReducido: en el servidor no se sabe, y se asume tactil.
   const conMouse = useSyncExternalStore(suscribir, () => window.matchMedia(CON_MOUSE).matches, () => false);
   const [estado, setEstado] = useState<"cargando" | "lista" | "fallo">("cargando");
   const [escala, setEscala] = useState(0.8);
+  const [cerca, setCerca] = useState(!diferida);
+  const envolturaRef = useRef<HTMLDivElement>(null);
   const pantallaRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Una demo diferida espera a estar por entrar en pantalla. Los 10 s de espera
+  // de abajo corren desde ahi: si no, una demo lejana se daria por caida antes
+  // de que nadie la pida.
+  useEffect(() => {
+    if (cerca) return;
+    const nodo = envolturaRef.current;
+    if (!nodo) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        setCerca(true);
+        io.disconnect();
+      },
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(nodo);
+    return () => io.disconnect();
+  }, [cerca]);
+
   // La demo avisa cuando cargo; si no avisa a tiempo, se queda el video.
   useEffect(() => {
-    if (!conMouse) return;
+    if (!conMouse || !cerca) return;
     const origen = new URL(url).origin;
     const alAvisar = (e: MessageEvent) => {
       if (e.origin === origen && e.data?.type === "trevoo-demo-lista") setEstado("lista");
@@ -65,7 +97,7 @@ export function DemoEnVivo({
       window.removeEventListener("message", alAvisar);
       clearTimeout(t);
     };
-  }, [conMouse, url]);
+  }, [conMouse, cerca, url]);
 
   // La pantalla de 390 px se achica al ancho del celular dibujado.
   useEffect(() => {
@@ -79,20 +111,22 @@ export function DemoEnVivo({
   const enVivo = conMouse && estado !== "fallo";
 
   return (
-    <div className="relative w-full">
+    <div ref={envolturaRef} className="relative w-full">
       {enVivo ? (
         <div className="aspect-[390/844] rounded-[2.6rem] border border-line-alto bg-[#0c0c0c] p-[0.55rem] shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
           <div ref={pantallaRef} data-demo-capa className="relative h-full w-full overflow-hidden rounded-[2.1rem] bg-bg-alto">
-            <iframe
-              ref={iframeRef}
-              src={url}
-              // Al cargar le pregunta a la demo si esta bien (por si aviso antes de que la escucharamos).
-              onLoad={() => iframeRef.current?.contentWindow?.postMessage({ type: "trevoo-demo-hola" }, new URL(url).origin)}
-              title={etiqueta}
-              referrerPolicy="no-referrer"
-              className="absolute top-0 left-0 origin-top-left border-0"
-              style={{ width: PANTALLA.w, height: PANTALLA.h, transform: `scale(${escala})` }}
-            />
+            {cerca && (
+              <iframe
+                ref={iframeRef}
+                src={url}
+                // Al cargar le pregunta a la demo si esta bien (por si aviso antes de que la escucharamos).
+                onLoad={() => iframeRef.current?.contentWindow?.postMessage({ type: "trevoo-demo-hola" }, new URL(url).origin)}
+                title={etiqueta}
+                referrerPolicy="no-referrer"
+                className="absolute top-0 left-0 origin-top-left border-0"
+                style={{ width: PANTALLA.w, height: PANTALLA.h, transform: `scale(${escala})` }}
+              />
+            )}
             {/* El video tapa la carga del iframe; se va cuando la demo esta lista. */}
             {estado !== "lista" && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -101,7 +135,7 @@ export function DemoEnVivo({
           </div>
         </div>
       ) : (
-        <Telefono video={video} poster={poster} etiqueta={etiqueta} prioridad />
+        <Telefono video={video} poster={poster} etiqueta={etiqueta} prioridad={!diferida} />
       )}
 
       {!conMouse && (
@@ -109,7 +143,7 @@ export function DemoEnVivo({
           href={url}
           target="_blank"
           rel="noopener"
-          data-analytics="turnos-demo-en-vivo"
+          data-analytics={analytics}
           className="absolute bottom-6 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white px-5 py-3 text-[15px] font-medium whitespace-nowrap text-[#0c0c0c] shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
         >
           Probá la demo en vivo
